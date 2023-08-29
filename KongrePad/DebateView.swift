@@ -8,15 +8,14 @@
 import SwiftUI
 import PusherSwift
 
-struct MainPageView: View{
+struct DebateView: View{
     @Environment(\.presentationMode) var pm
-    @State var goToSession = false
     @State var meeting: Meeting?
+    @State var debate: Debate?
+    @State var debateTeams: [DebateTeam]?
+    @State var selectedOption: Int = 1
     @State var virtualStands: [VirtualStand]?
-    @State var announcements: [Announcement]?
     @State var bannerName : String = ""
-    @State var pdfURL: URL = URL(string: "https://africau.edu/images/default/sample.pdf")!
-    
     
     var participant: Participant?
     var body: some View {
@@ -78,112 +77,22 @@ struct MainPageView: View{
                         .padding(.top, 23).padding(.leading, 20)
                         }
                         .shadow(radius: 6)
-                        ZStack{
-                            VStack(alignment: .center, spacing: 0){
-                                HStack(alignment: .bottom , spacing: 0){
-                                    ZStack{
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .frame(width: screen_width*0.3, height: screen_height*0.05)
-                                            .foregroundColor(Color.purple)
-                                            .padding(.bottom, -10)
-                                        Label("Duyurular", systemImage: "speaker")
-                                    }.zIndex(1)
-                                    RoundedRectangle(cornerRadius: 5)
-                                            .frame(width: screen_width*0.604, height: screen_height*0.02)
-                                            .foregroundColor(Color.purple)
-                                            .padding(.bottom, -10).padding(.leading, -3)
-                                }
-                                ZStack{
-                                Rectangle()
-                                        .frame(width: screen_width*0.9, height: screen_height*0.2)
-                                        .foregroundColor(Color.white)
-                                ScrollView(){
-                                    VStack(alignment: .leading, spacing: 20){
-                                        ForEach(self.announcements ?? []){announcement in
-                                            Text(announcement.title ?? "")
-                                        }
-                                    }.padding(3)
-                                }.frame(width: screen_width*0.9, height: screen_height*0.2, alignment: .leading)
-                                }
-                            }
-                        }.shadow(radius: 6)
-                        
-                        NavigationLink(destination: SessionView(pdfURL: self.pdfURL), isActive: $goToSession){
-                            HStack{
-                                Label("",systemImage: "play.fill").font(.system(size:50)).labelStyle(.iconOnly).padding()
-                                    .frame(width: screen_width*0.2, height: screen_height*0.2)
-                                    .foregroundColor(Color.white)
-                                    .background(Color.red)
-                                    .clipShape(Circle())
-                                    .zIndex(1)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(.white, lineWidth: 5)
-                                    )
-                                ZStack{
-                                    RoundedRectangle(cornerRadius: 50)
-                                        .frame(width: screen_width*0.65, height: screen_height*0.12)
-                                        .foregroundColor(Color.red)
-                                    Text("JOIN SESSION").foregroundColor(Color.white).padding(.leading, 60).font(.system(size: 22, weight: .heavy))
-                                }.padding(.leading, -80)
-                            }.onTapGesture {
-                                DispatchQueue.main.async {
-                                    getDocument()
-                                }
-                                self.goToSession = true
-                            }
-                        }
-                        HStack(spacing: 15){
-                            NavigationLink(destination: DenemeView())
-                            {
-                                Label("Program", systemImage: "play")
-                                    .labelStyle(.titleOnly).padding(15)
-                                    .foregroundColor(Color.purple)
-                                    .background(Color(.white))
-                                    .cornerRadius(10)
-                            }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke(.purple, lineWidth: 1)
-                            )
-                            .shadow(radius: 6)
-                            NavigationLink(destination: DenemeView())
-                            {
-                                Label("Surveys", systemImage: "play")
-                                    .labelStyle(.titleOnly).padding(15)
-                                    .foregroundColor(Color.purple)
-                                    .background(Color(.white))
-                                    .cornerRadius(10)
-                            }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke(.purple, lineWidth: 1)
-                            )
-                            .shadow(radius: 6)
-                            NavigationLink(destination: DenemeView())
-                            {
-                                Label("Score Games", systemImage: "play")
-                                    .labelStyle(.titleOnly).padding(15)
-                                    .foregroundColor(Color.purple)
-                                    .background(Color(.white))
-                                    .cornerRadius(10)
-                            }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke(.purple, lineWidth: 1)
-                            )
-                            .shadow(radius: 6)
-                        }
                         Spacer()
-                    }.padding().navigationBarBackButtonHidden(true).toolbar{
-                        Button("Logout") {
-                            let userDefault = UserDefaults.standard
-                            userDefault.set(nil, forKey: "token")
-                            userDefault.synchronize()
-                            pm.wrappedValue.dismiss()
+                        Text(self.debate?.title ?? "")
+                        ZStack{
+                        Rectangle()
+                                .frame(width: screen_width*0.9, height: screen_height*0.2)
+                                .foregroundColor(Color.white)
+                        ScrollView(){
+                            VStack(alignment: .leading, spacing: 20){
+                                ForEach(self.debateTeams ?? []){team in
+                                    HStack{
+                                        RadioButtonView(index: team.id!, text:team.title!, selectedIndex: $selectedOption)
+                                    }
+                                }
+                            }.padding(3)
+                        }.frame(width: screen_width*0.9, height: screen_height*0.2, alignment: .leading)
                         }
-                        .foregroundColor(Color.white)
-                        .font(.system(size:20, weight: .heavy))
                     }
                 }
                 
@@ -206,12 +115,28 @@ struct MainPageView: View{
             })
             
             pusher.connect()
-            getMeeting()
             getVirtualStands()
-            getAnnouncements()
+            getMeeting()
+            getDebate()
         }
     }
     
+    struct RadioButtonView: View {
+        var index: Int
+        var text: String
+        @Binding var selectedIndex: Int
+        var body: some View {
+            Button(action: {
+                selectedIndex = index
+            }) {
+                HStack {
+                    Image(systemName: selectedIndex == index ? "largecircle.fill.circle" : "circle")
+                        .foregroundColor(.black)
+                    Text(text)
+                }
+            }
+        }
+    }
     
     struct MainPageView_Previews: PreviewProvider {
         static var previews: some View {
@@ -245,6 +170,31 @@ struct MainPageView: View{
         }.resume()
     }
     
+    func getDebate(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/debate") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let debate = try JSONDecoder().decode(Debate.self, from: data)
+                DispatchQueue.main.async {
+                    self.debate = debate
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
     func getVirtualStands(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/virtual-stand") else {
             return
@@ -270,8 +220,8 @@ struct MainPageView: View{
         }.resume()
     }
     
-    func getAnnouncements(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/announcement") else {
+    func getDebateTeams(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/debate//team") else {
             return
         }
         
@@ -285,39 +235,13 @@ struct MainPageView: View{
             }
             
             do{
-                let announcements = try JSONDecoder().decode([Announcement].self, from: data)
+                let teams = try JSONDecoder().decode([DebateTeam].self, from: data)
                 DispatchQueue.main.async {
-                    self.announcements = announcements
+                    self.debateTeams = teams
                 }
             } catch {
                 print(error)
             }
         }.resume()
     }
-    
-    func getDocument(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/document") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let document = try JSONDecoder().decode(DocumentJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.pdfURL = URL(string: "https://app.kongrepad.com/storage/documents/\(String(describing: document.data!.file_name!)).\(String(describing: document.data!.file_extension!))")!
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-
 }
