@@ -15,3 +15,9 @@ class Meeting : Codable {
     var finish_at: String?
 }
 
+class MeetingJSON : Codable, Identifiable{
+    
+    var data: Meeting?
+    var errors: [String]?
+    var status: Bool?
+}

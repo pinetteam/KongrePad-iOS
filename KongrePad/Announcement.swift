@@ -12,3 +12,10 @@ class Announcement : Codable, Identifiable{
     var title: String?
     var status: Int?
 }
+
+class AnnouncementsJSON : Codable, Identifiable{
+    
+    var data: [Announcement]?
+    var errors: [String]?
+    var status: Bool?
+}

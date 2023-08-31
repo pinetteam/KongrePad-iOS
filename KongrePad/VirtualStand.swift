@@ -14,3 +14,10 @@ class VirtualStand : Codable, Identifiable{
     var title: String?
     var status: Int?
 }
+
+class VirtualStandsJSON : Codable, Identifiable{
+    
+    var data: [VirtualStand]?
+    var errors: [String]?
+    var status: Bool?
+}

@@ -12,6 +12,7 @@ class Participant : Codable {
     var title: String?
     var first_name: String?
     var last_name: String?
+    var full_name: String?
     var identification_number: String?
     var organisation: String?
     var email: String?
@@ -27,4 +28,13 @@ class Participant : Codable {
     var gdpr_consent: Int?
     var status: Int?
 }
+
+class ParticipantJSON : Codable, Identifiable{
+    
+    var data: Participant?
+    var errors: [String]?
+    var status: Bool?
+}
+
+
 

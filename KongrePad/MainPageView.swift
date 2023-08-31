@@ -12,182 +12,165 @@ struct MainPageView: View{
     @Environment(\.presentationMode) var pm
     @State var goToSession = false
     @State var meeting: Meeting?
+    @State var participant: Participant?
     @State var virtualStands: [VirtualStand]?
     @State var announcements: [Announcement]?
     @State var bannerName : String = ""
     @State var pdfURL: URL = URL(string: "https://africau.edu/images/default/sample.pdf")!
-    
-    
-    var participant: Participant?
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                ZStack{
-                    Image("giris")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .edgesIgnoringSafeArea(.all)
-                    VStack(alignment: .center){
+                VStack(alignment: .center, spacing: 0){
                         AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/meeting-banners/\(self.bannerName)")){ image in
                             image
                                 .resizable()
-                                .frame(width: screen_width*0.9, height:screen_height*0.2)
+                                .frame(width: screen_width, height:screen_height*0.15)
+                            
                         } placeholder: {
                             ProgressView()
                         }
-                        ZStack{
-                            VStack(alignment: .center, spacing: 0){
-                                HStack(alignment: .bottom, spacing: 0){
-                                    ZStack{
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .frame(width: screen_width*0.25, height: screen_height*0.05)
-                                            .foregroundColor(Color.purple)
-                                            .padding(.bottom, -10)
-                                        Text("Sponsorlar")
-                                            .foregroundColor(Color.black)
-                                    }.zIndex(1)
-                                    RoundedRectangle(cornerRadius: 5)
-                                            .frame(width: screen_width*0.655, height: screen_height*0.02)
-                                            .foregroundColor(Color.purple).padding(.bottom, -10)
-                                            .padding(.leading, -3)
-                                }
-                            Rectangle()
-                                .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                .foregroundColor(Color.white)
+                    ZStack(alignment: .top){
+                        Ellipse()
+                            .fill(.blue)
+                            .frame(width: screen_width*1.5, height: screen_height*0.2)
+                            .offset(y: -screen_height*0.1)
+                            .clipped()
+                            .offset(y: screen_height*0.05)
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .shadow(radius: 6)
+                        VStack{
+                            Text("\(participant?.full_name ?? "")")
+                                .foregroundColor(.white)
+                                .font(.system(size: 25)).bold()
+                            Text("Hoş Geldiniz")
+                                .foregroundColor(.white)
+                                .font(.system(size: 25))
                         }
-                        ScrollView(.horizontal){
-                            HStack(spacing: 10){
-                                ForEach(self.virtualStands ?? []){stand in
-                                    HStack{
-                                        AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")){ image in
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 100, height:50)
-                                        } placeholder: {
-                                            ProgressView()
+                    }
+                    Spacer()
+                            VStack(alignment: .center, spacing: 1){
+                                    ZStack(alignment: .bottom){
+                                        Text("Sanal Stant Alanı")
+                                            .padding(5)
+                                            .foregroundColor(Color.blue).bold()
+                                            .background(Color.white).cornerRadius(5)
+                                        Rectangle()
+                                                .frame(width: screen_width*0.9, height: screen_height*0.002)
+                                                .foregroundColor(Color.white).zIndex(-1)
+                                    }
+                                ScrollView(.horizontal){
+                                    HStack(spacing: 10){
+                                        ForEach(self.virtualStands ?? []){stand in
+                                            HStack{
+                                                AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")){ image in
+                                                    image
+                                                        .resizable()
+                                                        .aspectRatio(contentMode: .fit)
+                                                        .frame(width: 100, height:50)
+                                                } placeholder: {
+                                                    ProgressView()
+                                                }
+                                                    
+                                                    .scaledToFill()
+                                            }.frame(width: 100, height: 50)
                                         }
-                                            
-                                            .scaledToFill()
-                                    }.frame(width: 100, height: 50)
-                                }
-                            }
-                        }.frame(width: screen_width*0.85, height: screen_height*0.1)
-                        .padding(.top, 23).padding(.leading, 20)
+                                    }
+                                }.frame(width: screen_width*0.85, height: screen_height*0.1)
+                                
+                            Rectangle()
+                                    .frame(width: screen_width*0.9, height: screen_height*0.002)
+                                    .foregroundColor(Color.white)
                         }
                         .shadow(radius: 6)
-                        ZStack{
-                            VStack(alignment: .center, spacing: 0){
-                                HStack(alignment: .bottom , spacing: 0){
-                                    ZStack{
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .frame(width: screen_width*0.3, height: screen_height*0.05)
-                                            .foregroundColor(Color.purple)
-                                            .padding(.bottom, -10)
-                                        Label("Duyurular", systemImage: "speaker")
-                                    }.zIndex(1)
-                                    RoundedRectangle(cornerRadius: 5)
-                                            .frame(width: screen_width*0.604, height: screen_height*0.02)
-                                            .foregroundColor(Color.purple)
-                                            .padding(.bottom, -10).padding(.leading, -3)
-                                }
-                                ZStack{
-                                Rectangle()
-                                        .frame(width: screen_width*0.9, height: screen_height*0.2)
-                                        .foregroundColor(Color.white)
-                                ScrollView(){
-                                    VStack(alignment: .leading, spacing: 20){
-                                        ForEach(self.announcements ?? []){announcement in
-                                            Text(announcement.title ?? "")
-                                        }
-                                    }.padding(3)
-                                }.frame(width: screen_width*0.9, height: screen_height*0.2, alignment: .leading)
-                                }
-                            }
-                        }.shadow(radius: 6)
-                        
-                        NavigationLink(destination: SessionView(pdfURL: self.pdfURL), isActive: $goToSession){
-                            HStack{
-                                Label("",systemImage: "play.fill").font(.system(size:50)).labelStyle(.iconOnly).padding()
-                                    .frame(width: screen_width*0.2, height: screen_height*0.2)
-                                    .foregroundColor(Color.white)
-                                    .background(Color.red)
-                                    .clipShape(Circle())
-                                    .zIndex(1)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(.white, lineWidth: 5)
-                                    )
-                                ZStack{
-                                    RoundedRectangle(cornerRadius: 50)
-                                        .frame(width: screen_width*0.65, height: screen_height*0.12)
-                                        .foregroundColor(Color.red)
-                                    Text("JOIN SESSION").foregroundColor(Color.white).padding(.leading, 60).font(.system(size: 22, weight: .heavy))
-                                }.padding(.leading, -80)
+                    Spacer()
+                    VStack(alignment: .center, spacing: 15){
+                        HStack(spacing: 15){
+                            NavigationLink(destination: SessionView(pdfURL: self.pdfURL), isActive: $goToSession)
+                            {
+                                VStack(alignment: .center){
+                                    Label("", systemImage: "play").font(.system(size: 40)).foregroundColor(.white)
+                                    Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: 160, height: 120).background(AppColors.buttonPurple).cornerRadius(10)
                             }.onTapGesture {
                                 DispatchQueue.main.async {
                                     getDocument()
                                 }
                                 self.goToSession = true
                             }
+                            NavigationLink(destination: DenemeView())
+                            {
+                                VStack(alignment: .center){
+                                    Label("", systemImage: "questionmark").font(.system(size: 40)).foregroundColor(.white)
+                                    Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: 160, height: 120).background(AppColors.buttonPink).cornerRadius(10)
+                            }
                         }
                         HStack(spacing: 15){
                             NavigationLink(destination: DenemeView())
                             {
-                                Label("Program", systemImage: "play")
-                                    .labelStyle(.titleOnly).padding(15)
-                                    .foregroundColor(Color.purple)
-                                    .background(Color(.white))
-                                    .cornerRadius(10)
+                                VStack(alignment: .center){
+                                    Label("", systemImage: "doc.text").font(.system(size: 40)).foregroundColor(.white)
+                                    Text("Bilimsel Program").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: 160, height: 120).background(AppColors.buttonYellow).cornerRadius(10)
                             }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke(.purple, lineWidth: 1)
-                            )
-                            .shadow(radius: 6)
                             NavigationLink(destination: DenemeView())
                             {
-                                Label("Surveys", systemImage: "play")
-                                    .labelStyle(.titleOnly).padding(15)
-                                    .foregroundColor(Color.purple)
-                                    .background(Color(.white))
-                                    .cornerRadius(10)
+                                VStack(alignment: .center){
+                                    Label("", systemImage: "envelope.badge").font(.system(size: 40)).foregroundColor(.white)
+                                    Text("Mail Gönder").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: 160, height: 120).background(AppColors.buttonLightBlue).cornerRadius(10)
                             }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke(.purple, lineWidth: 1)
-                            )
-                            .shadow(radius: 6)
-                            NavigationLink(destination: DenemeView())
-                            {
-                                Label("Score Games", systemImage: "play")
-                                    .labelStyle(.titleOnly).padding(15)
-                                    .foregroundColor(Color.purple)
-                                    .background(Color(.white))
-                                    .cornerRadius(10)
-                            }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke(.purple, lineWidth: 1)
-                            )
-                            .shadow(radius: 6)
                         }
+
+                        HStack(spacing: 15){
+                            NavigationLink(destination: DenemeView())
+                            {
+                                VStack(alignment: .center){
+                                    Label("", systemImage: "text.badge.checkmark").font(.system(size: 40)).foregroundColor(.white)
+                                    Text("Anketler").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: 160, height: 120).background(AppColors.buttonDarkBlue).cornerRadius(10)
+                            }
+                            NavigationLink(destination: DenemeView())
+                            {
+                                VStack(alignment: .center){
+                                    Label("", systemImage: "leaf.arrow.circlepath").font(.system(size: 40)).foregroundColor(.white)
+                                    Text("Doğaya Can Ver").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: 160, height: 120).background(AppColors.buttonGreen).cornerRadius(10)
+                            }
+                        }
+                    }
                         Spacer()
-                    }.padding().navigationBarBackButtonHidden(true).toolbar{
-                        Button("Logout") {
+                    HStack(alignment: .center){
+                        Button(action:{
                             let userDefault = UserDefaults.standard
                             userDefault.set(nil, forKey: "token")
                             userDefault.synchronize()
                             pm.wrappedValue.dismiss()
+                        }){
+                            Label("", systemImage: "rectangle.portrait.and.arrow.right")
+                                .labelStyle(.iconOnly)
+                                .font(.system(size: 20)).bold()
+                                .foregroundColor(Color.white).padding()
                         }
-                        .foregroundColor(Color.white)
-                        .font(.system(size:20, weight: .heavy))
+                        .background(
+                            Circle().foregroundColor(Color.red)
+                        ).padding()
+                        Spacer()
+                    
+                        Button(action:{
+                        }){
+                            Label("", systemImage: "person.fill")
+                                .labelStyle(.iconOnly)
+                                .font(.system(size: 25)).bold()
+                                .foregroundColor(Color.white).padding()
+                        }
                     }
+                }.navigationBarBackButtonHidden(true)
                 }
-                
-            }
+            .background(AppColors.bgBlue)
+
             
         }
         .onAppear{
@@ -207,6 +190,7 @@ struct MainPageView: View{
             
             pusher.connect()
             getMeeting()
+            getParticipant()
             getVirtualStands()
             getAnnouncements()
         }
@@ -234,11 +218,36 @@ struct MainPageView: View{
             }
             
             do{
-                let meeting = try JSONDecoder().decode(Meeting.self, from: data)
+                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
                 DispatchQueue.main.async {
-                    self.meeting = meeting
+                    self.meeting = meeting.data
                 }
-                self.bannerName = "\(String(describing: meeting.banner_name!)).\(String(describing: meeting.banner_extension!))"
+                self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
+    func getParticipant(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/participant") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let participant = try JSONDecoder().decode(ParticipantJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.participant = participant.data
+                }
             } catch {
                 print(error)
             }
@@ -260,9 +269,9 @@ struct MainPageView: View{
             }
             
             do{
-                let stands = try JSONDecoder().decode([VirtualStand].self, from: data)
+                let stands = try JSONDecoder().decode(VirtualStandsJSON.self, from: data)
                 DispatchQueue.main.async {
-                    self.virtualStands = stands
+                    self.virtualStands = stands.data
                 }
             } catch {
                 print(error)
@@ -285,9 +294,9 @@ struct MainPageView: View{
             }
             
             do{
-                let announcements = try JSONDecoder().decode([Announcement].self, from: data)
+                let announcements = try JSONDecoder().decode(AnnouncementsJSON.self, from: data)
                 DispatchQueue.main.async {
-                    self.announcements = announcements
+                    self.announcements = announcements.data
                 }
             } catch {
                 print(error)

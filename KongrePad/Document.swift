@@ -20,4 +20,5 @@ class DocumentJSON : Codable, Identifiable{
     
     var data: Document?
     var errors: [String]?
+    var status: Bool?
 }
