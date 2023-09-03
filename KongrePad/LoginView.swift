@@ -63,17 +63,28 @@ struct LoginView: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 ZStack{
-                    Image("giris").resizable().aspectRatio(contentMode: .fill).edgesIgnoringSafeArea(.all)
+                    Circle()
+                        .frame(width: screen_width*2, height: screen_height*2)
+                        .foregroundColor(Color.white)
+                        .offset(y: -screen_height*0.3)
+                        .frame(width: screen_width, height: screen_height*0.1)
+                        .shadow(radius: 6)
+                    Circle()
+                        .frame(width: screen_width*2, height: screen_height*2)
+                        .foregroundColor(AppColors.bgBlue)
+                        .offset(y: -screen_height*0.8)
+                        .frame(width: screen_width, height: screen_height*0.1)
+                        .shadow(radius: 6)
                     VStack(alignment: .center){
-                        Image(uiImage: UIImage(named: "logo")!).padding(70)
+                        Image(uiImage: UIImage(named: "logo")!).padding(100)
                             .background(Color.white)
                             .clipShape(Circle())
                             .shadow(radius: 5)
-                        Spacer().frame(height: 30)
+                        Spacer().frame(height: screen_height*0.1)
                         Button(action: {
                             self.isPresentingScanner = true
                         }){
-                            Label("Log in", systemImage: "play")
+                            Label("Giriş Yap", systemImage: "play")
                                 .labelStyle(.titleAndIcon)
                                 .font(.system(size: 40, weight: .bold))
                                 .frame(width: screen_width*0.5, height: 100)
@@ -83,18 +94,20 @@ struct LoginView: View {
                             self.scannerSheet
                         }
                         Text(self.scanError).foregroundColor(Color.red).font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
-                        Text("Giriş butonuna bastıktan sonra kameraya yaka kartıınızda bulunan Qr Kod'u okutunuz.").font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
+                        Text("Giriş yap butonuna bastıktan sonra kameraya yaka kartıınızda bulunan Qr Kod'u okutunuz.").font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
                         
                     }.padding()
-                }.frame(width: screen_width, height: screen_height)}
+                }.frame(width: screen_width, height: screen_height)
+                    .background(AppColors.bgBlue)
+            }
             .navigationDestination(isPresented: $goToMainPage){
                 MainPageView()
                 }
-        }.onAppear{
+        }
+        .navigationBarBackButtonHidden(true)
+        .onAppear{
             
             let userDefault = UserDefaults.standard
-            userDefault.set("2|laravel_sanctum_pr7FcD1tnIn2StI9VzVEcXtmAVbbCo6XmvTKG6nGcad406ae", forKey: "token")
-            userDefault.synchronize()
                 if(UserDefaults.standard.string(forKey: "token") != nil)
                 {
                     self.goToMainPage = true

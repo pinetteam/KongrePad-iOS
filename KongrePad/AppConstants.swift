@@ -8,4 +8,6 @@ struct AppColors{
     static let buttonGreen = Color("buttonGreen")
     static let buttonPink = Color("buttonPink")
     static let buttonPurple = Color("buttonPurple")
+    static let programDateYellow = Color("programDateYellow")
+    static let programTitleBlue = Color("programTitleBlue")
 }

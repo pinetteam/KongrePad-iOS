@@ -8,6 +8,7 @@
 class Debate : Codable, Identifiable{
     
     var id: Int?
+    var sort_order: Int?
     var program_id: Int?
     var code: String?
     var title: String?

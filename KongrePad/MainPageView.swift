@@ -8,9 +8,15 @@
 import SwiftUI
 import PusherSwift
 
+
 struct MainPageView: View{
     @Environment(\.presentationMode) var pm
+    @State var isHallsForDocumentPresented = false
+    @State var isHallsForProgramPresented = false
+    @State var hallId: Int = 0
+    @State var logOut = false
     @State var goToSession = false
+    @State var goToPrograms = false
     @State var meeting: Meeting?
     @State var participant: Participant?
     @State var virtualStands: [VirtualStand]?
@@ -29,7 +35,7 @@ struct MainPageView: View{
                                 .frame(width: screen_width, height:screen_height*0.15)
                             
                         } placeholder: {
-                            ProgressView()
+                            Rectangle().frame(width: screen_width, height:screen_height*0.15)
                         }
                     ZStack(alignment: .top){
                         Ellipse()
@@ -41,6 +47,7 @@ struct MainPageView: View{
                             .frame(width: screen_width, height: screen_height*0.1)
                             .shadow(radius: 6)
                         VStack{
+                            Spacer().frame(height: 10)
                             Text("\(participant?.full_name ?? "")")
                                 .foregroundColor(.white)
                                 .font(.system(size: 25)).bold()
@@ -54,7 +61,7 @@ struct MainPageView: View{
                                     ZStack(alignment: .bottom){
                                         Text("Sanal Stant Alanı")
                                             .padding(5)
-                                            .foregroundColor(Color.blue).bold()
+                                            .foregroundColor(Color.blue).font(.system(size:20, weight: .heavy))
                                             .background(Color.white).cornerRadius(5)
                                         Rectangle()
                                                 .frame(width: screen_width*0.9, height: screen_height*0.002)
@@ -74,10 +81,10 @@ struct MainPageView: View{
                                                 }
                                                     
                                                     .scaledToFill()
-                                            }.frame(width: 100, height: 50)
+                                            }
                                         }
                                     }
-                                }.frame(width: screen_width*0.85, height: screen_height*0.1)
+                                }.frame(width: screen_width*0.85, height: screen_height*0.06)
                                 
                             Rectangle()
                                     .frame(width: screen_width*0.9, height: screen_height*0.002)
@@ -85,87 +92,88 @@ struct MainPageView: View{
                         }
                         .shadow(radius: 6)
                     Spacer()
-                    VStack(alignment: .center, spacing: 15){
-                        HStack(spacing: 15){
-                            NavigationLink(destination: SessionView(pdfURL: self.pdfURL), isActive: $goToSession)
-                            {
-                                VStack(alignment: .center){
-                                    Label("", systemImage: "play").font(.system(size: 40)).foregroundColor(.white)
-                                    Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: 160, height: 120).background(AppColors.buttonPurple).cornerRadius(10)
-                            }.onTapGesture {
-                                DispatchQueue.main.async {
-                                    getDocument()
-                                }
-                                self.goToSession = true
-                            }
-                            NavigationLink(destination: DenemeView())
-                            {
-                                VStack(alignment: .center){
-                                    Label("", systemImage: "questionmark").font(.system(size: 40)).foregroundColor(.white)
-                                    Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: 160, height: 120).background(AppColors.buttonPink).cornerRadius(10)
-                            }
-                        }
-                        HStack(spacing: 15){
-                            NavigationLink(destination: DenemeView())
-                            {
+                    VStack(alignment: .center, spacing: 15){                        VStack(alignment: .center){
+                            Label("", systemImage: "play").font(.system(size: 40)).foregroundColor(.white)
+                            Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
+                        }.frame(width: screen_width*0.76, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
+                            .onTapGesture {
+                                self.isHallsForDocumentPresented = true
+                            }.sheet(isPresented: $isHallsForDocumentPresented){
+                                HallsForDocument(goToSession: $goToSession, pdfURL: $pdfURL, hallId: $hallId)
+                            }.background(
+                                NavigationLink(destination: SessionView(pdfURL: pdfURL, hallId: hallId), isActive: $goToSession){
+                                EmptyView()
+                            })
+                        HStack(spacing: 10){
                                 VStack(alignment: .center){
                                     Label("", systemImage: "doc.text").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Bilimsel Program").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: 160, height: 120).background(AppColors.buttonYellow).cornerRadius(10)
-                            }
-                            NavigationLink(destination: DenemeView())
+                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonYellow).cornerRadius(10)
+                                .onTapGesture {
+                                    self.isHallsForProgramPresented = true
+                                }.sheet(isPresented: $isHallsForProgramPresented){
+                                    HallsForProgram(goToProgram: $goToPrograms, hallId: $hallId)
+                                }.background(
+                                    NavigationLink(destination: ProgramsView(hallId: hallId), isActive: $goToPrograms){
+                                    EmptyView()
+                                })
+                            NavigationLink(destination: SendMailView())
                             {
                                 VStack(alignment: .center){
                                     Label("", systemImage: "envelope.badge").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Mail Gönder").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: 160, height: 120).background(AppColors.buttonLightBlue).cornerRadius(10)
+                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonLightBlue).cornerRadius(10)
                             }
                         }
 
                         HStack(spacing: 15){
-                            NavigationLink(destination: DenemeView())
+                            NavigationLink(destination: SurveysView())
                             {
                                 VStack(alignment: .center){
                                     Label("", systemImage: "text.badge.checkmark").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Anketler").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: 160, height: 120).background(AppColors.buttonDarkBlue).cornerRadius(10)
+                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonDarkBlue).cornerRadius(10)
                             }
-                            NavigationLink(destination: DenemeView())
+                            NavigationLink(destination: ScoreGameView())
                             {
                                 VStack(alignment: .center){
                                     Label("", systemImage: "leaf.arrow.circlepath").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Doğaya Can Ver").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: 160, height: 120).background(AppColors.buttonGreen).cornerRadius(10)
+                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
                             }
                         }
                     }
                         Spacer()
                     HStack(alignment: .center){
-                        Button(action:{
-                            let userDefault = UserDefaults.standard
-                            userDefault.set(nil, forKey: "token")
-                            userDefault.synchronize()
-                            pm.wrappedValue.dismiss()
-                        }){
-                            Label("", systemImage: "rectangle.portrait.and.arrow.right")
+                        
+                        NavigationLink(destination: AnnouncementsView()){
+                            Label("", systemImage: "bell.fill")
                                 .labelStyle(.iconOnly)
-                                .font(.system(size: 20)).bold()
+                                .font(.system(size: 25, weight: .heavy))
                                 .foregroundColor(Color.white).padding()
                         }
-                        .background(
-                            Circle().foregroundColor(Color.red)
-                        ).padding()
                         Spacer()
-                    
-                        Button(action:{
-                        }){
+                        NavigationLink(destination: ProfileView()){
                             Label("", systemImage: "person.fill")
                                 .labelStyle(.iconOnly)
-                                .font(.system(size: 25)).bold()
+                                .font(.system(size: 25, weight: .heavy))
                                 .foregroundColor(Color.white).padding()
                         }
+                        Spacer()
+                        NavigationLink(destination: LoginView(), isActive: $logOut){
+                            Label("", systemImage: "rectangle.portrait.and.arrow.right")
+                                .labelStyle(.iconOnly)
+                                .font(.system(size: 20, weight: .heavy))
+                                .foregroundColor(Color.white).padding()
+                        .background(
+                            Circle().foregroundColor(Color.red)
+                        ).padding().onTapGesture {
+                                let userDefault = UserDefaults.standard
+                                userDefault.set(nil, forKey: "token")
+                                userDefault.synchronize()
+                            self.logOut = true
+                        }
+                    }
                     }
                 }.navigationBarBackButtonHidden(true)
                 }
@@ -174,21 +182,6 @@ struct MainPageView: View{
             
         }
         .onAppear{
-            let options = PusherClientOptions(
-              host: .cluster("eu"),
-              useTLS: true
-            )
-            let pusher = Pusher(key: "1cf2459678ef9563476b", options: options)
-            
-            let channel = pusher.subscribe("screen-channel")
-            
-            let _ = channel.bind(eventName: "my-event", eventCallback: { (event: PusherEvent) -> Void in
-                if let data: String = event.data {
-                    print("aa")
-                }
-            })
-            
-            pusher.connect()
             getMeeting()
             getParticipant()
             getVirtualStands()
@@ -304,8 +297,106 @@ struct MainPageView: View{
         }.resume()
     }
     
-    func getDocument(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/document") else {
+    
+
+}
+
+struct HallsForDocument: View {
+    @State var halls: [Hall]?
+    @Binding var goToSession: Bool
+    @Binding var pdfURL: URL
+    @Binding var hallId: Int
+    @Environment (\.dismiss) var dismiss
+    var body: some View{
+        NavigationStack{
+            GeometryReader{ geometry in
+                let screen_width = geometry.size.width
+                let screen_height = geometry.size.height
+                VStack(alignment: .leading){
+                    ZStack(alignment: .topLeading){
+                        Text("Lütfen sunumu görüntülemek istediğiniz salonu seçiniz")
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width, height: screen_height*0.1).padding()
+                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
+                        
+                        Button(action: {
+                            dismiss()
+                        }){
+                            Label("Geri", systemImage: "chevron.left")
+                                .labelStyle(.titleAndIcon)
+                                .font(.system(size: 20))
+                                .foregroundColor(Color.blue)
+                        }.padding(5)
+                    }
+                    HStack{
+                        Label("", systemImage: "chevron.left")
+                            .labelStyle(.iconOnly)
+                            .font(.system(size: 20, weight: .heavy))
+                            .foregroundColor(AppColors.bgBlue).padding()
+                        Spacer()
+                        ScrollView(.horizontal){
+                            HStack{
+                                ForEach(self.halls ?? []){hall in
+                                        VStack(alignment: .center){
+                                            ZStack(alignment: .bottom){
+                                                Text(hall.title!).foregroundColor(Color.white)
+                                                    .frame(width: screen_width*0.5, height: screen_width*0.5)
+                                                    .background(AppColors.bgBlue)
+                                                    .clipShape(Circle())
+                                                Text("Kişi Sayısı")
+                                                    .foregroundColor(Color.white)
+                                                    .frame(width: screen_width*0.5, height: screen_height*0.05)
+                                                    .background(AppColors.buttonGreen)
+                                            }
+                                        }.frame(width: screen_width*0.5)
+                                            .onTapGesture {
+                                                self.hallId = hall.id!
+                                                getDocument(HallId: hall.id!)
+                                                self.goToSession = true
+                                                dismiss()
+                                        }
+                                    }
+                                }
+                        }.onAppear{
+                            getHalls()
+                        }.frame(width: screen_width*0.5)
+                        Spacer()
+                        Label("", systemImage: "chevron.right")
+                            .labelStyle(.iconOnly)
+                            .font(.system(size: 20, weight: .heavy))
+                            .foregroundColor(AppColors.bgBlue).padding()
+                    }
+                }
+            }
+        }
+    }
+    func getHalls(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let halls = try JSONDecoder().decode(HallsJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.halls = halls.data
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
+    func getDocument(HallId: Int){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-document") else {
             return
         }
         
@@ -328,5 +419,98 @@ struct MainPageView: View{
             }
         }.resume()
     }
+}
+struct HallsForProgram: View {
+    @State var halls: [Hall]?
+    @Binding var goToProgram: Bool
+    @Binding var hallId: Int
+    @Environment (\.dismiss) var dismiss
+    var body: some View{
+        NavigationStack{
+            GeometryReader{ geometry in
+                let screen_width = geometry.size.width
+                let screen_height = geometry.size.height
+                VStack(alignment: .leading){
+                    ZStack(alignment: .topLeading){
+                        Text("Lütfen bilimsel programı görüntülemek istediğiniz salonu seçiniz")
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width, height: screen_height*0.1).padding()
+                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
+                        
+                        Button(action: {
+                            dismiss()
+                        }){
+                            Label("Geri", systemImage: "chevron.left")
+                                .labelStyle(.titleAndIcon)
+                                .font(.system(size: 20))
+                                .foregroundColor(Color.blue)
+                        }.padding(5)
+                    }
+                    HStack{
+                        Label("", systemImage: "chevron.left")
+                            .labelStyle(.iconOnly)
+                            .font(.system(size: 20, weight: .heavy))
+                            .foregroundColor(AppColors.bgBlue).padding()
+                        Spacer()
+                        ScrollView(.horizontal){
+                            HStack{
+                                ForEach(self.halls ?? []){hall in
+                                        VStack(alignment: .center){
+                                            ZStack(alignment: .bottom){
+                                                Text(hall.title!).foregroundColor(Color.white)
+                                                    .frame(width: screen_width*0.5, height: screen_width*0.5)
+                                                    .background(AppColors.bgBlue)
+                                                    .clipShape(Circle())
+                                                Text("Kişi Sayısı")
+                                                    .foregroundColor(Color.white)
+                                                    .frame(width: screen_width*0.5, height: screen_height*0.05)
+                                                    .background(AppColors.buttonGreen)
+                                            }
+                                        }.frame(width: screen_width*0.5)
+                                            .onTapGesture {
+                                                self.hallId = hall.id!
+                                                self.goToProgram = true
+                                                dismiss()
+                                        }
+                                    }
+                                }
+                        }.onAppear{
+                            getHalls()
+                        }.frame(width: screen_width*0.5)
+                        Spacer()
+                        Label("", systemImage: "chevron.right")
+                            .labelStyle(.iconOnly)
+                            .font(.system(size: 20, weight: .heavy))
+                            .foregroundColor(AppColors.bgBlue).padding()
+                    }
+                }
+            }
+        }
+    }
+    func getHalls(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let halls = try JSONDecoder().decode(HallsJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.halls = halls.data
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
 
 }
+

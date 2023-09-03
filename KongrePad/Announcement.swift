@@ -10,6 +10,7 @@ class Announcement : Codable, Identifiable{
     var id: Int?
     var meeting_id: Int?
     var title: String?
+    var created_at: String?
     var status: Int?
 }
 
