@@ -19,54 +19,44 @@ struct AnnouncementsView: View{
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
                     ZStack(alignment: .topLeading){
-                        Text("Duyurular")
+                        Text("Bildirimler")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                                .padding(5)
-                                .onTapGesture {
-                                    pm.wrappedValue.dismiss()
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                            Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }
+                    }.frame(width: screen_width)
+                    Spacer().frame(height: 10)
+                    VStack(alignment: .leading){
+                        ScrollView(.vertical){
+                            VStack(spacing: 10){
+                                ForEach(self.announcements ?? []){announcement in
+                                    Text(announcement.title!)
+                                        .font(.system(size: 20))
+                                        .frame(width: screen_width*0.80)
+                                        .cornerRadius(5)
+                                        .multilineTextAlignment(.leading)
+                                    Divider()
                                 }
+                            }
+                        }.frame(width: screen_width, height: screen_height*0.8)
+                            .background(Color.white)
                     }
-                    Spacer().frame(height: 5)
-                    VStack(alignment: .center){
-                        Text("Duyurular")
-                            .foregroundColor(Color.white)
-                            .bold()
-                            .frame(width: screen_width*0.85)
-                            .background(AppColors.buttonYellow)
-                            .cornerRadius(5)
-                            ScrollView(.vertical){
-                                VStack(spacing: 10){
-                                    ForEach(self.announcements ?? []){announcement in
-                                        HStack{
-                                            Text(announcement.created_at!)
-                                                .foregroundColor(Color.black)
-                                                .bold()
-                                                .frame(maxHeight: .infinity)
-                                                .frame(width: screen_width*0.20)
-                                                .background(AppColors.programDateYellow)
-                                                    .cornerRadius(5)
-                                            VStack(alignment: .leading){
-                                                Text(announcement.title!)
-                                                    .font(.system(size: 20))
-                                            }
-                                            .frame(width: screen_width*0.65)
-                                            .background(AppColors.programTitleBlue)
-                                            .cornerRadius(5)
-                                        }
-                                        
-                                    }
-                                }
-                            }.frame(width: screen_width*0.85, height: screen_height*0.7)
-                        }
+                    Spacer()
+                    Rectangle()
+                        .frame(width: screen_width, height: screen_height*0.1)
+                        .foregroundColor(AppColors.bgBlue)
+                }.background(AppColors.bgBlue)
                 }.navigationBarBackButtonHidden(true)
-                }
-            .background(AppColors.bgBlue)
         }
         .onAppear{
             getMeeting()

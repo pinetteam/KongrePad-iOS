@@ -7,8 +7,8 @@
 
 struct SurveyOption : Codable, Identifiable, Hashable{
     
-    var sort_order: Int?
     var id: Int?
+    var sort_order: Int?
     var survey_id: Int?
     var question_id: Int?
     var option: String?

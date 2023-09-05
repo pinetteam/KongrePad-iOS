@@ -11,7 +11,7 @@ import PusherSwift
 struct ProgramsView: View{
     @Environment(\.presentationMode) var pm
     @State var meeting: Meeting?
-    @State var hallId: Int
+    @Binding var hallId: Int
     @State var participant: Participant?
     @State var virtualStands: [VirtualStand]?
     @State var programs: [Program]?

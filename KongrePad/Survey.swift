@@ -5,7 +5,7 @@
 //  Created by Mert Demirbağ on 2.09.2023.
 //
 
-class Survey : Codable, Identifiable{
+struct Survey : Codable, Identifiable, Hashable{
     
     var sort_order: Int?
     var id: Int?

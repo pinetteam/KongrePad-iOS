@@ -29,6 +29,7 @@ struct ScoreGameView: View {
                 
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
                 
                 let body: [String: AnyHashable] = [
                     "code" : code.string,
@@ -39,17 +40,14 @@ struct ScoreGameView: View {
                     guard let data = data, error == nil else {
                         return
                     }
-                    
                     do{
-                        let response = try JSONSerialization.jsonObject(with: data,options: .allowFragments) as! [String: Any]
-                        let userDefault = UserDefaults.standard
-                        guard let token = response["token"]  else {
-                            self.scanError = "Wrong Qr Code"
+                        let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
+                        if (response.status != true){
+                            self.scanError = response.errors![0]
                             return
                         }
-                        userDefault.set(token, forKey: "token")
-                        userDefault.synchronize()
                         self.scanError = "qr Kod başarıyla okutuldu"
+                        getPoints()
                     } catch {
                         print(error)
                     }
@@ -65,23 +63,47 @@ struct ScoreGameView: View {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                VStack{
+                VStack(alignment: .center){
                     ZStack(alignment: .topLeading){
-                        Text("Score Oyunu")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                                .padding(5)
-                                .onTapGesture {
-                                    pm.wrappedValue.dismiss()
-                                }
+                        Rectangle()
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .foregroundColor(AppColors.bgBlue)
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }
                     }
-                    Text("\(total_point ?? 0) Puan").background(Color.blue)
+                    Button(action: {
+                        self.isPresentingScanner = true
+                    }){
+                        Text("Qr Kodu Okut\nDoğaya Can Ver")
+                            .font(.system(size: 20)).padding()
+                            .frame(width: screen_width*0.5, height: screen_height*0.15)
+                            .foregroundColor(Color.white)
+                            .background(Color.green).cornerRadius(30)
+                    }.sheet(isPresented: $isPresentingScanner) {
+                        self.scannerSheet
+                    }
+                    Text(self.scanError)
+                        .foregroundColor(Color.red)
+                        .font(.system(size: 22))
+                        .multilineTextAlignment(.center)
+                        .frame(width: screen_width*0.8)
+                    Spacer().frame(height: screen_height*0.1)
+                    
+                    Text("\(total_point) Puan")
+                        .font(.system(size: 30)).padding()
+                        .frame(width: screen_width*0.5, height: 100)
+                        .foregroundColor(Color.white)
+                        .background(Color.green).cornerRadius(30)
                         Spacer().frame(height: screen_height*0.1)
+                    
                     ScrollView(.vertical){
                             VStack(spacing: 10){
                                 ForEach(self.scoreGamePoints ?? []){point in
@@ -105,25 +127,13 @@ struct ScoreGameView: View {
                                 }
                             }
                         }.frame(width: screen_width*0.7, height: screen_height*0.5)
-                        Button(action: {
-                            self.isPresentingScanner = true
-                        }){
-                            Label("Puan Okut", systemImage: "qrcode.viewfinder")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 40, weight: .bold))
-                                .frame(width: screen_width*0.5, height: 100)
-                                .foregroundColor(Color.white)
-                                .background(Color.red).cornerRadius(30)
-                        }.sheet(isPresented: $isPresentingScanner) {
-                            self.scannerSheet
-                        }
-                        Text(self.scanError).foregroundColor(Color.red).font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
-                        Text("Giriş yap butonuna bastıktan sonra kameraya yaka kartıınızda bulunan Qr Kod'u okutunuz.").font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
                         
-                    }.padding()
+                    }
                 }.background(AppColors.bgBlue)
             }
-        .onAppear{}
+        .onAppear{
+            getPoints()
+        }
         .navigationBarBackButtonHidden(true)
         }
 
@@ -171,7 +181,8 @@ struct ScoreGameView: View {
                     self.scoreGamePoints = points.data
                 }
                 self.total_point = 0
-                ForEach(self.scoreGamePoints ?? []){point in
+                points.data?.forEach{point in
+                    total_point = total_point + point.point!
                 }
             } catch {
                 print(error)

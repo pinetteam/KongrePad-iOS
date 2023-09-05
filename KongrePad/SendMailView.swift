@@ -11,7 +11,7 @@ struct SendMailView : View {
     @Environment(\.presentationMode) var pm
     @State var meeting: Meeting?
     @State var documents: [Document]?
-    @State var selected = true
+    @State var selectedDocuments: Set = [0]
     
     var body: some View{
         NavigationStack {
@@ -22,31 +22,58 @@ struct SendMailView : View {
                     ZStack(alignment: .topLeading){
                         Text("Sunumunun mail olarak paylaşılmasına izin veren konuşmacıların sunumlarını kendinize mail olarak gönderebilirsiniz")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                                .padding(5)
-                                .onTapGesture {
-                                    pm.wrappedValue.dismiss()
-                                }
-                    }
-                    ScrollView(.horizontal){
-                        VStack(alignment: .center, spacing: 10){
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                            Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }
+                    }.frame(width: screen_width)
+                    ScrollView(.vertical){
+                        VStack(alignment: .leading, spacing: 10){
                             ForEach(self.documents ?? []){document in
                                 HStack{
-                                        Image(systemName: document.is_selected != false ? "square.fill" : "square")
-                                        Text("\(document.title ?? "")")
+                                    Button(action: {
+                                        if selectedDocuments.contains(document.id!)
+                                            {
+                                                self.selectedDocuments.remove(document.id!)
+                                            }
+                                        else
+                                            {
+                                                self.selectedDocuments.insert(document.id!)
+                                            }
+                                    }){
+                                        if document.sharing_via_email == 1{
+                                            Image(systemName: selectedDocuments.contains(document.id!) ? "square.fill" : "square")
+                                        }
+                                        Text("\(document.title ?? "")").foregroundColor(Color.black)
+                                        
+                                    }
                                 }
+                                Divider()
                             }
-                        }.frame(width: screen_width*0.65)
+                        }.padding()
+                    }.frame(width: screen_width, height: screen_height*0.8).background(Color.white)
+                    Spacer()
+                    ZStack(alignment: .center){
+                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
+                        Label("Mail Gönder", systemImage: "envelope")
+                            .foregroundColor(Color.white)
+                            .padding().background(AppColors.buttonLightBlue).bold()
+                            .cornerRadius(5)
+                            .onTapGesture {
+                                sendMail()
+                            }
                     }
-                    Text("Mail Gönder").padding().background(Color.green).onTapGesture {
-                        sendMail()
-                    }
-                }
+                    
+                }.background(AppColors.bgBlue)
             }
         }
         .navigationBarBackButtonHidden(true)

@@ -14,3 +14,9 @@ class ScoreGamePointsJSON : Codable, Identifiable{
     var errors: [String]?
     var status: Bool?
 }
+
+class ScoreGamePointsResponseJSON: Codable{
+    var data: Bool?
+    var errors: [String]?
+    var status: Bool?
+}

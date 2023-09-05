@@ -23,23 +23,49 @@ struct AskQuestionView : View {
                     ZStack(alignment: .topLeading){
                         Text("Sunucuya sormak istediğiniz soruyu yazın")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                                .padding(5)
-                                .onTapGesture {
-                                    pm.wrappedValue.dismiss()
-                                }
-                    }
-                    TextField("soru", text: $question, axis: .vertical).textFieldStyle(.roundedBorder).background(Color.gray)
-                    Toggle("İsmim görünmesin", isOn: $is_hidden_name).frame(width: screen_width*0.5)
-                    Text("Soru sor").padding().background(Color.green).onTapGesture {
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                            Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }
+                    }.frame(width: screen_width)
+                    Spacer()
+                    VStack{
+                        Text("Soru Sor").font(.system(size: 40)).bold().foregroundColor(Color.white)
+                        Image(systemName: "questionmark").font(.system(size: 40)).bold().foregroundColor(Color.white)
+                        TextField("soru", text: $question, axis: .vertical)
+                            .textFieldStyle(.roundedBorder)
+                            .background(Color.gray)
+                            .frame(height: screen_height*0.4)
+                            .cornerRadius(10).padding()
+                        HStack{
+                            Image(systemName: is_hidden_name ? "checkmark.square" : "square.fill")
+                            Text("İsmim Görünmesin")
+                        }
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width*0.4)
+                            .onTapGesture {
+                                self.is_hidden_name = !self.is_hidden_name
+                            }
+                    }.frame(width: screen_width*0.7).background(Color.red).cornerRadius(10)
+                    Spacer().frame(height: 15)
+                    Text("GÖNDER")
+                        .frame(width: screen_width*0.7, height: screen_height*0.05)
+                        .background(Color.green)
+                        .cornerRadius(5)
+                        .onTapGesture {
                         askQuestion()
                     }
-                }
+                    Spacer()
+                }.background(AppColors.bgBlue)
             }
         }
         .navigationBarBackButtonHidden(true)

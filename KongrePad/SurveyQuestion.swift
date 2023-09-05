@@ -5,14 +5,19 @@
 //  Created by Mert Demirbağ on 2.09.2023.
 //
 
-class SurveyQuestion : Codable, Identifiable{
+struct SurveyQuestion : Codable, Identifiable{
     
-    var sort_order: Int?
     var id: Int?
+    var sort_order: Int?
     var survey_id: Int?
     var question: String?
     var options: [SurveyOption]?
     var status: Int?
+    var selectedOptionId: Int?
+    
+    private enum CodingKeys: String, CodingKey {
+        case id, sort_order, survey_id, question, options, status
+    }
 }
 
 class SurveyQuestionsJSON : Codable, Identifiable{

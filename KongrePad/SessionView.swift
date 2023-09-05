@@ -10,11 +10,11 @@ import PDFKit
 
 struct SessionView : View {
     @Environment(\.presentationMode) var pm
-    @State var pdfURL: URL
+    @Binding var pdfURL: URL?
     @State var document: Document?
     @State var meeting: Meeting?
     @State var bannerName : String = ""
-    @State var hallId: Int
+    @Binding var hallId: Int
     
     
     
@@ -28,30 +28,35 @@ struct SessionView : View {
                     ZStack(alignment: .topLeading){
                         Text("\(document?.title ?? "")")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
+                            .frame(width: screen_width, height: screen_height*0.1)
                             .background(AppColors.bgBlue).multilineTextAlignment(.center)
                         NavigationLink(destination: MainPageView()){
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                                .padding(5)
+                            Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }
                         }
                     }
-                    ZStack(alignment: .bottomTrailing){
-                        PdfKitRepresentedView(documentURL: self.pdfURL)
-                            .accessibilityLabel("pdf from \(pdfURL)")
-                            .accessibilityValue("pdf from \(pdfURL)")
+                    PdfKitRepresentedView(documentURL: $pdfURL)
+                    ZStack(alignment: .trailing){
+                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
                         NavigationLink(destination: AskQuestionView(hallId: self.hallId)){
-                                Label("Soru", systemImage: "questionmark")
-                                    .labelStyle(.iconOnly)
-                                    .frame(width: screen_width*0.1, height: screen_height*0.05)
-                                    .font(.system(size: 20))
-                                    .background(Color.blue).padding()
+                            Label("Soru Sor", systemImage: "questionmark")
+                                .foregroundColor(Color.white)
+                                .frame(width: screen_width*0.2, height: screen_height*0.05)
+                                .font(.system(size: 20))
+                                .background(Color.red)
+                                .cornerRadius(5).padding()
                         }
                     }
             
-        }
+                }.background(AppColors.bgBlue)
         }
                 
         }
@@ -62,7 +67,7 @@ struct SessionView : View {
             }
     }
     func getDocument(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/document") else {
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/active-document") else {
             return
         }
         
@@ -77,10 +82,12 @@ struct SessionView : View {
             
             do{
                 let document = try JSONDecoder().decode(DocumentJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.document = document.data
+                if document.status!{
+                    DispatchQueue.main.async {
+                        self.document = document.data
+                    }
+                    self.pdfURL = URL(string: "https://app.kongrepad.com/storage/documents/\(String(describing: document.data!.file_name!)).\(String(describing: document.data!.file_extension!))")!
                 }
-                self.pdfURL = URL(string: "https://app.kongrepad.com/storage/documents/\(String(describing: document.data!.file_name!)).\(String(describing: document.data!.file_extension!))")!
             } catch {
                 print(error)
             }
@@ -117,16 +124,13 @@ struct SessionView : View {
 
 struct PdfKitRepresentedView : UIViewRepresentable {
     
-    let documentURL : URL
+    @Binding var documentURL : URL?
     
-    init(documentURL : URL){
-        self.documentURL = documentURL
-    }
-    
-    func makeUIView(context: Context) -> some UIView {
+    func makeUIView(context: Context) -> some PDFView {
         let pdfView : PDFView = PDFView()
-        
-        pdfView.document = PDFDocument(url: self.documentURL)
+        if let documentURL{
+            pdfView.document = PDFDocument(url: self.documentURL!)
+        }
         pdfView.displayDirection = .vertical
         pdfView.minScaleFactor = 0.5
         pdfView.maxScaleFactor = 5.0
@@ -135,6 +139,11 @@ struct PdfKitRepresentedView : UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
+        if let documentURL {
+            uiView.document = PDFDocument(url: documentURL)
+        } else {
+            uiView.document = nil
+        }
         
     }
 }

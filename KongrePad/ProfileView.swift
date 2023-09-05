@@ -21,18 +21,19 @@ struct ProfileView: View{
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
                     ZStack(alignment: .topLeading){
-                        Text("\(participant?.full_name ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                                .padding(5)
-                                .onTapGesture {
-                                    pm.wrappedValue.dismiss()
-                                }
+                        Rectangle()
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .foregroundColor(AppColors.bgBlue)
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }
                     }
                         Spacer()
                         VStack(spacing: 20){
@@ -49,7 +50,7 @@ struct ProfileView: View{
                                 .frame(width: screen_width*0.5)
                                 .overlay(
                                         RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.blue, lineWidth: 4)
+                                            .stroke(AppColors.buttonLightBlue, lineWidth: 2)
                                     )
                             Text((self.participant?.email) ?? "")
                                 .padding()
@@ -57,7 +58,7 @@ struct ProfileView: View{
                                 .frame(width: screen_width*0.5)
                                 .overlay(
                                         RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.blue, lineWidth: 4)
+                                            .stroke(AppColors.buttonLightBlue, lineWidth: 2)
                                     )
                             Text((self.participant?.phone) ?? "")
                                 .padding()
@@ -65,7 +66,7 @@ struct ProfileView: View{
                                 .frame(width: screen_width*0.5)
                                 .overlay(
                                         RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.blue, lineWidth: 4)
+                                            .stroke(AppColors.buttonLightBlue, lineWidth: 2)
                                     )
                             Text((self.participant?.organisation) ?? "")
                                 .padding()
@@ -73,15 +74,16 @@ struct ProfileView: View{
                                 .frame(width: screen_width*0.5)
                                 .overlay(
                                         RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.blue, lineWidth: 4)
+                                            .stroke(AppColors.buttonLightBlue, lineWidth: 2)
                                     )
                         }
                     Spacer()
                     ZStack(alignment: .topLeading){
                         Text("Bilgilerinizde eksik veya hatalı bilgi var ise lütfen ön masa ile irtibata geçiniz")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
+                            .frame(width: screen_width*0.8, height: screen_height*0.1).padding()
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
                     }
                     }.navigationBarBackButtonHidden(true)
                 }

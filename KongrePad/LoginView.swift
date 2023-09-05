@@ -84,17 +84,23 @@ struct LoginView: View {
                         Button(action: {
                             self.isPresentingScanner = true
                         }){
-                            Label("Giriş Yap", systemImage: "play")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 40, weight: .bold))
-                                .frame(width: screen_width*0.5, height: 100)
-                                .foregroundColor(Color.white)
-                                .background(Color.orange).cornerRadius(30)
+                            HStack{
+                                Label("Giriş Yap", systemImage: "play")
+                                    .labelStyle(.titleOnly)
+                                    .font(.system(size: 40, weight: .bold))
+                                    .foregroundColor(Color.white)
+                                Label("Giriş Yap", systemImage: "arrow.right")
+                                    .labelStyle(.iconOnly)
+                                    .font(.system(size: 40, weight: .bold))
+                                    .foregroundColor(Color.white)
+                            }
+                            .frame(width: screen_width*0.5, height: 100)
+                            .background(Color.orange).cornerRadius(50)
                         }.sheet(isPresented: $isPresentingScanner) {
                             self.scannerSheet
                         }
                         Text(self.scanError).foregroundColor(Color.red).font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
-                        Text("Giriş yap butonuna bastıktan sonra kameraya yaka kartıınızda bulunan Qr Kod'u okutunuz.").font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
+                        Text("Giriş yap butonuna bastıktan sonra kameraya yaka kartınızda bulunan Qr Kod'u okutunuz.").font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.6)
                         
                     }.padding()
                 }.frame(width: screen_width, height: screen_height)
@@ -108,6 +114,9 @@ struct LoginView: View {
         .onAppear{
             
             let userDefault = UserDefaults.standard
+            
+            userDefault.set("93|laravel_sanctum_Aic3dhx3VfL4I1c3zVLDFyw9qMvEd6gjDfHGSbHTd1941945", forKey: "token")
+            userDefault.synchronize()
                 if(UserDefaults.standard.string(forKey: "token") != nil)
                 {
                     self.goToMainPage = true

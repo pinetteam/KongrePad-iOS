@@ -20,50 +20,63 @@ struct SurveysView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                    ZStack(alignment: .topLeading){
-                        Text("Anketlerimizi doldurarak yardımcı olun")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
+                        ZStack(alignment: .topLeading){
+                            VStack{
+                                Text("ANKETLER")
+                                    .foregroundColor(Color.white).font(.system(size:30))
+                                Text("Anketlerimizi doldurarak bize yardımcı olabilirsiniz")
+                                    .foregroundColor(Color.white).font(.system(size:20))
+                            }
+                                .frame(width: screen_width, height: screen_height*0.1)
+                                .background(AppColors.bgBlue)
+                                .multilineTextAlignment(.center)
+                                Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
                                 .foregroundColor(Color.blue)
+                                .background(
+                                    Circle().fill(AppColors.buttonLightBlue)
+                                )
                                 .padding(5)
                                 .onTapGesture {
                                     pm.wrappedValue.dismiss()
                                 }
-                    }
-                    Spacer().frame(height: 5)
-                    VStack(alignment: .center){
-                        Text("Anketler")
-                            .foregroundColor(Color.white)
-                            .bold()
-                            .frame(width: screen_width*0.85)
-                            .background(AppColors.buttonYellow)
-                            .cornerRadius(5)
-                        NavigationLink(destination: SurveyView(surveyId: self.surveyId), isActive: $goToSurvey){
-                            ScrollView(.vertical){
-                                VStack(spacing: 10){
-                                    ForEach(self.surveys ?? []){survey in
-                                        HStack{
-                                            VStack(alignment: .leading){
-                                                Text(survey.title!)
-                                                    .font(.system(size: 20))
+                        }.frame(width: screen_width)
+                    Spacer().frame(height: 20)
+                    NavigationLink(destination: SurveyView(surveyId: $surveyId), isActive: $goToSurvey){
+                        ScrollView(.vertical){
+                            VStack(spacing: 10){
+                                ForEach(Array(self.surveys?.enumerated() ?? [].enumerated()), id: \.element){index, survey in
+                                    HStack{
+                                        if index%2 == 0{
+                                            Text(survey.title!)
+                                                .font(.system(size: 20)).bold()
+                                                .foregroundColor(Color.white)
+                                                .frame(width: screen_width*0.4, height: screen_width*0.4)
+                                                .background(AppColors.buttonLightBlue)
+                                                .cornerRadius(20)
+                                                .onTapGesture{
+                                                    self.surveyId = survey.id!
+                                                    self.goToSurvey = true
+                                                }
+                                            if(index < surveys!.count - 1){
+                                                Text(surveys![index+1].title!)
+                                                    .font(.system(size: 20)).bold()
+                                                    .foregroundColor(Color.white)
+                                                    .frame(width: screen_width*0.4, height: screen_width*0.4)
+                                                    .background(AppColors.buttonLightBlue)
+                                                    .cornerRadius(20)
+                                                    .onTapGesture{
+                                                        self.surveyId = surveys![index+1].id!
+                                                        self.goToSurvey = true
+                                                    }
                                             }
-                                            .frame(width: screen_width*0.65)
-                                            .background(AppColors.programTitleBlue)
-                                            .cornerRadius(5)
-                                        }.onTapGesture{
-                                            self.surveyId = survey.id!
-                                            self.goToSurvey = true
                                         }
-                                        
                                     }
+                                    
                                 }
-                            }.frame(width: screen_width*0.85, height: screen_height*0.5)
-                        }
-                        }
+                            }
+                        }.frame(width: screen_width*0.85, height: screen_height*0.8)
+                    }
                 }.navigationBarBackButtonHidden(true)
                 }
             .background(AppColors.bgBlue)

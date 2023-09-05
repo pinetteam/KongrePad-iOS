@@ -22,7 +22,7 @@ struct MainPageView: View{
     @State var virtualStands: [VirtualStand]?
     @State var announcements: [Announcement]?
     @State var bannerName : String = ""
-    @State var pdfURL: URL = URL(string: "https://africau.edu/images/default/sample.pdf")!
+    @State var pdfURL: URL?
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in
@@ -61,8 +61,11 @@ struct MainPageView: View{
                                     ZStack(alignment: .bottom){
                                         Text("Sanal Stant Alanı")
                                             .padding(5)
-                                            .foregroundColor(Color.blue).font(.system(size:20, weight: .heavy))
-                                            .background(Color.white).cornerRadius(5)
+                                            .foregroundColor(Color.blue).font(.system(size:20))
+                                            .background(Color.white)
+                                            .padding(.bottom, 5)
+                                            .cornerRadius(5)
+                                            .padding(.bottom, -5)
                                         Rectangle()
                                                 .frame(width: screen_width*0.9, height: screen_height*0.002)
                                                 .foregroundColor(Color.white).zIndex(-1)
@@ -93,7 +96,7 @@ struct MainPageView: View{
                         .shadow(radius: 6)
                     Spacer()
                     VStack(alignment: .center, spacing: 15){                        VStack(alignment: .center){
-                            Label("", systemImage: "play").font(.system(size: 40)).foregroundColor(.white)
+                            Label("", systemImage: "play.fill").font(.system(size: 40)).foregroundColor(.white)
                             Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
                         }.frame(width: screen_width*0.76, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
                             .onTapGesture {
@@ -101,7 +104,7 @@ struct MainPageView: View{
                             }.sheet(isPresented: $isHallsForDocumentPresented){
                                 HallsForDocument(goToSession: $goToSession, pdfURL: $pdfURL, hallId: $hallId)
                             }.background(
-                                NavigationLink(destination: SessionView(pdfURL: pdfURL, hallId: hallId), isActive: $goToSession){
+                                NavigationLink(destination: SessionView(pdfURL: $pdfURL, hallId: $hallId), isActive: $goToSession){
                                 EmptyView()
                             })
                         HStack(spacing: 10){
@@ -114,7 +117,7 @@ struct MainPageView: View{
                                 }.sheet(isPresented: $isHallsForProgramPresented){
                                     HallsForProgram(goToProgram: $goToPrograms, hallId: $hallId)
                                 }.background(
-                                    NavigationLink(destination: ProgramsView(hallId: hallId), isActive: $goToPrograms){
+                                    NavigationLink(destination: ProgramsView(hallId: $hallId), isActive: $goToPrograms){
                                     EmptyView()
                                 })
                             NavigationLink(destination: SendMailView())
@@ -143,38 +146,36 @@ struct MainPageView: View{
                             }
                         }
                     }
-                        Spacer()
+                    Spacer()
                     HStack(alignment: .center){
-                        
+                        NavigationLink(destination: LoginView(), isActive: $logOut){
+                            Label("", systemImage: "rectangle.portrait.and.arrow.right")
+                                .labelStyle(.iconOnly)
+                                .font(.system(size: 20, weight: .heavy))
+                                .foregroundColor(Color.blue).padding()
+                                .onTapGesture {
+                                    let userDefault = UserDefaults.standard
+                                    userDefault.set(nil, forKey: "token")
+                                    userDefault.synchronize()
+                                    self.logOut = true
+                                }
+                            }
+                        Spacer()
+                        HStack{
                         NavigationLink(destination: AnnouncementsView()){
                             Label("", systemImage: "bell.fill")
                                 .labelStyle(.iconOnly)
                                 .font(.system(size: 25, weight: .heavy))
                                 .foregroundColor(Color.white).padding()
                         }
-                        Spacer()
                         NavigationLink(destination: ProfileView()){
                             Label("", systemImage: "person.fill")
                                 .labelStyle(.iconOnly)
                                 .font(.system(size: 25, weight: .heavy))
                                 .foregroundColor(Color.white).padding()
                         }
-                        Spacer()
-                        NavigationLink(destination: LoginView(), isActive: $logOut){
-                            Label("", systemImage: "rectangle.portrait.and.arrow.right")
-                                .labelStyle(.iconOnly)
-                                .font(.system(size: 20, weight: .heavy))
-                                .foregroundColor(Color.white).padding()
-                        .background(
-                            Circle().foregroundColor(Color.red)
-                        ).padding().onTapGesture {
-                                let userDefault = UserDefaults.standard
-                                userDefault.set(nil, forKey: "token")
-                                userDefault.synchronize()
-                            self.logOut = true
                         }
-                    }
-                    }
+                }
                 }.navigationBarBackButtonHidden(true)
                 }
             .background(AppColors.bgBlue)
@@ -304,7 +305,7 @@ struct MainPageView: View{
 struct HallsForDocument: View {
     @State var halls: [Hall]?
     @Binding var goToSession: Bool
-    @Binding var pdfURL: URL
+    @Binding var pdfURL: URL?
     @Binding var hallId: Int
     @Environment (\.dismiss) var dismiss
     var body: some View{
@@ -316,18 +317,20 @@ struct HallsForDocument: View {
                     ZStack(alignment: .topLeading){
                         Text("Lütfen sunumu görüntülemek istediğiniz salonu seçiniz")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                        
-                        Button(action: {
-                            dismiss()
-                        }){
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                        }.padding(5)
-                    }
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                            Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                dismiss()
+                            }
+                    }.frame(width: screen_width)
                     HStack{
                         Label("", systemImage: "chevron.left")
                             .labelStyle(.iconOnly)
@@ -411,8 +414,10 @@ struct HallsForDocument: View {
             
             do{
                 let document = try JSONDecoder().decode(DocumentJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.pdfURL = URL(string: "https://app.kongrepad.com/storage/documents/\(String(describing: document.data!.file_name!)).\(String(describing: document.data!.file_extension!))")!
+                if document.status!{
+                    DispatchQueue.main.async {
+                        self.pdfURL = URL(string: "https://app.kongrepad.com/storage/documents/\(String(describing: document.data!.file_name!)).\(String(describing: document.data!.file_extension!))")!
+                    }
                 }
             } catch {
                 print(error)
@@ -434,18 +439,20 @@ struct HallsForProgram: View {
                     ZStack(alignment: .topLeading){
                         Text("Lütfen bilimsel programı görüntülemek istediğiniz salonu seçiniz")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                        
-                        Button(action: {
-                            dismiss()
-                        }){
-                            Label("Geri", systemImage: "chevron.left")
-                                .labelStyle(.titleAndIcon)
-                                .font(.system(size: 20))
-                                .foregroundColor(Color.blue)
-                        }.padding(5)
-                    }
+                            .frame(width: screen_width, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                            Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                dismiss()
+                            }
+                    }.frame(width: screen_width)
                     HStack{
                         Label("", systemImage: "chevron.left")
                             .labelStyle(.iconOnly)
