@@ -5,8 +5,7 @@
 //  Created by Mert Demirbağ on 28.08.2023.
 //
 
-class DebateTeam : Codable, Identifiable{
-
+struct DebateTeam : Codable, Identifiable, Hashable{
     var id: Int?
     var debate_id: Int?
     var code: String?

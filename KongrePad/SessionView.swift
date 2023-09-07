@@ -25,34 +25,35 @@ struct SessionView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(spacing: 0){
-                    ZStack(alignment: .topLeading){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
                         Text("\(document?.title ?? "")")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1)
-                            .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                        NavigationLink(destination: MainPageView()){
-                            Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                        }
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
                     }
                     PdfKitRepresentedView(documentURL: $pdfURL)
                     ZStack(alignment: .trailing){
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
-                        NavigationLink(destination: AskQuestionView(hallId: self.hallId)){
-                            Label("Soru Sor", systemImage: "questionmark")
-                                .foregroundColor(Color.white)
-                                .frame(width: screen_width*0.2, height: screen_height*0.05)
-                                .font(.system(size: 20))
-                                .background(Color.red)
-                                .cornerRadius(5).padding()
+                        if(self.pdfURL != nil){
+                            NavigationLink(destination: AskQuestionView(hallId: self.hallId)){
+                                Label("Soru Sor", systemImage: "questionmark")
+                                    .foregroundColor(Color.white)
+                                    .frame(width: screen_width*0.3, height: screen_height*0.05)
+                                    .font(.system(size: 20))
+                                    .background(Color.red)
+                                    .cornerRadius(5).padding()
+                            }
                         }
                     }
             

@@ -13,6 +13,8 @@ struct AskQuestionView : View {
     @State var hallId: Int!
     @State var question = "soru"
     @State var is_hidden_name = false
+    @State var popUp = false
+    @State var popUpText = ""
     
     var body: some View{
         NavigationStack {
@@ -20,23 +22,23 @@ struct AskQuestionView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    ZStack(alignment: .topLeading){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
                         Text("Sunucuya sormak istediğiniz soruyu yazın")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                            Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                    }.frame(width: screen_width)
+                    }
                     Spacer()
                     VStack{
                         Text("Soru Sor").font(.system(size: 40)).bold().foregroundColor(Color.white)
@@ -67,6 +69,9 @@ struct AskQuestionView : View {
                     Spacer()
                 }.background(AppColors.bgBlue)
             }
+        }
+        .alert(popUpText, isPresented: $popUp){
+            Button("OK", role: .cancel){}
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
@@ -116,12 +121,12 @@ struct AskQuestionView : View {
             }
             do{
                 let response = try JSONDecoder().decode(SessionQuestionResponseJSON.self, from: data)
-                DispatchQueue.main.async {
-                    if(response.data != nil){
-                        self.question = "Sorunuz Gönderildi"
-                    } else {
-                        self.question = "Bir Sorun Meydana geldi"
-                    }
+                if(response.status!){
+                    self.popUpText = "Sorunuz Gönderildi"
+                    self.popUp = true
+                } else {
+                    self.popUpText = "Bir Sorun Meydana geldi"
+                    self.popUp = true
                 }
             } catch {
                 print(error)

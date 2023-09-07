@@ -19,23 +19,23 @@ struct SendMailView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    ZStack(alignment: .topLeading){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
                         Text("Sunumunun mail olarak paylaşılmasına izin veren konuşmacıların sunumlarını kendinize mail olarak gönderebilirsiniz")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                            Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                    }.frame(width: screen_width)
+                    }
                     ScrollView(.vertical){
                         VStack(alignment: .leading, spacing: 10){
                             ForEach(self.documents ?? []){document in

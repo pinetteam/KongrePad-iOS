@@ -13,11 +13,15 @@ struct MainPageView: View{
     @Environment(\.presentationMode) var pm
     @State var isHallsForDocumentPresented = false
     @State var isHallsForProgramPresented = false
+    @State var keypadPresent = false
+    @State var debatePresent = false
     @State var hallId: Int = 0
     @State var logOut = false
     @State var goToSession = false
     @State var goToPrograms = false
     @State var meeting: Meeting?
+    @State var keypad: Keypad?
+    @State var debate: Debate?
     @State var participant: Participant?
     @State var virtualStands: [VirtualStand]?
     @State var announcements: [Announcement]?
@@ -96,17 +100,39 @@ struct MainPageView: View{
                         .shadow(radius: 6)
                     Spacer()
                     VStack(alignment: .center, spacing: 15){                        VStack(alignment: .center){
-                            Label("", systemImage: "play.fill").font(.system(size: 40)).foregroundColor(.white)
-                            Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
-                        }.frame(width: screen_width*0.76, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.white)
+                        Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
+                    }.frame(width: screen_width*0.76, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
                             .onTapGesture {
                                 self.isHallsForDocumentPresented = true
                             }.sheet(isPresented: $isHallsForDocumentPresented){
                                 HallsForDocument(goToSession: $goToSession, pdfURL: $pdfURL, hallId: $hallId)
                             }.background(
                                 NavigationLink(destination: SessionView(pdfURL: $pdfURL, hallId: $hallId), isActive: $goToSession){
-                                EmptyView()
-                            })
+                                    EmptyView()
+                                })
+                        HStack{
+                            VStack(alignment: .center){
+                                Text("Keypad Deneme").font(.system(size: 20)).foregroundColor(.white)
+                            }.frame(width: screen_width*0.37, height: screen_height*0.05).background(AppColors.buttonPurple).cornerRadius(10)
+                                .onTapGesture {
+                                    getKeypad(HallId: 5)
+                                    self.keypadPresent = true
+                                }.sheet(isPresented: $keypadPresent){
+                                    KeypadView(keypad: $keypad)
+                                }
+                            VStack(alignment: .center){
+                                Text("Debate Deneme").font(.system(size: 20)).foregroundColor(.white)
+                            }.frame(width: screen_width*0.37, height: screen_height*0.05).background(AppColors.buttonPurple).cornerRadius(10)
+                                .onTapGesture {
+                                    getDebate(HallId: 5)
+                                    self.debatePresent = true
+                                }.sheet(isPresented: $debatePresent){
+                                    DebateView(debate: $debate)
+                                }
+                        }
                         HStack(spacing: 10){
                                 VStack(alignment: .center){
                                     Label("", systemImage: "doc.text").font(.system(size: 40)).foregroundColor(.white)
@@ -298,6 +324,61 @@ struct MainPageView: View{
         }.resume()
     }
     
+    func getKeypad(HallId: Int){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-keypad") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let keypad = try JSONDecoder().decode(KeypadJSON.self, from: data)
+                if keypad.status!{
+                    DispatchQueue.main.async {
+                        self.keypad = keypad.data
+                    }
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
+    func getDebate(HallId: Int){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-debate") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let debate = try JSONDecoder().decode(DebateJSON.self, from: data)
+                if debate.status!{
+                    DispatchQueue.main.async {
+                        self.debate = debate.data
+                    }
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+
+    
     
 
 }
@@ -314,23 +395,23 @@ struct HallsForDocument: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .leading){
-                    ZStack(alignment: .topLeading){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            dismiss()
+                        }.frame(width: screen_width*0.1)
                         Text("Lütfen sunumu görüntülemek istediğiniz salonu seçiniz")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                            Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                dismiss()
-                            }
-                    }.frame(width: screen_width)
+                    }.frame(width: screen_width).background(AppColors.bgBlue)
                     HStack{
                         Label("", systemImage: "chevron.left")
                             .labelStyle(.iconOnly)
@@ -418,6 +499,8 @@ struct HallsForDocument: View {
                     DispatchQueue.main.async {
                         self.pdfURL = URL(string: "https://app.kongrepad.com/storage/documents/\(String(describing: document.data!.file_name!)).\(String(describing: document.data!.file_extension!))")!
                     }
+                } else {
+                    pdfURL = nil
                 }
             } catch {
                 print(error)
@@ -436,23 +519,23 @@ struct HallsForProgram: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .leading){
-                    ZStack(alignment: .topLeading){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            dismiss()
+                        }.frame(width: screen_width*0.1)
                         Text("Lütfen bilimsel programı görüntülemek istediğiniz salonu seçiniz")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                            Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                dismiss()
-                            }
-                    }.frame(width: screen_width)
+                    }.frame(width: screen_width).background(AppColors.bgBlue)
                     HStack{
                         Label("", systemImage: "chevron.left")
                             .labelStyle(.iconOnly)

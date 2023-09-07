@@ -23,20 +23,23 @@ struct ProgramsView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                        ZStack(alignment: .topLeading){
-                            Text("Kongre programı")
-                                .foregroundColor(Color.white)
-                                .frame(width: screen_width, height: screen_height*0.1).padding()
-                                .background(AppColors.bgBlue).multilineTextAlignment(.center)
-                                Label("Geri", systemImage: "chevron.left")
-                                    .labelStyle(.titleAndIcon)
-                                    .font(.system(size: 20))
-                                    .foregroundColor(Color.blue)
-                                    .padding(5)
-                                    .onTapGesture {
-                                        pm.wrappedValue.dismiss()
-                                    }
-                        }
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
+                        Text("Bilimsel Program")
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                    }
                     Spacer().frame(height: 5)
                     VStack(alignment: .center){
                         Text("Bilimsel Program")

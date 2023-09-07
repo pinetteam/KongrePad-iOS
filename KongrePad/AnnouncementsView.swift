@@ -18,39 +18,46 @@ struct AnnouncementsView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                    ZStack(alignment: .topLeading){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
                         Text("Bildirimler")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                            Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                    }.frame(width: screen_width)
+                    }
                     Spacer().frame(height: 10)
                     VStack(alignment: .leading){
                         ScrollView(.vertical){
-                            VStack(spacing: 10){
+                            VStack(alignment:.leading, spacing: 10){
                                 ForEach(self.announcements ?? []){announcement in
-                                    Text(announcement.title!)
-                                        .font(.system(size: 20))
-                                        .frame(width: screen_width*0.80)
-                                        .cornerRadius(5)
-                                        .multilineTextAlignment(.leading)
+                                    HStack{
+                                        Text(announcement.created_at!)
+                                            .font(.system(size: 20))
+                                            .frame(width: screen_width*0.2)
+                                            .cornerRadius(5)
+                                            .multilineTextAlignment(.leading)
+                                        Text(announcement.title!)
+                                            .font(.system(size: 20))
+                                            .frame(width: screen_width*0.65, alignment: .leading)
+                                            .cornerRadius(5)
+                                            .multilineTextAlignment(.leading)
+                                    }
                                     Divider()
                                 }
-                            }
-                        }.frame(width: screen_width, height: screen_height*0.8)
-                            .background(Color.white)
-                    }
+                            }.padding()
+                        }.frame(width: screen_width*0.9, height: screen_height*0.8)
+                            .background(Color.white).padding()
+                    }.cornerRadius(20)
                     Spacer()
                     Rectangle()
                         .frame(width: screen_width, height: screen_height*0.1)

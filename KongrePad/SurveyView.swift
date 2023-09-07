@@ -12,6 +12,8 @@ struct SurveyView : View {
     @State var meeting: Meeting?
     @State var survey: Survey?
     @Binding var surveyId: Int
+    @Binding var popUp: Bool
+    @Binding var popUpText: String
     @State var questions: [SurveyQuestion]?
     @State var error = ""
     
@@ -21,23 +23,23 @@ struct SurveyView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    ZStack(alignment: .topLeading){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
                         Text("\(survey?.title ?? "")")
                             .foregroundColor(Color.white)
-                            .frame(width: screen_width, height: screen_height*0.1)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                            Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                    }.frame(width: screen_width)
+                    }
                     ScrollView(.vertical){
                         VStack(alignment: .leading, spacing: 20){
                             ForEach(self.questions ?? []){question in
@@ -49,8 +51,8 @@ struct SurveyView : View {
                                                 self.changeSelectedOption(item: question, optionId: option.id!)
                                             }){
                                                 Image(systemName: option.id == question.selectedOptionId ? "circle.fill" : "circle")
+                                                Text(option.option ?? "").foregroundColor(Color.black).multilineTextAlignment(.leading)
                                             }
-                                            Text(option.option ?? "")
                                             Spacer()
                                         }
                                     }
@@ -209,7 +211,11 @@ struct SurveyView : View {
                     self.error = response.errors![0]
                     return
                 }
-                self.error = "Yanıtlarınız gönderildi"
+                self.popUpText = "Yanıtlarınız gönderildi"
+                self.popUp = true
+                DispatchQueue.main.async {
+                    pm.wrappedValue.dismiss()
+                }
             } catch {
                 print(error)
             }

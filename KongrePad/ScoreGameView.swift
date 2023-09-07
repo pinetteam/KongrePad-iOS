@@ -12,6 +12,8 @@ struct ScoreGameView: View {
     @Environment(\.presentationMode) var pm
     
     @State var isPresentingScanner = false
+    @State var popUp = false
+    @State var popUpText = ""
     @State var scanError : String = ""
     @State var total_point : Int = 0
     @State var scoreGame: ScoreGame?
@@ -43,15 +45,18 @@ struct ScoreGameView: View {
                     do{
                         let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
                         if (response.status != true){
-                            self.scanError = response.errors![0]
+                            self.isPresentingScanner = false
+                            self.popUp = true
+                            self.popUpText = response.errors![0]
                             return
                         }
-                        self.scanError = "qr Kod başarıyla okutuldu"
+                        self.popUpText = "qr Kod başarıyla okutuldu"
                         getPoints()
                     } catch {
                         print(error)
                     }
                 }.resume()
+                self.popUp = true
                 self.isPresentingScanner = false
             }
         })
@@ -64,10 +69,8 @@ struct ScoreGameView: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    ZStack(alignment: .topLeading){
-                        Rectangle()
-                            .frame(width: screen_width, height: screen_height*0.1)
-                            .foregroundColor(AppColors.bgBlue)
+                    
+                    HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
                         .foregroundColor(Color.blue)
@@ -77,7 +80,10 @@ struct ScoreGameView: View {
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
-                        }
+                        }.frame(width: screen_width*0.1)
+                        Rectangle()
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .foregroundColor(AppColors.bgBlue)
                     }
                     Button(action: {
                         self.isPresentingScanner = true
@@ -133,6 +139,9 @@ struct ScoreGameView: View {
             }
         .onAppear{
             getPoints()
+        }
+        .alert(popUpText, isPresented: $popUp){
+            Button("OK", role: .cancel){}
         }
         .navigationBarBackButtonHidden(true)
         }

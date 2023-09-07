@@ -10,6 +10,8 @@ import SwiftUI
 struct SurveysView: View{
     @Environment(\.presentationMode) var pm
     @State var goToSurvey = false
+    @State var popUp = false
+    @State var popUpText = ""
     @State var meeting: Meeting?
     @State var participant: Participant?
     @State var surveys: [Survey]?
@@ -20,29 +22,29 @@ struct SurveysView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                        ZStack(alignment: .topLeading){
-                            VStack{
-                                Text("ANKETLER")
-                                    .foregroundColor(Color.white).font(.system(size:30))
-                                Text("Anketlerimizi doldurarak bize yardımcı olabilirsiniz")
-                                    .foregroundColor(Color.white).font(.system(size:20))
-                            }
-                                .frame(width: screen_width, height: screen_height*0.1)
-                                .background(AppColors.bgBlue)
-                                .multilineTextAlignment(.center)
-                                Image(systemName: "chevron.left")
-                                .font(.system(size: 20)).bold().padding(8)
-                                .foregroundColor(Color.blue)
-                                .background(
-                                    Circle().fill(AppColors.buttonLightBlue)
-                                )
-                                .padding(5)
-                                .onTapGesture {
-                                    pm.wrappedValue.dismiss()
-                                }
-                        }.frame(width: screen_width)
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
+                        VStack{
+                            Text("ANKETLER")
+                                .foregroundColor(Color.white).font(.system(size:20))
+                            Text("Anketlerimizi doldurarak bize yardımcı olabilirsiniz")
+                                .foregroundColor(Color.white).font(.system(size:15))
+                        }
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                    }
                     Spacer().frame(height: 20)
-                    NavigationLink(destination: SurveyView(surveyId: $surveyId), isActive: $goToSurvey){
+                    NavigationLink(destination: SurveyView(surveyId: $surveyId, popUp: $popUp, popUpText: $popUpText), isActive: $goToSurvey){
                         ScrollView(.vertical){
                             VStack(spacing: 10){
                                 ForEach(Array(self.surveys?.enumerated() ?? [].enumerated()), id: \.element){index, survey in
@@ -52,22 +54,26 @@ struct SurveysView: View{
                                                 .font(.system(size: 20)).bold()
                                                 .foregroundColor(Color.white)
                                                 .frame(width: screen_width*0.4, height: screen_width*0.4)
-                                                .background(AppColors.buttonLightBlue)
+                                                .background(survey.is_completed! ? Color.red : AppColors.buttonLightBlue)
                                                 .cornerRadius(20)
                                                 .onTapGesture{
-                                                    self.surveyId = survey.id!
-                                                    self.goToSurvey = true
+                                                    if !survey.is_completed!{
+                                                        self.surveyId = survey.id!
+                                                        self.goToSurvey = true
+                                                    }
                                                 }
                                             if(index < surveys!.count - 1){
                                                 Text(surveys![index+1].title!)
                                                     .font(.system(size: 20)).bold()
                                                     .foregroundColor(Color.white)
                                                     .frame(width: screen_width*0.4, height: screen_width*0.4)
-                                                    .background(AppColors.buttonLightBlue)
+                                                    .background(surveys![index+1].is_completed! ? Color.red : AppColors.buttonLightBlue)
                                                     .cornerRadius(20)
                                                     .onTapGesture{
-                                                        self.surveyId = surveys![index+1].id!
-                                                        self.goToSurvey = true
+                                                        if !surveys![index+1].is_completed!{
+                                                            self.surveyId = surveys![index+1].id!
+                                                            self.goToSurvey = true
+                                                        }
                                                     }
                                             }
                                         }
@@ -77,9 +83,14 @@ struct SurveysView: View{
                             }
                         }.frame(width: screen_width*0.85, height: screen_height*0.8)
                     }
-                }.navigationBarBackButtonHidden(true)
+                }
+                .navigationBarBackButtonHidden(true)
+                    
                 }
             .background(AppColors.bgBlue)
+        }
+        .alert(popUpText, isPresented: $popUp){
+            Button("OK", role: .cancel){}
         }
         .onAppear{
             getMeeting()
@@ -87,7 +98,7 @@ struct SurveysView: View{
             getParticipant()
         }
     }
-    
+        
     
     struct MainPageView_Previews: PreviewProvider {
         static var previews: some View {

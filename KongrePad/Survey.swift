@@ -15,6 +15,7 @@ struct Survey : Codable, Identifiable, Hashable{
     var start_at: String?
     var finish_at: String?
     var status: Int?
+    var is_completed: Bool?
 }
 
 class SurveysJSON : Codable, Identifiable{
