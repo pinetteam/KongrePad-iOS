@@ -11,6 +11,7 @@ import CodeScanner
 struct LoginView: View {
     
     @State var isPresentingScanner = false
+    @State var isPresentingLoginWithCode = false
     @State var goToMainPage = false
     @State var scanError : String = ""
     
@@ -103,7 +104,17 @@ struct LoginView: View {
                         }
                         Text(self.scanError).foregroundColor(Color.red).font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
                         Text("Giriş yap butonuna bastıktan sonra kameraya yaka kartınızda bulunan Qr Kod'u okutunuz.").font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
-                        
+                        Text("Kod İle Giriş").font(.system(size: 20)).foregroundColor(.white)
+                            .frame(width: screen_width*0.42, height: screen_height*0.05).background(AppColors.buttonLightBlue).cornerRadius(10)
+                            .onTapGesture {
+                                self.isPresentingLoginWithCode = true
+                            }.sheet(isPresented: $isPresentingLoginWithCode){
+                                loginWithCode(goToMainPage: $goToMainPage, scanError: $scanError)
+                            }.background(
+                                NavigationLink(destination: MainPageView(), isActive: $goToMainPage){
+                                EmptyView()
+                            })
+                            
                     }.padding()
                 }.frame(width: screen_width, height: screen_height)
                     .background(AppColors.bgBlue)
@@ -114,9 +125,7 @@ struct LoginView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
-            
             let userDefault = UserDefaults.standard
-            userDefault.set("93|laravel_sanctum_Aic3dhx3VfL4I1c3zVLDFyw9qMvEd6gjDfHGSbHTd1941945", forKey: "token")
                 if(userDefault.string(forKey: "token") != nil)
                 {
                     self.goToMainPage = true
@@ -125,11 +134,85 @@ struct LoginView: View {
         }
         
     }
-
-    
-    struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-            LoginView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+}
+struct loginWithCode: View {
+    @Binding var goToMainPage: Bool
+    @State var code: String = "Lütfen kodunuzu buraya giriniz."
+    @Binding var scanError: String
+    @Environment (\.dismiss) var dismiss
+    var body: some View{
+        NavigationStack{
+            GeometryReader{ geometry in
+                let screen_width = geometry.size.width
+                let screen_height = geometry.size.height
+                VStack(alignment: .center){
+                    HStack(alignment: .center){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            dismiss()
+                        }.frame(width: screen_width*0.1)
+                        Spacer()
+                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                    Spacer()
+                    TextField("", text: $code, axis: .vertical)
+                        .frame(width: screen_width*0.65).padding()
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(AppColors.buttonLightBlue, lineWidth: 2)
+                        ).padding()
+                    Text("GİRİŞ")
+                        .frame(width: screen_width*0.2, height: screen_height*0.05)
+                        .background(AppColors.buttonLightBlue)
+                        .cornerRadius(15)
+                        .onTapGesture {
+                        login()
+                    }
+                    Spacer()
+                }.background(AppColors.bgBlue)
+            }
         }
+    }
+    func login(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/auth/login/participant") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: AnyHashable] = [
+            "username" : self.code,
+        ]
+        
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: .fragmentsAllowed)
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let response = try JSONSerialization.jsonObject(with: data,options: .allowFragments) as! [String: Any]
+                let userDefault = UserDefaults.standard
+                guard let token = response["token"]  else {
+                    self.scanError = "Wrong Qr Code"
+                    dismiss()
+                    return
+                }
+                self.goToMainPage = true
+                userDefault.set(token, forKey: "token")
+                userDefault.synchronize()
+                dismiss()
+            } catch {
+                print(error)
+            }
+        }.resume()
     }
 }

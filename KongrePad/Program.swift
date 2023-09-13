@@ -5,6 +5,11 @@
 //  Created by Mert Demirbağ on 1.09.2023.
 //
 
+class ProgramDay : Codable, Identifiable{
+    var day: String?
+    var programs: [Program]?
+}
+
 class Program : Codable, Identifiable{
     
     var id: Int?
@@ -25,7 +30,7 @@ class Program : Codable, Identifiable{
 
 class ProgramsJson : Codable, Identifiable{
     
-    var data: [Program]?
+    var data: [ProgramDay]?
     var errors: [String]?
     var status: Bool?
 }

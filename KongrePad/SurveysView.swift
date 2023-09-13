@@ -54,7 +54,7 @@ struct SurveysView: View{
                                                 .font(.system(size: 20)).bold()
                                                 .foregroundColor(Color.white)
                                                 .frame(width: screen_width*0.4, height: screen_width*0.4)
-                                                .background(survey.is_completed! ? Color.red : AppColors.buttonLightBlue)
+                                                .background(survey.is_completed! ? Color.red : AppColors.buttonDarkBlue)
                                                 .cornerRadius(20)
                                                 .onTapGesture{
                                                     if !survey.is_completed!{
@@ -67,7 +67,7 @@ struct SurveysView: View{
                                                     .font(.system(size: 20)).bold()
                                                     .foregroundColor(Color.white)
                                                     .frame(width: screen_width*0.4, height: screen_width*0.4)
-                                                    .background(surveys![index+1].is_completed! ? Color.red : AppColors.buttonLightBlue)
+                                                    .background(surveys![index+1].is_completed! ? Color.red : AppColors.buttonDarkBlue)
                                                     .cornerRadius(20)
                                                     .onTapGesture{
                                                         if !surveys![index+1].is_completed!{
@@ -96,13 +96,6 @@ struct SurveysView: View{
             getMeeting()
             getSurveys()
             getParticipant()
-        }
-    }
-        
-    
-    struct MainPageView_Previews: PreviewProvider {
-        static var previews: some View {
-            MainPageView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
         }
     }
     

@@ -11,7 +11,9 @@ struct SendMailView : View {
     @Environment(\.presentationMode) var pm
     @State var meeting: Meeting?
     @State var documents: [Document]?
-    @State var selectedDocuments: Set = [0]
+    @State var selectedDocuments = Set<Int>()
+    @State var popUp = false
+    @State var popUpText = ""
     
     var body: some View{
         NavigationStack {
@@ -76,6 +78,9 @@ struct SendMailView : View {
                 }.background(AppColors.bgBlue)
             }
         }
+        .alert(popUpText, isPresented: $popUp){
+            Button("OK", role: .cancel){}
+        }
         .navigationBarBackButtonHidden(true)
         .onAppear{
                 getMeeting()
@@ -134,5 +139,49 @@ func getDocuments(){
     }
     
     func sendMail(){
+        
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/mail") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        var body: [String: String]
+        do{
+            
+            let encoder = JSONEncoder()
+            let documentsData = try encoder.encode(Array(selectedDocuments))
+            let string : String? = String(data: documentsData, encoding: .utf8)
+            body = ["documents": string!]
+        } catch {
+            self.popUpText = "Bir hata meydana geldi"
+            self.popUp = true
+            return
+        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: body)
+        request.httpBody = jsonData
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            do{
+                let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
+                if (response.status != true){
+                    self.popUpText = response.errors![0]
+                    self.popUp = true
+                    return
+                }
+                self.popUpText = "İstediğiniz dökümanlar size mail olarak gönderilecek"
+                self.popUp = true
+                DispatchQueue.main.async {
+                    pm.wrappedValue.dismiss()
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
     }
 }

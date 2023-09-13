@@ -13,6 +13,8 @@ class Meeting : Codable {
     var title: String?
     var start_at: String?
     var finish_at: String?
+    var hall_count: Int?
+    var first_hall_id: Int?
 }
 
 class MeetingJSON : Codable, Identifiable{

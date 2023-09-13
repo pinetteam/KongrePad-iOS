@@ -1,0 +1,128 @@
+//
+//  ContentView.swift
+//  KongrePad
+//
+//  Created by Mert Demirbağ on 16.08.2023.
+//
+
+import SwiftUI
+import PusherSwift
+
+struct ProgramDaysView: View{
+    @Environment(\.presentationMode) var pm
+    @State var meeting: Meeting?
+    @Binding var hallId: Int
+    @State var virtualStands: [VirtualStand]?
+    @State var programs: [Program]?
+    @State var programDays: [ProgramDay]?
+    @State var bannerName : String = ""
+    var body: some View {
+        NavigationStack {
+            GeometryReader{ geometry in
+                let screen_width = geometry.size.width
+                let screen_height = geometry.size.height
+                VStack(alignment: .center, spacing: 0){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            pm.wrappedValue.dismiss()
+                        }.frame(width: screen_width*0.1)
+                        Text("BİLİMSEL PROGRAM")
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                    }
+                    Spacer()
+                    VStack(alignment: .center){
+                        ScrollView(.vertical){
+                            VStack(spacing: 10){
+                                ForEach(self.programDays ?? []){day in
+                                    NavigationLink(destination: ProgramsView(programDay: day)){
+                                        HStack{
+                                            Text(day.day!)
+                                                .font(.system(size: 20))
+                                                .foregroundColor(AppColors.bgBlue)
+                                                .padding()
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
+                                                .font(.system(size: 20)).bold().padding(8)
+                                                .foregroundColor(AppColors.bgBlue)
+                                        }
+                                        .frame(width: screen_width*0.8, height: screen_height*0.08)
+                                        .background(AppColors.programDayBackground)
+                                        .cornerRadius(5)
+                                    }    
+                                }
+                            }
+                        }.frame(width: screen_width*0.85, height: screen_height*0.7)
+                    }
+                    Spacer()
+                }.navigationBarBackButtonHidden(true)
+                }
+            .background(AppColors.bgBlue)
+        }
+        .onAppear{
+            getMeeting()
+            getPrograms()
+        }
+    }
+    
+    func getMeeting(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.meeting = meeting.data
+                }
+                self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
+    func getPrograms(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/program") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let programs = try JSONDecoder().decode(ProgramsJson.self, from: data)
+                DispatchQueue.main.async {
+                    self.programDays = programs.data
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+
+}

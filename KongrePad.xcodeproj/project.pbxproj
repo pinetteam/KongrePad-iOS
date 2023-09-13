@@ -17,6 +17,8 @@
 		08320E6D2AA439090046AE41 /* ScoreGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E6C2AA439090046AE41 /* ScoreGameView.swift */; };
 		08320E6F2AA8B68E0046AE41 /* Keypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E6E2AA8B68E0046AE41 /* Keypad.swift */; };
 		08320E712AA8B7180046AE41 /* KeypadOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E702AA8B7180046AE41 /* KeypadOption.swift */; };
+		08320E732AB0632E0046AE41 /* ProgramDaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E722AB0632E0046AE41 /* ProgramDaysView.swift */; };
+		08320E752AB13BCB0046AE41 /* VirtualStandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E742AB13BCB0046AE41 /* VirtualStandView.swift */; };
 		0838153F2AA3EE7600E79B15 /* AskQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0838153E2AA3EE7600E79B15 /* AskQuestionView.swift */; };
 		087B49562A96A9BC00BEC00C /* VirtualStand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087B49552A96A9BC00BEC00C /* VirtualStand.swift */; };
 		087B49582A96BB2300BEC00C /* Announcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087B49572A96BB2300BEC00C /* Announcement.swift */; };
@@ -57,6 +59,8 @@
 		08320E6C2AA439090046AE41 /* ScoreGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreGameView.swift; sourceTree = "<group>"; };
 		08320E6E2AA8B68E0046AE41 /* Keypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keypad.swift; sourceTree = "<group>"; };
 		08320E702AA8B7180046AE41 /* KeypadOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadOption.swift; sourceTree = "<group>"; };
+		08320E722AB0632E0046AE41 /* ProgramDaysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramDaysView.swift; sourceTree = "<group>"; };
+		08320E742AB13BCB0046AE41 /* VirtualStandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualStandView.swift; sourceTree = "<group>"; };
 		0838153E2AA3EE7600E79B15 /* AskQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskQuestionView.swift; sourceTree = "<group>"; };
 		087B49552A96A9BC00BEC00C /* VirtualStand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualStand.swift; sourceTree = "<group>"; };
 		087B49572A96BB2300BEC00C /* Announcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
@@ -126,6 +130,7 @@
 				08320E6E2AA8B68E0046AE41 /* Keypad.swift */,
 				08320E702AA8B7180046AE41 /* KeypadOption.swift */,
 				087B49552A96A9BC00BEC00C /* VirtualStand.swift */,
+				08320E742AB13BCB0046AE41 /* VirtualStandView.swift */,
 				087B49572A96BB2300BEC00C /* Announcement.swift */,
 				08AB71FB2A94C68A00EA59DF /* Meeting.swift */,
 				08B6E9762A96597F00F9B529 /* Participant.swift */,
@@ -146,6 +151,7 @@
 				087B49642A9D4F2D00BEC00C /* Document.swift */,
 				08D643052AA16E1400C7E676 /* Program.swift */,
 				08D643072AA1708200C7E676 /* ProgramsView.swift */,
+				08320E722AB0632E0046AE41 /* ProgramDaysView.swift */,
 				08D6430B2AA1DF8F00C7E676 /* ProfileView.swift */,
 				08320E662AA424F10046AE41 /* AnnouncementsView.swift */,
 				08D643092AA1BEF300C7E676 /* Session.swift */,
@@ -253,6 +259,7 @@
 				087B49632A9D455800BEC00C /* SessionView.swift in Sources */,
 				08D643082AA1708200C7E676 /* ProgramsView.swift in Sources */,
 				08320E6D2AA439090046AE41 /* ScoreGameView.swift in Sources */,
+				08320E752AB13BCB0046AE41 /* VirtualStandView.swift in Sources */,
 				08D643062AA16E1400C7E676 /* Program.swift in Sources */,
 				08320E692AA437B40046AE41 /* ScoreGame.swift in Sources */,
 				08D6430E2AA375DD00C7E676 /* Survey.swift in Sources */,
@@ -276,6 +283,7 @@
 				087B49582A96BB2300BEC00C /* Announcement.swift in Sources */,
 				08AB71E12A8D223800EA59DF /* KongrePadApp.swift in Sources */,
 				087B49652A9D4F2D00BEC00C /* Document.swift in Sources */,
+				08320E732AB0632E0046AE41 /* ProgramDaysView.swift in Sources */,
 				08320E6F2AA8B68E0046AE41 /* Keypad.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -423,7 +431,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -459,7 +467,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -29,7 +29,7 @@ struct AnnouncementsView: View{
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
                         }.frame(width: screen_width*0.1)
-                        Text("Bildirimler")
+                        Text("BLDİRİMLER")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)

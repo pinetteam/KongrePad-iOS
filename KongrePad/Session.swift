@@ -23,3 +23,11 @@ class Session : Codable, Identifiable{
     var question_auto_start: Int?
     var status: Int?
 }
+
+
+
+class SessionJSON : Codable, Identifiable{
+    var data: Session?
+    var errors: [String]?
+    var status: Bool?
+}

@@ -13,20 +13,21 @@ struct MainPageView: View{
     @Environment(\.presentationMode) var pm
     @State var isHallsForDocumentPresented = false
     @State var isHallsForProgramPresented = false
-    @State var keypadPresent = false
-    @State var debatePresent = false
+    @State var isHallsForAskQuestionPresented = false
+    @State var selectedVirtualStandId: Int = 0
     @State var hallId: Int = 0
     @State var logOut = false
     @State var goToSession = false
     @State var goToPrograms = false
+    @State var goToAskQuestion = false
+    @State var goToVirtualStand = false
     @State var meeting: Meeting?
-    @State var keypad: Keypad?
-    @State var debate: Debate?
     @State var participant: Participant?
     @State var virtualStands: [VirtualStand]?
     @State var announcements: [Announcement]?
     @State var bannerName : String = ""
     @State var pdfURL: URL?
+    @State var standPdfURL: URL?
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in
@@ -43,7 +44,7 @@ struct MainPageView: View{
                         }
                     ZStack(alignment: .top){
                         Ellipse()
-                            .fill(.blue)
+                            .fill(AppColors.bgLightBlue)
                             .frame(width: screen_width*1.5, height: screen_height*0.2)
                             .offset(y: -screen_height*0.1)
                             .clipped()
@@ -64,20 +65,21 @@ struct MainPageView: View{
                             VStack(alignment: .center, spacing: 1){
                                     ZStack(alignment: .bottom){
                                         Text("Sanal Stant Alanı")
-                                            .padding(5)
+                                            .padding(6)
                                             .foregroundColor(Color.blue).font(.system(size:20))
                                             .background(Color.white)
-                                            .padding(.bottom, 5)
-                                            .cornerRadius(5)
-                                            .padding(.bottom, -5)
+                                            .padding(.bottom, 15)
+                                            .cornerRadius(15)
+                                            .padding(.bottom, -15)
                                         Rectangle()
                                                 .frame(width: screen_width*0.9, height: screen_height*0.002)
                                                 .foregroundColor(Color.white).zIndex(-1)
                                     }
-                                ScrollView(.horizontal){
-                                    HStack(spacing: 10){
-                                        ForEach(self.virtualStands ?? []){stand in
-                                            HStack{
+                                NavigationLink(destination: VirtualStandView(pdfURL: $standPdfURL, virtualStandId: $selectedVirtualStandId), isActive: $goToVirtualStand)
+                                {
+                                    ScrollView(.horizontal){
+                                        HStack(spacing: 10){
+                                            ForEach(self.virtualStands ?? []){stand in
                                                 AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")){ image in
                                                     image
                                                         .resizable()
@@ -86,12 +88,15 @@ struct MainPageView: View{
                                                 } placeholder: {
                                                     ProgressView()
                                                 }
-                                                    
-                                                    .scaledToFill()
+                                                .scaledToFill()
+                                                .onTapGesture{
+                                                    self.selectedVirtualStandId = stand.id!
+                                                    self.goToVirtualStand = true
+                                                }
                                             }
                                         }
-                                    }
-                                }.frame(width: screen_width*0.85, height: screen_height*0.06)
+                                    }.frame(width: screen_width*0.85, height: screen_height*0.06)
+                                }
                                 
                             Rectangle()
                                     .frame(width: screen_width*0.9, height: screen_height*0.002)
@@ -99,51 +104,63 @@ struct MainPageView: View{
                         }
                         .shadow(radius: 6)
                     Spacer()
-                    VStack(alignment: .center, spacing: 15){                        VStack(alignment: .center){
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 40))
-                            .foregroundColor(.white)
-                        Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
-                    }.frame(width: screen_width*0.76, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
-                            .onTapGesture {
-                                self.isHallsForDocumentPresented = true
-                            }.sheet(isPresented: $isHallsForDocumentPresented){
-                                HallsForDocument(goToSession: $goToSession, pdfURL: $pdfURL, hallId: $hallId)
-                            }.background(
-                                NavigationLink(destination: SessionView(pdfURL: $pdfURL, hallId: $hallId), isActive: $goToSession){
-                                    EmptyView()
-                                })
+                    VStack(alignment: .center, spacing: 15){
                         HStack{
                             VStack(alignment: .center){
-                                Text("Keypad Deneme").font(.system(size: 20)).foregroundColor(.white)
-                            }.frame(width: screen_width*0.37, height: screen_height*0.05).background(AppColors.buttonPurple).cornerRadius(10)
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(.white)
+                            Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
+                        }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
                                 .onTapGesture {
-                                    getKeypad(HallId: 5)
-                                    self.keypadPresent = true
-                                }.sheet(isPresented: $keypadPresent){
-                                    KeypadView(keypad: $keypad)
-                                }
+                                    if self.meeting?.hall_count == 1 {
+                                        self.goToSession = true
+                                        self.hallId = (self.meeting?.first_hall_id)!
+                                    } else {
+                                        self.isHallsForDocumentPresented = true
+                                    }
+                                }.sheet(isPresented: $isHallsForDocumentPresented){
+                                    HallsForDocument(goToSession: $goToSession, pdfURL: $pdfURL, hallId: $hallId)
+                                }.background(
+                                    NavigationLink(destination: SessionView(pdfURL: $pdfURL, hallId: $hallId), isActive: $goToSession){
+                                        EmptyView()
+                                    })
                             VStack(alignment: .center){
-                                Text("Debate Deneme").font(.system(size: 20)).foregroundColor(.white)
-                            }.frame(width: screen_width*0.37, height: screen_height*0.05).background(AppColors.buttonPurple).cornerRadius(10)
+                            Image(systemName: "questionmark")
+                                .font(.system(size: 40))
+                                .foregroundColor(.white)
+                            Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
+                        }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
                                 .onTapGesture {
-                                    getDebate(HallId: 5)
-                                    self.debatePresent = true
-                                }.sheet(isPresented: $debatePresent){
-                                    DebateView(debate: $debate)
-                                }
+                                    if self.meeting?.hall_count == 1 {
+                                        self.goToAskQuestion = true
+                                        self.hallId = (self.meeting?.first_hall_id)!
+                                    } else {
+                                        self.isHallsForAskQuestionPresented = true
+                                    }
+                                }.sheet(isPresented: $isHallsForAskQuestionPresented){
+                                    HallsForAskQuestion(goToAskQuestion: $goToAskQuestion, hallId: $hallId)
+                                }.background(
+                                    NavigationLink(destination: AskQuestionView(hallId: $hallId), isActive: $goToAskQuestion){
+                                        EmptyView()
+                                    })
                         }
                         HStack(spacing: 10){
                                 VStack(alignment: .center){
                                     Label("", systemImage: "doc.text").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Bilimsel Program").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonYellow).cornerRadius(10)
+                                }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonYellow).cornerRadius(10)
                                 .onTapGesture {
-                                    self.isHallsForProgramPresented = true
+                                    if self.meeting?.hall_count == 1 {
+                                        self.goToPrograms = true
+                                        self.hallId = (self.meeting?.first_hall_id)!
+                                    } else {
+                                        self.isHallsForProgramPresented = true
+                                    }
                                 }.sheet(isPresented: $isHallsForProgramPresented){
                                     HallsForProgram(goToProgram: $goToPrograms, hallId: $hallId)
                                 }.background(
-                                    NavigationLink(destination: ProgramsView(hallId: $hallId), isActive: $goToPrograms){
+                                    NavigationLink(destination: ProgramDaysView(hallId: $hallId), isActive: $goToPrograms){
                                     EmptyView()
                                 })
                             NavigationLink(destination: SendMailView())
@@ -151,7 +168,7 @@ struct MainPageView: View{
                                 VStack(alignment: .center){
                                     Label("", systemImage: "envelope.badge").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Mail Gönder").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonLightBlue).cornerRadius(10)
+                                }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonLightBlue).cornerRadius(10)
                             }
                         }
 
@@ -161,14 +178,14 @@ struct MainPageView: View{
                                 VStack(alignment: .center){
                                     Label("", systemImage: "text.badge.checkmark").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Anketler").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonDarkBlue).cornerRadius(10)
+                                }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonDarkBlue).cornerRadius(10)
                             }
                             NavigationLink(destination: ScoreGameView())
                             {
                                 VStack(alignment: .center){
                                     Label("", systemImage: "leaf.arrow.circlepath").font(.system(size: 40)).foregroundColor(.white)
                                     Text("Doğaya Can Ver").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: screen_width*0.37, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
+                                }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
                             }
                         }
                     }
@@ -178,7 +195,7 @@ struct MainPageView: View{
                             Label("", systemImage: "rectangle.portrait.and.arrow.right")
                                 .labelStyle(.iconOnly)
                                 .font(.system(size: 20, weight: .heavy))
-                                .foregroundColor(Color.blue).padding()
+                                .foregroundColor(AppColors.logoutButtonBlue).padding()
                                 .onTapGesture {
                                     let userDefault = UserDefaults.standard
                                     userDefault.set(nil, forKey: "token")
@@ -213,13 +230,6 @@ struct MainPageView: View{
             getParticipant()
             getVirtualStands()
             getAnnouncements()
-        }
-    }
-    
-    
-    struct MainPageView_Previews: PreviewProvider {
-        static var previews: some View {
-            MainPageView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
         }
     }
     
@@ -324,59 +334,7 @@ struct MainPageView: View{
         }.resume()
     }
     
-    func getKeypad(HallId: Int){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-keypad") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let keypad = try JSONDecoder().decode(KeypadJSON.self, from: data)
-                if keypad.status!{
-                    DispatchQueue.main.async {
-                        self.keypad = keypad.data
-                    }
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
     
-    func getDebate(HallId: Int){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-debate") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let debate = try JSONDecoder().decode(DebateJSON.self, from: data)
-                if debate.status!{
-                    DispatchQueue.main.async {
-                        self.debate = debate.data
-                    }
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
 
     
     
@@ -394,7 +352,7 @@ struct HallsForDocument: View {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                VStack(alignment: .leading){
+                VStack(alignment: .center){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
@@ -412,45 +370,26 @@ struct HallsForDocument: View {
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
                     }.frame(width: screen_width).background(AppColors.bgBlue)
-                    HStack{
-                        Label("", systemImage: "chevron.left")
-                            .labelStyle(.iconOnly)
-                            .font(.system(size: 20, weight: .heavy))
-                            .foregroundColor(AppColors.bgBlue).padding()
-                        Spacer()
-                        ScrollView(.horizontal){
-                            HStack{
+                    Spacer()
+                        ScrollView(.vertical){
+                            VStack{
                                 ForEach(self.halls ?? []){hall in
-                                        VStack(alignment: .center){
-                                            ZStack(alignment: .bottom){
-                                                Text(hall.title!).foregroundColor(Color.white)
-                                                    .frame(width: screen_width*0.5, height: screen_width*0.5)
-                                                    .background(AppColors.bgBlue)
-                                                    .clipShape(Circle())
-                                                Text("Kişi Sayısı")
-                                                    .foregroundColor(Color.white)
-                                                    .frame(width: screen_width*0.5, height: screen_height*0.05)
-                                                    .background(AppColors.buttonGreen)
-                                            }
-                                        }.frame(width: screen_width*0.5)
-                                            .onTapGesture {
-                                                self.hallId = hall.id!
-                                                getDocument(HallId: hall.id!)
-                                                self.goToSession = true
-                                                dismiss()
+                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                        .frame(width: screen_width*0.9, height: screen_height*0.1)
+                                        .background(AppColors.programTitleBlue).cornerRadius(5)
+                                        .onTapGesture {
+                                            self.hallId = hall.id!
+                                            getDocument(HallId: hall.id!)
+                                            self.goToSession = true
+                                            dismiss()
                                         }
                                     }
                                 }
                         }.onAppear{
                             getHalls()
-                        }.frame(width: screen_width*0.5)
-                        Spacer()
-                        Label("", systemImage: "chevron.right")
-                            .labelStyle(.iconOnly)
-                            .font(.system(size: 20, weight: .heavy))
-                            .foregroundColor(AppColors.bgBlue).padding()
-                    }
-                }
+                        }
+                    Spacer()
+                }.background(AppColors.bgBlue)
             }
         }
     }
@@ -508,6 +447,7 @@ struct HallsForDocument: View {
         }.resume()
     }
 }
+
 struct HallsForProgram: View {
     @State var halls: [Hall]?
     @Binding var goToProgram: Bool
@@ -518,7 +458,7 @@ struct HallsForProgram: View {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                VStack(alignment: .leading){
+                VStack(alignment: .center){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
@@ -536,44 +476,102 @@ struct HallsForProgram: View {
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
                     }.frame(width: screen_width).background(AppColors.bgBlue)
-                    HStack{
-                        Label("", systemImage: "chevron.left")
-                            .labelStyle(.iconOnly)
-                            .font(.system(size: 20, weight: .heavy))
-                            .foregroundColor(AppColors.bgBlue).padding()
-                        Spacer()
-                        ScrollView(.horizontal){
-                            HStack{
+                    Spacer()
+                        ScrollView(.vertical){
+                            VStack{
                                 ForEach(self.halls ?? []){hall in
-                                        VStack(alignment: .center){
-                                            ZStack(alignment: .bottom){
-                                                Text(hall.title!).foregroundColor(Color.white)
-                                                    .frame(width: screen_width*0.5, height: screen_width*0.5)
-                                                    .background(AppColors.bgBlue)
-                                                    .clipShape(Circle())
-                                                Text("Kişi Sayısı")
-                                                    .foregroundColor(Color.white)
-                                                    .frame(width: screen_width*0.5, height: screen_height*0.05)
-                                                    .background(AppColors.buttonGreen)
-                                            }
-                                        }.frame(width: screen_width*0.5)
-                                            .onTapGesture {
-                                                self.hallId = hall.id!
-                                                self.goToProgram = true
-                                                dismiss()
+                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                        .frame(width: screen_width*0.9, height: screen_height*0.1)
+                                        .background(AppColors.programTitleBlue).cornerRadius(5)
+                                        .onTapGesture {
+                                            self.hallId = hall.id!
+                                            self.goToProgram = true
+                                            dismiss()
                                         }
                                     }
                                 }
                         }.onAppear{
                             getHalls()
-                        }.frame(width: screen_width*0.5)
-                        Spacer()
-                        Label("", systemImage: "chevron.right")
-                            .labelStyle(.iconOnly)
-                            .font(.system(size: 20, weight: .heavy))
-                            .foregroundColor(AppColors.bgBlue).padding()
-                    }
+                        }
+                    Spacer()
+                }.background(AppColors.bgBlue)
+            }
+        }
+    }
+    func getHalls(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let halls = try JSONDecoder().decode(HallsJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.halls = halls.data
                 }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+
+}
+
+struct HallsForAskQuestion: View {
+    @State var halls: [Hall]?
+    @Binding var goToAskQuestion: Bool
+    @Binding var hallId: Int
+    @Environment (\.dismiss) var dismiss
+    var body: some View{
+        NavigationStack{
+            GeometryReader{ geometry in
+                let screen_width = geometry.size.width
+                let screen_height = geometry.size.height
+                VStack(alignment: .center){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                        .font(.system(size: 20)).bold().padding(8)
+                        .foregroundColor(Color.blue)
+                        .background(
+                            Circle().fill(AppColors.buttonLightBlue)
+                        )
+                        .padding(5)
+                        .onTapGesture {
+                            dismiss()
+                        }.frame(width: screen_width*0.1)
+                        Text("Lütfen soru sormak istediğiniz salonu seçiniz")
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .background(AppColors.bgBlue)
+                            .multilineTextAlignment(.center)
+                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                    Spacer()
+                        ScrollView(.vertical){
+                            VStack{
+                                ForEach(self.halls ?? []){hall in
+                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                        .frame(width: screen_width*0.9, height: screen_height*0.1)
+                                        .background(AppColors.programTitleBlue).cornerRadius(5)
+                                        .onTapGesture {
+                                            self.hallId = hall.id!
+                                            self.goToAskQuestion = true
+                                            dismiss()
+                                        }
+                                    }
+                                }
+                        }.onAppear{
+                            getHalls()
+                        }
+                    Spacer()
+                }.background(AppColors.bgBlue)
             }
         }
     }

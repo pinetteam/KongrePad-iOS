@@ -9,8 +9,8 @@ import SwiftUI
 
 struct AskQuestionView : View {
     @Environment(\.presentationMode) var pm
-    @State var meeting: Meeting?
-    @State var hallId: Int!
+    @Binding var hallId: Int
+    @State var session: Session?
     @State var question = "soru"
     @State var is_hidden_name = false
     @State var popUp = false
@@ -33,21 +33,19 @@ struct AskQuestionView : View {
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
                         }.frame(width: screen_width*0.1)
-                        Text("Sunucuya sormak istediğiniz soruyu yazın")
+                        Text("\(self.session?.title ?? "")")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                    }
+                    }.frame(width: screen_width)
                     Spacer()
                     VStack{
                         Text("Soru Sor").font(.system(size: 40)).bold().foregroundColor(Color.white)
                         Image(systemName: "questionmark").font(.system(size: 40)).bold().foregroundColor(Color.white)
                         TextField("soru", text: $question, axis: .vertical)
-                            .textFieldStyle(.roundedBorder)
-                            .background(Color.gray)
-                            .frame(height: screen_height*0.4)
-                            .cornerRadius(10).padding()
+                            .frame(width: screen_width*0.65, height: screen_height*0.3)
+                            .background(Color.white).cornerRadius(10).padding()
                         HStack{
                             Image(systemName: is_hidden_name ? "checkmark.square" : "square.fill")
                             Text("İsmim Görünmesin")
@@ -57,11 +55,11 @@ struct AskQuestionView : View {
                             .onTapGesture {
                                 self.is_hidden_name = !self.is_hidden_name
                             }
-                    }.frame(width: screen_width*0.7).background(Color.red).cornerRadius(10)
+                    }.frame(width: screen_width*0.8).background(Color.red).cornerRadius(10)
                     Spacer().frame(height: 15)
                     Text("GÖNDER")
-                        .frame(width: screen_width*0.7, height: screen_height*0.05)
-                        .background(Color.green)
+                        .frame(width: screen_width*0.8, height: screen_height*0.05)
+                        .background(AppColors.buttonGreen)
                         .cornerRadius(5)
                         .onTapGesture {
                         askQuestion()
@@ -70,41 +68,18 @@ struct AskQuestionView : View {
                 }.background(AppColors.bgBlue)
             }
         }
+        .onAppear{
+            getSession()
+        }
         .alert(popUpText, isPresented: $popUp){
             Button("OK", role: .cancel){}
         }
         .navigationBarBackButtonHidden(true)
-        .onAppear{
-                getMeeting()
-            }
     }
     
-        func getMeeting(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.meeting = meeting.data
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
+    
     func askQuestion(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(String(describing: self.hallId!))/session-question") else {
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(String(describing: self.hallId))/session-question") else {
             return
         }
         let body: [String: Any] = ["question": self.question, "is_hidden_name": self.is_hidden_name ? 1 : 0]
@@ -127,6 +102,31 @@ struct AskQuestionView : View {
                 } else {
                     self.popUpText = "Bir Sorun Meydana geldi"
                     self.popUp = true
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
+    func getSession(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/active-session") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let session = try JSONDecoder().decode(SessionJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.session = session.data
                 }
             } catch {
                 print(error)

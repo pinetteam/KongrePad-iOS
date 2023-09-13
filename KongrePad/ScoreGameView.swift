@@ -46,17 +46,15 @@ struct ScoreGameView: View {
                         let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
                         if (response.status != true){
                             self.isPresentingScanner = false
-                            self.popUp = true
-                            self.popUpText = response.errors![0]
+                            self.scanError = response.errors![0]
                             return
                         }
-                        self.popUpText = "qr Kod başarıyla okutuldu"
+                        self.scanError = "qr Kod başarıyla okutuldu"
                         getPoints()
                     } catch {
                         print(error)
                     }
                 }.resume()
-                self.popUp = true
                 self.isPresentingScanner = false
             }
         })

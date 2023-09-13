@@ -3,14 +3,17 @@ import SwiftUI
 
 struct AppColors{
     static let bgBlue = Color("BackgroundBlue")
+    static let bgLightBlue = Color("bgLightBlue")
     static let buttonLightBlue = Color("buttonLightBlue")
     static let buttonDarkBlue = Color("buttonDarkBlue")
     static let buttonYellow = Color("buttonYellow")
     static let buttonGreen = Color("buttonGreen")
     static let buttonPink = Color("buttonPink")
     static let buttonPurple = Color("buttonPurple")
+    static let logoutButtonBlue = Color("logoutButtonBlue")
     static let programDateYellow = Color("programDateYellow")
     static let programTitleBlue = Color("programTitleBlue")
+    static let programDayBackground = Color("programDayBackground")
 }
 
 
