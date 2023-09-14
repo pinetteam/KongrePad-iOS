@@ -11,7 +11,7 @@ struct AskQuestionView : View {
     @Environment(\.presentationMode) var pm
     @Binding var hallId: Int
     @State var session: Session?
-    @State var question = "soru"
+    @State var question = "Soru sor"
     @State var is_hidden_name = false
     @State var popUp = false
     @State var popUpText = ""
@@ -25,9 +25,9 @@ struct AskQuestionView : View {
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(AppColors.bgBlue)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(AppColors.logoutButtonBlue)
                         )
                         .padding(5)
                         .onTapGesture {
@@ -41,25 +41,29 @@ struct AskQuestionView : View {
                     }.frame(width: screen_width)
                     Spacer()
                     VStack{
-                        Text("Soru Sor").font(.system(size: 40)).bold().foregroundColor(Color.white)
-                        Image(systemName: "questionmark").font(.system(size: 40)).bold().foregroundColor(Color.white)
+                        Text("\(self.session?.speaker_name ?? "")")
+                            .foregroundColor(Color.white)
+                            .bold()
+                            .multilineTextAlignment(.center)
+                            .padding()
                         TextField("soru", text: $question, axis: .vertical)
-                            .frame(width: screen_width*0.65, height: screen_height*0.3)
+                            .frame(width: screen_width*0.85, height: screen_height*0.3)
                             .background(Color.white).cornerRadius(10).padding()
                         HStack{
                             Image(systemName: is_hidden_name ? "checkmark.square" : "square.fill")
-                            Text("İsmim Görünmesin")
+                            Text("İsmimi gizle")
                         }
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.4)
-                            .onTapGesture {
-                                self.is_hidden_name = !self.is_hidden_name
-                            }
-                    }.frame(width: screen_width*0.8).background(Color.red).cornerRadius(10)
+                        .foregroundColor(Color.white)
+                        .frame(width: screen_width*0.5)
+                        .onTapGesture {
+                            self.is_hidden_name = !self.is_hidden_name
+                        }.padding()
+                    }.frame(width: screen_width*0.9).background(Color.red).cornerRadius(10)
                     Spacer().frame(height: 15)
                     Text("GÖNDER")
-                        .frame(width: screen_width*0.8, height: screen_height*0.05)
-                        .background(AppColors.buttonGreen)
+                        .frame(width: screen_width*0.9, height: screen_height*0.08)
+                        .foregroundColor(Color.white)
+                        .background(AppColors.sendButtonGreen)
                         .cornerRadius(5)
                         .onTapGesture {
                         askQuestion()

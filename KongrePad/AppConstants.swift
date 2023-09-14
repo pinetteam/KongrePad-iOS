@@ -2,18 +2,26 @@ import SwiftUI
 
 
 struct AppColors{
-    static let bgBlue = Color("BackgroundBlue")
+    static let bgBlue = Color("bgBlue")
     static let bgLightBlue = Color("bgLightBlue")
+    static let bgLightPink = Color("bgLightPink")
+    static let bgLightYellow = Color("bgLightYellow")
+    static let notificationsRed = Color("notificationsRed")
+    static let sendMailBlue = Color("sendMailBlue")
+    static let bgOrange = Color("bgOrange")
     static let buttonLightBlue = Color("buttonLightBlue")
     static let buttonDarkBlue = Color("buttonDarkBlue")
     static let buttonYellow = Color("buttonYellow")
     static let buttonGreen = Color("buttonGreen")
     static let buttonPink = Color("buttonPink")
+    static let buttonRed = Color("buttonRed")
     static let buttonPurple = Color("buttonPurple")
     static let logoutButtonBlue = Color("logoutButtonBlue")
+    static let sendButtonGreen = Color("sendButtonGreen")
     static let programDateYellow = Color("programDateYellow")
     static let programTitleBlue = Color("programTitleBlue")
     static let programDayBackground = Color("programDayBackground")
+    static let programButtonBlue = Color("programButtonBlue")
 }
 
 
@@ -30,9 +38,9 @@ struct KeypadView: View {
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(AppColors.bgBlue)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(AppColors.logoutButtonBlue)
                         )
                         .padding(5)
                         .onTapGesture {
@@ -41,9 +49,12 @@ struct KeypadView: View {
                         Text("\(keypad?.keypad ?? "")")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
+                            .background(AppColors.sendMailBlue)
                             .multilineTextAlignment(.center)
-                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                    }
+                    .frame(width: screen_width)
+                    .background(AppColors.sendMailBlue)
+                    .overlay(Divider().background(.white), alignment: .bottom)
                     Spacer()
                     ScrollView(.vertical){
                         VStack(spacing: 10){
@@ -128,9 +139,9 @@ struct DebateView: View {
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(AppColors.bgBlue)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(AppColors.logoutButtonBlue)
                         )
                         .padding(5)
                         .onTapGesture {
@@ -139,9 +150,12 @@ struct DebateView: View {
                         Text("\(debate?.title ?? "")")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
+                            .background(AppColors.sendMailBlue)
                             .multilineTextAlignment(.center)
-                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                    }
+                    .frame(width: screen_width)
+                    .background(AppColors.sendMailBlue)
+                    .overlay(Divider().background(.white), alignment: .bottom)
                     Spacer()
                     ScrollView(.vertical){
                         VStack(spacing: 10){

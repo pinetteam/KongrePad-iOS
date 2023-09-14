@@ -26,9 +26,9 @@ struct SurveyView : View {
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(AppColors.bgBlue)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(AppColors.logoutButtonBlue)
                         )
                         .padding(5)
                         .onTapGesture {
@@ -37,9 +37,12 @@ struct SurveyView : View {
                         Text("\(survey?.title ?? "")")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
+                            .background(AppColors.sendMailBlue)
                             .multilineTextAlignment(.center)
                     }
+                    .frame(width: screen_width)
+                    .background(AppColors.sendMailBlue)
+                    .overlay(Divider().background(.white), alignment: .bottom)
                     ScrollView(.vertical){
                         VStack(alignment: .leading, spacing: 20){
                             ForEach(self.questions ?? []){question in
@@ -60,7 +63,7 @@ struct SurveyView : View {
                                 Divider()
                             }
                         }.padding()
-                    }.frame(width: screen_width*0.8, height: screen_height*0.7)
+                    }.frame(width: screen_width*0.9, height: screen_height*0.75)
                         .background(Color.white)
                         .cornerRadius(20)
                     Spacer()

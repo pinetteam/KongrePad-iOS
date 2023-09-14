@@ -26,27 +26,27 @@ struct VirtualStandView : View {
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(Color.black)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(Color.white)
                         )
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
                         }.frame(width: screen_width*0.1)
                         Text("\(virtualStand?.title ?? "")")
+                            .font(.system(size: 30))
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
                     }
+                    .frame(width: screen_width)
+                    .background(AppColors.bgOrange)
                     PdfKitRepresentedView(documentURL: $pdfURL)
-                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
-            
-                }.background(AppColors.bgBlue)
-        }
-                
-        }
+                    Rectangle().frame(width: screen_width, height: screen_height*0.05).foregroundColor(Color.gray)
+                }
+            }
+        }.background(Color.gray)
         .navigationBarBackButtonHidden(true)
         .onAppear{
                 getVirtualStand()

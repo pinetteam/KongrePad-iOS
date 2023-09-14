@@ -21,35 +21,40 @@ struct ProgramsView: View{
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(Color.black)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(Color.white)
                         )
-                        .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
                         }.frame(width: screen_width*0.1)
-                        Text("Bilimsel Program")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
-                            .multilineTextAlignment(.center)
-                    }
+                        .padding()
+                        Spacer()
+                    }.frame(width: screen_width)
                     Spacer().frame(height: 5)
                     VStack(alignment: .center){
                         Text("Bilimsel Program")
-                            .font(.largeTitle)
+                            .bold()
+                            .padding()
                             .foregroundColor(AppColors.bgBlue)
                             .frame(width: screen_width*0.85)
                             .background(AppColors.buttonYellow)
-                            .cornerRadius(5)
+                            .overlay (
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(.black)
+                            )
+                            .cornerRadius(8)
                         Spacer().frame(height: 5)
                         Text("\(programDay?.day ?? "")")
                             .foregroundColor(AppColors.bgBlue)
-                            .bold()
+                            .padding()
                             .frame(width: screen_width*0.85)
-                            .background(AppColors.buttonYellow)
-                            .cornerRadius(5)
+                            .background(AppColors.programDateYellow)
+                            .overlay (
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(.black)
+                            )
+                            .cornerRadius(8)
                         ScrollView(.vertical){
                             VStack(spacing: 10){
                                 ForEach(self.programDay?.programs ?? []){program in
@@ -66,7 +71,11 @@ struct ProgramsView: View{
                                         .frame(maxHeight: .infinity)
                                         .frame(width: screen_width*0.20)
                                         .background(AppColors.programDateYellow)
-                                            .cornerRadius(5)
+                                        .overlay (
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(.black)
+                                        )
+                                        .cornerRadius(8)
                                         VStack(alignment: .leading){
                                             Text(program.title!)
                                                 .font(.system(size: 20))
@@ -80,7 +89,11 @@ struct ProgramsView: View{
                                         .frame(maxHeight: .infinity)
                                         .frame(width: screen_width*0.65)
                                         .background(AppColors.programTitleBlue)
-                                        .cornerRadius(5)
+                                        .overlay (
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(.black)
+                                        )
+                                        .cornerRadius(8)
                                     }
                                     ForEach(program.sessions ?? []){session in
                                         HStack{
@@ -96,7 +109,11 @@ struct ProgramsView: View{
                                             .frame(maxHeight: .infinity)
                                             .frame(width: screen_width*0.20)
                                             .background(AppColors.programDateYellow)
-                                                .cornerRadius(5)
+                                            .overlay (
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(.black)
+                                            )
+                                            .cornerRadius(8)
                                             VStack(alignment: .leading){
                                                 Text(session.title!)
                                                     .font(.system(size: 20))
@@ -105,28 +122,25 @@ struct ProgramsView: View{
                                             .frame(maxHeight: .infinity)
                                             .frame(width: screen_width*0.65)
                                             .background(AppColors.programTitleBlue)
-                                            .cornerRadius(5)
+                                            .overlay (
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(.black)
+                                            )
+                                            .cornerRadius(8)
                                         }
                                         
                                     }
                                        
                                 }
                             }
-                        }.frame(width: screen_width*0.85, height: screen_height*0.7)
+                        }.frame(width: screen_width*0.85, height: screen_height*0.8)
                     }
                 }.navigationBarBackButtonHidden(true)
                 }
-            .background(AppColors.bgBlue)
+            .background(AppColors.bgLightYellow)
         }
         .onAppear{
             getMeeting()
-        }
-    }
-    
-    
-    struct MainPageView_Previews: PreviewProvider {
-        static var previews: some View {
-            MainPageView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
         }
     }
     

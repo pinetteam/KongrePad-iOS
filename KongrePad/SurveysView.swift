@@ -25,9 +25,9 @@ struct SurveysView: View{
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(AppColors.bgBlue)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(AppColors.logoutButtonBlue)
                         )
                         .padding(5)
                         .onTapGesture {
@@ -40,9 +40,12 @@ struct SurveysView: View{
                                 .foregroundColor(Color.white).font(.system(size:15))
                         }
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
+                            .background(AppColors.sendMailBlue)
                             .multilineTextAlignment(.center)
                     }
+                    .frame(width: screen_width)
+                    .background(AppColors.sendMailBlue)
+                    .overlay(Divider().background(.white), alignment: .bottom)
                     Spacer().frame(height: 20)
                     NavigationLink(destination: SurveyView(surveyId: $surveyId, popUp: $popUp, popUpText: $popUpText), isActive: $goToSurvey){
                         ScrollView(.vertical){

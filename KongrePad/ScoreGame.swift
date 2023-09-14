@@ -8,6 +8,7 @@ class ScoreGame : Codable, Identifiable{
     
     var id: Int?
     var meeting_id: Int?
+    var total_point: Int?
     var logo: String?
     var start_at: String?
     var finish_At: String?

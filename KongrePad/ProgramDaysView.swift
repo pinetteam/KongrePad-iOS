@@ -25,20 +25,20 @@ struct ProgramDaysView: View{
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(Color.black)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(Color.white)
                         )
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
                         }.frame(width: screen_width*0.1)
                         Text("BİLİMSEL PROGRAM")
+                            .font(.system(size: 30))
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
-                    }
+                    }.frame(width: screen_width).background(AppColors.buttonYellow)
                     Spacer()
                     VStack(alignment: .center){
                         ScrollView(.vertical){
@@ -51,22 +51,24 @@ struct ProgramDaysView: View{
                                                 .foregroundColor(AppColors.bgBlue)
                                                 .padding()
                                             Spacer()
-                                            Image(systemName: "chevron.right")
-                                                .font(.system(size: 20)).bold().padding(8)
-                                                .foregroundColor(AppColors.bgBlue)
+                                            Image("double_right_arrow")
+                                                .resizable()
+                                                .frame(width: screen_height*0.035, height: screen_height*0.035)
+                                                .padding()
                                         }
-                                        .frame(width: screen_width*0.8, height: screen_height*0.08)
-                                        .background(AppColors.programDayBackground)
+                                        .frame(width: screen_width*0.9, height: screen_height*0.08)
+                                        .background(AppColors.programButtonBlue)
                                         .cornerRadius(5)
+                                        .border(.black)
                                     }    
                                 }
                             }
-                        }.frame(width: screen_width*0.85, height: screen_height*0.7)
+                        }.frame(width: screen_width*0.9, height: screen_height*0.7)
                     }
                     Spacer()
                 }.navigationBarBackButtonHidden(true)
                 }
-            .background(AppColors.bgBlue)
+            .background(AppColors.bgLightYellow)
         }
         .onAppear{
             getMeeting()

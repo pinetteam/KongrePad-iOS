@@ -24,9 +24,9 @@ struct SendMailView : View {
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(AppColors.bgBlue)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(AppColors.logoutButtonBlue)
                         )
                         .padding(5)
                         .onTapGesture {
@@ -35,9 +35,11 @@ struct SendMailView : View {
                         Text("Sunumunun mail olarak paylaşılmasına izin veren konuşmacıların sunumlarını kendinize mail olarak gönderebilirsiniz")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
+                            .background(AppColors.sendMailBlue)
                             .multilineTextAlignment(.center)
                     }
+                    .frame(width: screen_width)
+                    .background(AppColors.sendMailBlue)
                     ScrollView(.vertical){
                         VStack(alignment: .leading, spacing: 10){
                             ForEach(self.documents ?? []){document in
@@ -66,13 +68,18 @@ struct SendMailView : View {
                     Spacer()
                     ZStack(alignment: .center){
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
-                        Label("Mail Gönder", systemImage: "envelope")
-                            .foregroundColor(Color.white)
-                            .padding().background(AppColors.buttonLightBlue).bold()
-                            .cornerRadius(5)
-                            .onTapGesture {
-                                sendMail()
-                            }
+                        HStack{
+                            Image("send_mail_button")
+                                .resizable()
+                                .frame(width: screen_width*0.05, height: screen_width*0.05)
+                            Text("Mail Gönder")
+                                .foregroundColor(Color.white)
+                        }
+                        .padding().background(AppColors.buttonLightBlue).bold()
+                        .cornerRadius(5)
+                        .onTapGesture {
+                            sendMail()
+                        }
                     }
                     
                 }.background(AppColors.bgBlue)

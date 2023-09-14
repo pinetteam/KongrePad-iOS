@@ -55,26 +55,13 @@ struct MainPageView: View{
                             Spacer().frame(height: 10)
                             Text("\(participant?.full_name ?? "")")
                                 .foregroundColor(.white)
-                                .font(.system(size: 25)).bold()
-                            Text("Hoş Geldiniz")
-                                .foregroundColor(.white)
-                                .font(.system(size: 25))
-                        }
+                                .font(.system(size: 25)).bold()                        }
                     }
                     Spacer()
                             VStack(alignment: .center, spacing: 1){
-                                    ZStack(alignment: .bottom){
-                                        Text("Sanal Stant Alanı")
-                                            .padding(6)
-                                            .foregroundColor(Color.blue).font(.system(size:20))
-                                            .background(Color.white)
-                                            .padding(.bottom, 15)
-                                            .cornerRadius(15)
-                                            .padding(.bottom, -15)
-                                        Rectangle()
-                                                .frame(width: screen_width*0.9, height: screen_height*0.002)
-                                                .foregroundColor(Color.white).zIndex(-1)
-                                    }
+                                Rectangle()
+                                        .frame(width: screen_width*0.9, height: screen_height*0.002)
+                                        .foregroundColor(Color.white).zIndex(-1)
                                 NavigationLink(destination: VirtualStandView(pdfURL: $standPdfURL, virtualStandId: $selectedVirtualStandId), isActive: $goToVirtualStand)
                                 {
                                     ScrollView(.horizontal){
@@ -107,9 +94,9 @@ struct MainPageView: View{
                     VStack(alignment: .center, spacing: 15){
                         HStack{
                             VStack(alignment: .center){
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(.white)
+                            Image("play_button")
+                                    .resizable()
+                                    .frame(width: screen_width*0.1, height: screen_width*0.1)
                             Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
                         }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
                                 .onTapGesture {
@@ -130,7 +117,7 @@ struct MainPageView: View{
                                 .font(.system(size: 40))
                                 .foregroundColor(.white)
                             Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
-                        }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
+                        }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonRed).cornerRadius(10)
                                 .onTapGesture {
                                     if self.meeting?.hall_count == 1 {
                                         self.goToAskQuestion = true
@@ -147,7 +134,9 @@ struct MainPageView: View{
                         }
                         HStack(spacing: 10){
                                 VStack(alignment: .center){
-                                    Label("", systemImage: "doc.text").font(.system(size: 40)).foregroundColor(.white)
+                                    Image("program_button")
+                                            .resizable()
+                                            .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Bilimsel Program").font(.system(size: 20)).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonYellow).cornerRadius(10)
                                 .onTapGesture {
@@ -166,7 +155,9 @@ struct MainPageView: View{
                             NavigationLink(destination: SendMailView())
                             {
                                 VStack(alignment: .center){
-                                    Label("", systemImage: "envelope.badge").font(.system(size: 40)).foregroundColor(.white)
+                                    Image("send_mail_button")
+                                        .resizable()
+                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Mail Gönder").font(.system(size: 20)).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonLightBlue).cornerRadius(10)
                             }
@@ -176,14 +167,18 @@ struct MainPageView: View{
                             NavigationLink(destination: SurveysView())
                             {
                                 VStack(alignment: .center){
-                                    Label("", systemImage: "text.badge.checkmark").font(.system(size: 40)).foregroundColor(.white)
+                                    Image("surveys_button")
+                                            .resizable()
+                                            .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Anketler").font(.system(size: 20)).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonDarkBlue).cornerRadius(10)
                             }
                             NavigationLink(destination: ScoreGameView())
                             {
                                 VStack(alignment: .center){
-                                    Label("", systemImage: "leaf.arrow.circlepath").font(.system(size: 40)).foregroundColor(.white)
+                                    Image("score_game_button")
+                                            .resizable()
+                                            .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Doğaya Can Ver").font(.system(size: 20)).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
                             }
@@ -192,10 +187,10 @@ struct MainPageView: View{
                     Spacer()
                     HStack(alignment: .center){
                         NavigationLink(destination: LoginView(), isActive: $logOut){
-                            Label("", systemImage: "rectangle.portrait.and.arrow.right")
-                                .labelStyle(.iconOnly)
-                                .font(.system(size: 20, weight: .heavy))
-                                .foregroundColor(AppColors.logoutButtonBlue).padding()
+                            Image("logout_button")
+                                .resizable()
+                                .frame(width: screen_width*0.07, height: screen_width*0.08)
+                                .padding()
                                 .onTapGesture {
                                     let userDefault = UserDefaults.standard
                                     userDefault.set(nil, forKey: "token")

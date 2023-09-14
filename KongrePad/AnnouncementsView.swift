@@ -21,21 +21,24 @@ struct AnnouncementsView: View{
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(Color.black)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(Color.white)
                         )
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
                         }.frame(width: screen_width*0.1)
-                        Text("BLDİRİMLER")
+                        Text("BİLDİRİMLER")
+                            .font(.system(size: 30))
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
                     }
-                    Spacer().frame(height: 10)
+                    .frame(width: screen_width)
+                    .background(AppColors.notificationsRed)
+                    
+                    Rectangle().frame(width: screen_width, height: screen_height*0.01).foregroundColor(Color.gray)
                     VStack(alignment: .leading){
                         ScrollView(.vertical){
                             VStack(alignment:.leading, spacing: 10){
@@ -55,27 +58,18 @@ struct AnnouncementsView: View{
                                     Divider()
                                 }
                             }.padding()
-                        }.frame(width: screen_width*0.9, height: screen_height*0.8)
-                            .background(Color.white).padding()
-                    }.cornerRadius(20)
-                    Spacer()
-                    Rectangle()
-                        .frame(width: screen_width, height: screen_height*0.1)
-                        .foregroundColor(AppColors.bgBlue)
-                }.background(AppColors.bgBlue)
+                        }.frame(width: screen_width, height: screen_height*0.8)
+                            .frame(maxHeight: .infinity)
+                            .background(AppColors.bgLightPink)
+                    }
+                    Rectangle().frame(width: screen_width, height: screen_height*0.05).foregroundColor(Color.gray).ignoresSafeArea(.all)
+                }.background(Color.gray)
                 }.navigationBarBackButtonHidden(true)
         }
         .onAppear{
             getMeeting()
             getAnnouncements()
             getParticipant()
-        }
-    }
-    
-    
-    struct MainPageView_Previews: PreviewProvider {
-        static var previews: some View {
-            MainPageView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
         }
     }
     

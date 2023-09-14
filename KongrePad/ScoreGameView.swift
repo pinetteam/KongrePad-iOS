@@ -67,13 +67,12 @@ struct ScoreGameView: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(AppColors.bgBlue)
                         .background(
-                            Circle().fill(AppColors.buttonLightBlue)
+                            Circle().fill(AppColors.logoutButtonBlue)
                         )
                         .padding(5)
                         .onTapGesture {
@@ -87,10 +86,10 @@ struct ScoreGameView: View {
                         self.isPresentingScanner = true
                     }){
                         Text("Qr Kodu Okut\nDoğaya Can Ver")
-                            .font(.system(size: 20)).padding()
-                            .frame(width: screen_width*0.5, height: screen_height*0.15)
+                            .font(.system(size: 25)).padding()
+                            .frame(width: screen_width*0.7, height: screen_height*0.15)
                             .foregroundColor(Color.white)
-                            .background(Color.green).cornerRadius(30)
+                            .background(AppColors.sendButtonGreen).cornerRadius(10)
                     }.sheet(isPresented: $isPresentingScanner) {
                         self.scannerSheet
                     }
@@ -100,14 +99,23 @@ struct ScoreGameView: View {
                         .multilineTextAlignment(.center)
                         .frame(width: screen_width*0.8)
                     Spacer().frame(height: screen_height*0.1)
-                    
+                    ZStack{
+                        Image("dogaya_can_ver")
+                            .renderingMode(.template)
+                            .resizable()
+                            .frame(width: screen_width*0.5, height: screen_width*0.5)
+                            .foregroundColor(AppColors.sendButtonGreen)
+                        Image("dogaya_can_ver")
+                            .renderingMode(.template)
+                            .resizable()
+                            .frame(width: screen_width*0.5, height: screen_width*0.5)
+                            .foregroundColor(Color.gray)
+                            .mask(Rectangle().padding(.bottom, screen_width*0.5*CGFloat(total_point * 100 / (scoreGame?.total_point ?? 1))))
+                    }
                     Text("\(total_point) Puan")
-                        .font(.system(size: 30)).padding()
-                        .frame(width: screen_width*0.5, height: 100)
-                        .foregroundColor(Color.white)
-                        .background(Color.green).cornerRadius(30)
-                        Spacer().frame(height: screen_height*0.1)
-                    
+                        .font(.system(size: 30))
+                        .foregroundColor(AppColors.sendButtonGreen)
+                    Spacer().frame(height: screen_height*0.1)
                     ScrollView(.vertical){
                             VStack(spacing: 10){
                                 ForEach(self.scoreGamePoints ?? []){point in
@@ -137,6 +145,7 @@ struct ScoreGameView: View {
             }
         .onAppear{
             getPoints()
+            getScoreGame()
         }
         .alert(popUpText, isPresented: $popUp){
             Button("OK", role: .cancel){}

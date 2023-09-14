@@ -14,6 +14,7 @@ class Session : Codable, Identifiable{
     var sort_order: Int?
     var code: String?
     var title: String?
+    var speaker_name: String?
     var description: String?
     var start_at: String?
     var finish_at: String?
