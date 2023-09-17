@@ -42,29 +42,54 @@ struct SendMailView : View {
                     .background(AppColors.sendMailBlue)
                     ScrollView(.vertical){
                         VStack(alignment: .leading, spacing: 10){
-                            ForEach(self.documents ?? []){document in
-                                HStack{
-                                    Button(action: {
-                                        if selectedDocuments.contains(document.id!)
-                                            {
-                                                self.selectedDocuments.remove(document.id!)
-                                            }
-                                        else
-                                            {
-                                                self.selectedDocuments.insert(document.id!)
-                                            }
-                                    }){
-                                        if document.sharing_via_email == 1{
-                                            Image(systemName: selectedDocuments.contains(document.id!) ? "square.fill" : "square")
+                            ForEach(documents ?? []){document in
+                                if document.session != nil {
+                                    HStack{
+                                        VStack(alignment: .leading){
+                                            Text(document.session?.start_at! ?? "")
+                                                .foregroundColor(Color.black)
+                                                .bold()
+                                            Spacer()
+                                            Text(document.session?.finish_at! ?? "")
+                                                .foregroundColor(Color.black)
+                                                .bold()
                                         }
-                                        Text("\(document.title ?? "")").foregroundColor(Color.black)
-                                        
+                                        .frame(maxHeight: .infinity)
+                                        .frame(width: screen_width*0.20)
+                                        .background(AppColors.programDateYellow)
+                                        .overlay (
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(.black)
+                                        )
+                                        .cornerRadius(8)
+                                        VStack(alignment: .leading){
+                                            Text(document.session?.title! ?? "")
+                                                .font(.system(size: 20))
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                        .frame(maxHeight: .infinity)
+                                        .frame(width: screen_width*0.65)
+                                        .background((selectedDocuments.contains(document.id!) || document.is_requested!) ? Color.red : AppColors.programTitleBlue)
+                                        .overlay (
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(.black)
+                                        )
+                                        .cornerRadius(8)
+                                    }.onTapGesture{
+                                        if selectedDocuments.contains(document.id!)
+                                        {
+                                            self.selectedDocuments.remove(document.id!)
+                                        }
+                                        else
+                                        {
+                                            self.selectedDocuments.insert(document.id!)
+                                        }
                                     }
                                 }
-                                Divider()
+                                
                             }
                         }.padding()
-                    }.frame(width: screen_width, height: screen_height*0.8).background(Color.white)
+                    }.frame(width: screen_width, height: screen_height*0.7).background(Color.white)
                     Spacer()
                     ZStack(alignment: .center){
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
@@ -90,9 +115,9 @@ struct SendMailView : View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
-                getMeeting()
+            getMeeting()
             getDocuments()
-            }
+        }
     }
     
         func getMeeting(){
@@ -181,7 +206,7 @@ func getDocuments(){
                     self.popUp = true
                     return
                 }
-                self.popUpText = "İstediğiniz dökümanlar size mail olarak gönderilecek"
+                self.popUpText = "İstediğiniz dökümanlar kongreden sonra size mail olarak gönderilecek"
                 self.popUp = true
                 DispatchQueue.main.async {
                     pm.wrappedValue.dismiss()

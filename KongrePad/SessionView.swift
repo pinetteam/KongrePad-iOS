@@ -15,11 +15,7 @@ struct SessionView : View {
     @State var meeting: Meeting?
     @State var bannerName : String = ""
     @Binding var hallId: Int
-    @State var keypadPresent = false
-    @State var debatePresent = false
     @State var session: Session?
-    @State var keypad: Keypad?
-    @State var debate: Debate?
     
     
     
@@ -52,26 +48,8 @@ struct SessionView : View {
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
                         if(self.pdfURL != nil){
                             HStack{
-                                VStack(alignment: .center){
-                                    Text("Keypad").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: screen_width*0.3, height: screen_height*0.05).background(AppColors.buttonPurple).cornerRadius(10)
-                                    .onTapGesture {
-                                        getKeypad(HallId: self.hallId)
-                                        self.keypadPresent = true
-                                    }.sheet(isPresented: $keypadPresent){
-                                        KeypadView(keypad: $keypad)
-                                    }
-                                VStack(alignment: .center){
-                                    Text("Debate").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: screen_width*0.3, height: screen_height*0.05).background(AppColors.buttonPurple).cornerRadius(10)
-                                    .onTapGesture {
-                                        getDebate(HallId: self.hallId)
-                                        self.debatePresent = true
-                                    }.sheet(isPresented: $debatePresent){
-                                        DebateView(debate: $debate)
-                                    }
                                 NavigationLink(destination: AskQuestionView(hallId: $hallId)){
-                                    Label("Soru Sor", systemImage: "questionmark")
+                                    Text("Soru Sor")
                                         .foregroundColor(Color.white)
                                         .frame(width: screen_width*0.3, height: screen_height*0.05)
                                         .font(.system(size: 20))
@@ -140,64 +118,6 @@ struct SessionView : View {
                     self.meeting = meeting.data
                 }
                 self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    func getKeypad(HallId: Int){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-keypad") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let keypad = try JSONDecoder().decode(KeypadJSON.self, from: data)
-                if keypad.status!{
-                    DispatchQueue.main.async {
-                        self.keypad = keypad.data
-                    }
-                } else {
-                    self.keypad = nil
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    
-    func getDebate(HallId: Int){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-debate") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let debate = try JSONDecoder().decode(DebateJSON.self, from: data)
-                if debate.status!{
-                    DispatchQueue.main.async {
-                        self.debate = debate.data
-                    }
-                } else
-                {
-                    self.debate = nil
-                }
             } catch {
                 print(error)
             }

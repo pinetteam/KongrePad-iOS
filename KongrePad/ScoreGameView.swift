@@ -81,7 +81,7 @@ struct ScoreGameView: View {
                         Rectangle()
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .foregroundColor(AppColors.bgBlue)
-                    }
+                    }.frame(width: screen_width)
                     Button(action: {
                         self.isPresentingScanner = true
                     }){
@@ -142,6 +142,7 @@ struct ScoreGameView: View {
                         
                     }
                 }.background(AppColors.bgBlue)
+            
             }
         .onAppear{
             getPoints()

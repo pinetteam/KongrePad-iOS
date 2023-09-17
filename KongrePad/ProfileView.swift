@@ -97,13 +97,6 @@ struct ProfileView: View{
             }
         }
         
-        
-        struct MainPageView_Previews: PreviewProvider {
-            static var previews: some View {
-                MainPageView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-            }
-        }
-        
         func getMeeting(){
             guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
                 return

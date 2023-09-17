@@ -25,9 +25,11 @@ struct AppColors{
 }
 
 
+
 struct KeypadView: View {
-    @Binding var keypad: Keypad?
+    @Binding var hallId: Int
     @State var response: String?
+    @State var keypad: Keypad?
     @Environment (\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
@@ -87,12 +89,42 @@ struct KeypadView: View {
                             }
                         }
                     }
-                    Text(response ?? "")
+                    Text(response ?? "").foregroundColor(Color.white)
                 }.background(AppColors.bgBlue)
+                    .onAppear{
+                        getKeypad(HallId: hallId)
+                    }
             }
         }
     }
-    
+    func getKeypad(HallId: Int){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-keypad") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let keypad = try JSONDecoder().decode(KeypadJSON.self, from: data)
+                if keypad.status!{
+                    DispatchQueue.main.async {
+                        self.keypad = keypad.data
+                    }
+                } else {
+                    self.keypad = nil
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
     func sendVote(optionId: Int, keypadId: Int){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/keypad/\(keypadId)/keypad-vote") else {
             return
@@ -127,7 +159,8 @@ struct KeypadView: View {
 
 
 struct DebateView: View {
-    @Binding var debate: Debate?
+    @Binding var hallId: Int
+    @State var debate: Debate?
     @State var response: String?
     @Environment (\.dismiss) var dismiss
     var body: some View{
@@ -188,12 +221,46 @@ struct DebateView: View {
                             }
                         }
                     }
-                    Text(response ?? "")
+                    Text(response ?? "").foregroundColor(Color.white)
                 }.background(AppColors.bgBlue)
+                    .onAppear{
+                        getDebate(HallId: hallId)
+                    }
             }
         }
     }
     
+    
+    
+    func getDebate(HallId: Int){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-debate") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let debate = try JSONDecoder().decode(DebateJSON.self, from: data)
+                if debate.status!{
+                    DispatchQueue.main.async {
+                        self.debate = debate.data
+                    }
+                } else
+                {
+                    self.debate = nil
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
     func sendVote(teamId: Int, debateId: Int){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/debate/\(debateId)/debate-vote") else {
             return
@@ -224,4 +291,33 @@ struct DebateView: View {
             }
         }.resume()
     }
+}
+
+struct LoadingView: View {
+    @Binding var isLoading: Bool
+    var body: some View{
+        ZStack{
+            Color(.white)
+                .ignoresSafeArea()
+                .opacity(0.3)
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: AppColors.bgBlue))
+                .scaleEffect(3)
+        }.background(BackgroundClearView())
+            .onDisappear{
+                isLoading = false
+            }
+    }
+}
+
+struct BackgroundClearView: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        DispatchQueue.main.async {
+            view.superview?.superview?.backgroundColor = .clear
+        }
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {}
 }

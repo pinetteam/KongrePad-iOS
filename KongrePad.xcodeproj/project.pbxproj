@@ -19,6 +19,7 @@
 		08320E712AA8B7180046AE41 /* KeypadOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E702AA8B7180046AE41 /* KeypadOption.swift */; };
 		08320E732AB0632E0046AE41 /* ProgramDaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E722AB0632E0046AE41 /* ProgramDaysView.swift */; };
 		08320E752AB13BCB0046AE41 /* VirtualStandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E742AB13BCB0046AE41 /* VirtualStandView.swift */; };
+		08320E772AB67D000046AE41 /* PusherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08320E762AB67CFF0046AE41 /* PusherManager.swift */; };
 		0838153F2AA3EE7600E79B15 /* AskQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0838153E2AA3EE7600E79B15 /* AskQuestionView.swift */; };
 		087B49562A96A9BC00BEC00C /* VirtualStand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087B49552A96A9BC00BEC00C /* VirtualStand.swift */; };
 		087B49582A96BB2300BEC00C /* Announcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087B49572A96BB2300BEC00C /* Announcement.swift */; };
@@ -61,6 +62,7 @@
 		08320E702AA8B7180046AE41 /* KeypadOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadOption.swift; sourceTree = "<group>"; };
 		08320E722AB0632E0046AE41 /* ProgramDaysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramDaysView.swift; sourceTree = "<group>"; };
 		08320E742AB13BCB0046AE41 /* VirtualStandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualStandView.swift; sourceTree = "<group>"; };
+		08320E762AB67CFF0046AE41 /* PusherManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PusherManager.swift; sourceTree = "<group>"; };
 		0838153E2AA3EE7600E79B15 /* AskQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskQuestionView.swift; sourceTree = "<group>"; };
 		087B49552A96A9BC00BEC00C /* VirtualStand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualStand.swift; sourceTree = "<group>"; };
 		087B49572A96BB2300BEC00C /* Announcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 			children = (
 				08AB71F72A93EA0500EA59DF /* Info.plist */,
 				08AB71E02A8D223800EA59DF /* KongrePadApp.swift */,
+				08320E762AB67CFF0046AE41 /* PusherManager.swift */,
 				08AB71E22A8D223800EA59DF /* MainPageView.swift */,
 				08D643132AA399DF00C7E676 /* Hall.swift */,
 				089FB4B12A9FEDAD00F4D531 /* AppConstants.swift */,
@@ -250,6 +253,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08320E772AB67D000046AE41 /* PusherManager.swift in Sources */,
 				08AB71FC2A94C68A00EA59DF /* Meeting.swift in Sources */,
 				08AB71F62A93DD5A00EA59DF /* LoginView.swift in Sources */,
 				08AB71EA2A8D223900EA59DF /* Persistence.swift in Sources */,
@@ -426,7 +430,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -462,7 +466,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

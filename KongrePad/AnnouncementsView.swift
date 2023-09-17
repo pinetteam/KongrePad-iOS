@@ -12,6 +12,7 @@ struct AnnouncementsView: View{
     @State var meeting: Meeting?
     @State var participant: Participant?
     @State var announcements: [Announcement]?
+    
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in

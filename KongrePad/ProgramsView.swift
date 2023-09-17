@@ -12,6 +12,7 @@ struct ProgramsView: View{
     @Environment(\.presentationMode) var pm
     @State var meeting: Meeting?
     @State var programDay: ProgramDay?
+    
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in

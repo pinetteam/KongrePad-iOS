@@ -5,7 +5,7 @@
 //  Created by Mert Demirbağ on 29.08.2023.
 //
 
-struct Document : Codable, Identifiable, Hashable{
+struct Document : Codable, Identifiable{
     
     var id: Int?
     var meeting_id: Int?
@@ -14,11 +14,8 @@ struct Document : Codable, Identifiable, Hashable{
     var title: String?
     var sharing_via_email: Int?
     var status: Int?
-    var is_selected = false
-    
-    private enum CodingKeys: String, CodingKey {
-        case id, meeting_id, file_name, file_extension, title, sharing_via_email, status
-    }
+    var is_requested: Bool?
+    var session: Session?
 }
 
 class DocumentJSON : Codable, Identifiable{

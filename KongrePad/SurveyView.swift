@@ -16,71 +16,70 @@ struct SurveyView : View {
     @Binding var popUpText: String
     @State var questions: [SurveyQuestion]?
     @State var error = ""
-    
     var body: some View{
         NavigationStack {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                VStack(alignment: .center){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(AppColors.bgBlue)
-                        .background(
-                            Circle().fill(AppColors.logoutButtonBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
-                        }.frame(width: screen_width*0.1)
-                        Text("\(survey?.title ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.sendMailBlue)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(width: screen_width)
-                    .background(AppColors.sendMailBlue)
-                    .overlay(Divider().background(.white), alignment: .bottom)
-                    ScrollView(.vertical){
-                        VStack(alignment: .leading, spacing: 20){
-                            ForEach(self.questions ?? []){question in
-                                Text(question.question ?? "").bold()
-                                VStack(alignment: .leading){
-                                    ForEach(question.options ?? []){option in
-                                        HStack{
-                                            Button(action:{
-                                                self.changeSelectedOption(item: question, optionId: option.id!)
-                                            }){
-                                                Image(systemName: option.id == question.selectedOptionId ? "circle.fill" : "circle")
-                                                Text(option.option ?? "").foregroundColor(Color.black).multilineTextAlignment(.leading)
+                    VStack(alignment: .center){
+                        HStack(alignment: .top){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.bgBlue)
+                                .background(
+                                    Circle().fill(AppColors.logoutButtonBlue)
+                                )
+                                .padding(5)
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Text("\(survey?.title ?? "")")
+                                .foregroundColor(Color.white)
+                                .frame(width: screen_width*0.85, height: screen_height*0.1)
+                                .background(AppColors.sendMailBlue)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(width: screen_width)
+                        .background(AppColors.sendMailBlue)
+                        .overlay(Divider().background(.white), alignment: .bottom)
+                        ScrollView(.vertical){
+                            VStack(alignment: .leading, spacing: 20){
+                                ForEach(self.questions ?? []){question in
+                                    Text(question.question ?? "").bold()
+                                    VStack(alignment: .leading){
+                                        ForEach(question.options ?? []){option in
+                                            HStack{
+                                                Button(action:{
+                                                    self.changeSelectedOption(item: question, optionId: option.id!)
+                                                }){
+                                                    Image(systemName: option.id == question.selectedOptionId ? "circle.fill" : "circle")
+                                                    Text(option.option ?? "").foregroundColor(Color.black).multilineTextAlignment(.leading)
+                                                }
+                                                Spacer()
                                             }
-                                            Spacer()
                                         }
                                     }
+                                    Divider()
                                 }
-                                Divider()
-                            }
-                        }.padding()
-                    }.frame(width: screen_width*0.9, height: screen_height*0.75)
-                        .background(Color.white)
-                        .cornerRadius(20)
-                    Spacer()
-                    ZStack(alignment: .center){
-                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
-                        VStack{
-                            Text(error).padding().foregroundColor(Color.red)
-                            Text("Cevapları Gönder")
-                                .foregroundColor(Color.white)
-                                .padding().background(Color.green)
-                                .cornerRadius(10)
-                                .onTapGesture {
-                                sendAnswers()
+                            }.padding()
+                        }.frame(width: screen_width*0.9, height: screen_height*0.75)
+                            .background(Color.white)
+                            .cornerRadius(20)
+                        Spacer()
+                        ZStack(alignment: .center){
+                            Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
+                            VStack{
+                                Text(error).padding().foregroundColor(Color.red)
+                                Text("Cevapları Gönder")
+                                    .foregroundColor(Color.white)
+                                    .padding().background(Color.green)
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        sendAnswers()
+                                    }
                             }
                         }
-                    }
-                }.background(AppColors.bgBlue)
+                    }.background(AppColors.bgBlue)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -88,7 +87,7 @@ struct SurveyView : View {
                 getMeeting()
                 getSurvey()
                 getQuestions()
-            }
+        }
     }
     
         func getMeeting(){
@@ -107,7 +106,7 @@ struct SurveyView : View {
             
             do{
                 let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
-                DispatchQueue.main.async {
+                DispatchQueue.main.sync {
                     self.meeting = meeting.data
                 }
             } catch {

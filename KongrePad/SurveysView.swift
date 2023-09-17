@@ -16,6 +16,7 @@ struct SurveysView: View{
     @State var participant: Participant?
     @State var surveys: [Survey]?
     @State var surveyId = 0
+    
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in

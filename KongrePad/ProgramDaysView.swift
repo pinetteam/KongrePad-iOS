@@ -16,6 +16,7 @@ struct ProgramDaysView: View{
     @State var programs: [Program]?
     @State var programDays: [ProgramDay]?
     @State var bannerName : String = ""
+    
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in

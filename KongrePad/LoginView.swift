@@ -11,6 +11,7 @@ import CodeScanner
 struct LoginView: View {
     
     @State var isPresentingScanner = false
+    @State var isPresentingKvkk = false
     @State var isPresentingLoginWithCode = false
     @State var goToMainPage = false
     @State var scanError : String = ""
@@ -89,8 +90,7 @@ struct LoginView: View {
                             self.isPresentingScanner = true
                         }){
                             HStack{
-                                Label("GİRİŞ", systemImage: "play")
-                                    .labelStyle(.titleOnly)
+                                Text("GİRİŞ")
                                     .font(.system(size: 40, weight: .bold))
                                     .foregroundColor(Color.white)
                                 Image(systemName: "arrow.right")
@@ -98,30 +98,40 @@ struct LoginView: View {
                                     .foregroundColor(Color.white)
                             }
                             .frame(width: screen_width*0.5, height: 100)
-                            .background(Color.orange).cornerRadius(50)
+                            .background(Color.orange)
+                            .cornerRadius(50)
                         }.sheet(isPresented: $isPresentingScanner) {
                             self.scannerSheet
-                        }
+                        }.navigationDestination(isPresented: $goToMainPage){
+                            MainPageView()
+                            }
                         Text(self.scanError).foregroundColor(Color.red).font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
                         Text("Giriş yap butonuna bastıktan sonra kameraya yaka kartınızda bulunan Qr Kod'u okutunuz.").font(.system(size: 22)).multilineTextAlignment(.center).frame(width: screen_width*0.8)
-                        Text("Kod İle Giriş").font(.system(size: 20)).foregroundColor(.white)
-                            .frame(width: screen_width*0.42, height: screen_height*0.05).background(AppColors.buttonLightBlue).cornerRadius(10)
+                        (
+                            Text("Giriş yaparak ") + Text("6698 Sayılı KVKK'yı").underline()
+                            + Text(" kabul etmiş sayılırsınız")
+                        ).multilineTextAlignment(.center).frame(width: screen_width*0.8)
+                        .onTapGesture {
+                            self.isPresentingKvkk = true
+                        }
+                        .sheet(isPresented: $isPresentingKvkk) {
+                            Text("kvkk kanunu")
+                        }
+                            
+                        Text("KOD İLE GİRİŞ").font(.system(size: 20))
+                            .foregroundColor(AppColors.bgBlue)
+                            .frame(width: screen_width*0.42, height: screen_height*0.05)
+                            .background(AppColors.buttonLightBlue).cornerRadius(20)
                             .onTapGesture {
                                 self.isPresentingLoginWithCode = true
                             }.sheet(isPresented: $isPresentingLoginWithCode){
                                 loginWithCode(goToMainPage: $goToMainPage, scanError: $scanError)
-                            }.background(
-                                NavigationLink(destination: MainPageView(), isActive: $goToMainPage){
-                                EmptyView()
-                            })
-                            
+                            }
                     }.padding()
                 }.frame(width: screen_width, height: screen_height)
                     .background(AppColors.bgBlue)
             }
-            .navigationDestination(isPresented: $goToMainPage){
-                MainPageView()
-                }
+            
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
@@ -171,8 +181,8 @@ struct loginWithCode: View {
                         .background(AppColors.buttonLightBlue)
                         .cornerRadius(15)
                         .onTapGesture {
-                        login()
-                    }
+                            login()
+                        }
                     Spacer()
                 }.background(AppColors.bgBlue)
             }

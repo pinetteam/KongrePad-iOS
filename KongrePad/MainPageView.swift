@@ -8,9 +8,9 @@
 import SwiftUI
 import PusherSwift
 
-
 struct MainPageView: View{
     @Environment(\.presentationMode) var pm
+    @EnvironmentObject var pusherManager: PusherManager
     @State var isHallsForDocumentPresented = false
     @State var isHallsForProgramPresented = false
     @State var isHallsForAskQuestionPresented = false
@@ -55,7 +55,8 @@ struct MainPageView: View{
                             Spacer().frame(height: 10)
                             Text("\(participant?.full_name ?? "")")
                                 .foregroundColor(.white)
-                                .font(.system(size: 25)).bold()                        }
+                                .font(.system(size: 25)).bold()
+                        }
                     }
                     Spacer()
                             VStack(alignment: .center, spacing: 1){
@@ -114,7 +115,7 @@ struct MainPageView: View{
                                     })
                             VStack(alignment: .center){
                             Image(systemName: "questionmark")
-                                .font(.system(size: 40))
+                                .font(.system(size: 50))
                                 .foregroundColor(.white)
                             Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
                         }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonRed).cornerRadius(10)
@@ -195,6 +196,7 @@ struct MainPageView: View{
                                     let userDefault = UserDefaults.standard
                                     userDefault.set(nil, forKey: "token")
                                     userDefault.synchronize()
+                                    pusherManager.setChannel("ios")
                                     self.logOut = true
                                 }
                             }
@@ -221,10 +223,9 @@ struct MainPageView: View{
             
         }
         .onAppear{
-            getMeeting()
-            getParticipant()
-            getVirtualStands()
-            getAnnouncements()
+                getMeeting()
+                getParticipant()
+                getVirtualStands()
         }
     }
     
@@ -248,6 +249,7 @@ struct MainPageView: View{
                     self.meeting = meeting.data
                 }
                 self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
+                pusherManager.setChannel("meeting-\(String(describing: meeting.data!.id!))")
             } catch {
                 print(error)
             }
