@@ -10,6 +10,7 @@ import PusherSwift
 
 struct MainPageView: View{
     @Environment(\.presentationMode) var pm
+    @ObservedObject var loadingViewModel = LoadingViewModel()
     @EnvironmentObject var pusherManager: PusherManager
     @State var isHallsForDocumentPresented = false
     @State var isHallsForProgramPresented = false
@@ -19,12 +20,12 @@ struct MainPageView: View{
     @State var logOut = false
     @State var goToSession = false
     @State var goToPrograms = false
+    @State var goToProgramsForMail = false
     @State var goToAskQuestion = false
     @State var goToVirtualStand = false
     @State var meeting: Meeting?
     @State var participant: Participant?
     @State var virtualStands: [VirtualStand]?
-    @State var announcements: [Announcement]?
     @State var bannerName : String = ""
     @State var pdfURL: URL?
     @State var standPdfURL: URL?
@@ -34,14 +35,14 @@ struct MainPageView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                        AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/meeting-banners/\(self.bannerName)")){ image in
-                            image
-                                .resizable()
-                                .frame(width: screen_width, height:screen_height*0.15)
-                            
-                        } placeholder: {
-                            Rectangle().frame(width: screen_width, height:screen_height*0.15)
-                        }
+                    AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/meeting-banners/\(self.bannerName)")){ image in
+                        image
+                            .resizable()
+                            .frame(width: screen_width, height:screen_height*0.15)
+                        
+                    } placeholder: {
+                        Rectangle().frame(width: screen_width, height:screen_height*0.15)
+                    }
                     ZStack(alignment: .top){
                         Ellipse()
                             .fill(AppColors.bgLightBlue)
@@ -55,122 +56,129 @@ struct MainPageView: View{
                             Spacer().frame(height: 10)
                             Text("\(participant?.full_name ?? "")")
                                 .foregroundColor(.white)
-                                .font(.system(size: 25)).bold()
+                                .font(.system(size: 30)).bold().padding(.top, 10)
                         }
                     }
                     Spacer()
-                            VStack(alignment: .center, spacing: 1){
-                                Rectangle()
-                                        .frame(width: screen_width*0.9, height: screen_height*0.002)
-                                        .foregroundColor(Color.white).zIndex(-1)
-                                NavigationLink(destination: VirtualStandView(pdfURL: $standPdfURL, virtualStandId: $selectedVirtualStandId), isActive: $goToVirtualStand)
-                                {
-                                    ScrollView(.horizontal){
-                                        HStack(spacing: 10){
-                                            ForEach(self.virtualStands ?? []){stand in
-                                                AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")){ image in
-                                                    image
-                                                        .resizable()
-                                                        .aspectRatio(contentMode: .fit)
-                                                        .frame(width: 100, height:50)
-                                                } placeholder: {
-                                                    ProgressView()
-                                                }
-                                                .scaledToFill()
-                                                .onTapGesture{
-                                                    self.selectedVirtualStandId = stand.id!
-                                                    self.goToVirtualStand = true
-                                                }
-                                            }
+                    VStack(alignment: .center, spacing: 1){
+                        Rectangle()
+                            .frame(width: screen_width*0.9, height: screen_height*0.002)
+                            .foregroundColor(Color.white).zIndex(-1)
+                        NavigationLink(destination: VirtualStandView(pdfURL: $standPdfURL, virtualStandId: $selectedVirtualStandId), isActive: $goToVirtualStand)
+                        {
+                            ScrollView(.horizontal){
+                                HStack(spacing: 10){
+                                    ForEach(self.virtualStands ?? []){stand in
+                                        AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")){ image in
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 100, height:50)
+                                        } placeholder: {
+                                            ProgressView()
                                         }
-                                    }.frame(width: screen_width*0.85, height: screen_height*0.06)
+                                        .scaledToFill()
+                                        .onTapGesture{
+                                            self.selectedVirtualStandId = stand.id!
+                                            self.goToVirtualStand = true
+                                        }
+                                    }
                                 }
-                                
-                            Rectangle()
-                                    .frame(width: screen_width*0.9, height: screen_height*0.002)
-                                    .foregroundColor(Color.white)
+                            }.frame(width: screen_width*0.85, height: screen_height*0.06)
                         }
-                        .shadow(radius: 6)
+                        
+                        Rectangle()
+                            .frame(width: screen_width*0.9, height: screen_height*0.002)
+                            .foregroundColor(Color.white)
+                    }
+                    .shadow(radius: 6)
                     Spacer()
                     VStack(alignment: .center, spacing: 15){
                         HStack{
-                            VStack(alignment: .center){
-                            Image("play_button")
-                                    .resizable()
-                                    .frame(width: screen_width*0.1, height: screen_width*0.1)
-                            Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
-                        }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
-                                .onTapGesture {
-                                    if self.meeting?.hall_count == 1 {
-                                        self.goToSession = true
-                                        self.hallId = (self.meeting?.first_hall_id)!
-                                    } else {
-                                        self.isHallsForDocumentPresented = true
+                            NavigationLink(destination: SessionView(hallId: $hallId), isActive: $goToSession){
+                                VStack(alignment: .center){
+                                    Image("play_button")
+                                        .resizable()
+                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
+                                    Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
+                                    .onTapGesture {
+                                        if self.meeting?.hall_count == 1 {
+                                            self.goToSession = true
+                                            self.hallId = (self.meeting?.first_hall_id)!
+                                        } else {
+                                            self.isHallsForDocumentPresented = true
+                                        }
+                                    }.sheet(isPresented: $isHallsForDocumentPresented){
+                                        HallsForDocument(goToSession: $goToSession, pdfURL: $pdfURL, hallId: $hallId)
                                     }
-                                }.sheet(isPresented: $isHallsForDocumentPresented){
-                                    HallsForDocument(goToSession: $goToSession, pdfURL: $pdfURL, hallId: $hallId)
-                                }.background(
-                                    NavigationLink(destination: SessionView(pdfURL: $pdfURL, hallId: $hallId), isActive: $goToSession){
-                                        EmptyView()
-                                    })
-                            VStack(alignment: .center){
-                            Image(systemName: "questionmark")
-                                .font(.system(size: 50))
-                                .foregroundColor(.white)
-                            Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
-                        }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonRed).cornerRadius(10)
-                                .onTapGesture {
-                                    if self.meeting?.hall_count == 1 {
-                                        self.goToAskQuestion = true
-                                        self.hallId = (self.meeting?.first_hall_id)!
-                                    } else {
-                                        self.isHallsForAskQuestionPresented = true
+                            }
+                            NavigationLink(destination: AskQuestionView(hallId: $hallId), isActive: $goToAskQuestion){
+                                VStack(alignment: .center){
+                                    Image(systemName: "questionmark")
+                                        .font(.system(size: 50)).bold()
+                                        .foregroundColor(.white)
+                                    Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
+                                }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonRed).cornerRadius(10)
+                                    .onTapGesture {
+                                        if self.meeting?.hall_count == 1 {
+                                            self.goToAskQuestion = true
+                                            self.hallId = (self.meeting?.first_hall_id)!
+                                        } else {
+                                            self.isHallsForAskQuestionPresented = true
+                                        }
+                                    }.sheet(isPresented: $isHallsForAskQuestionPresented){
+                                        HallsForAskQuestion(goToAskQuestion: $goToAskQuestion, hallId: $hallId)
                                     }
-                                }.sheet(isPresented: $isHallsForAskQuestionPresented){
-                                    HallsForAskQuestion(goToAskQuestion: $goToAskQuestion, hallId: $hallId)
-                                }.background(
-                                    NavigationLink(destination: AskQuestionView(hallId: $hallId), isActive: $goToAskQuestion){
-                                        EmptyView()
-                                    })
+                            }
                         }
                         HStack(spacing: 10){
+                            NavigationLink(destination: ProgramDaysView(hallId: $hallId), isActive: $goToPrograms){
                                 VStack(alignment: .center){
                                     Image("program_button")
-                                            .resizable()
-                                            .frame(width: screen_width*0.1, height: screen_width*0.1)
+                                        .resizable()
+                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Bilimsel Program").font(.system(size: 20)).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonYellow).cornerRadius(10)
-                                .onTapGesture {
-                                    if self.meeting?.hall_count == 1 {
-                                        self.goToPrograms = true
-                                        self.hallId = (self.meeting?.first_hall_id)!
-                                    } else {
-                                        self.isHallsForProgramPresented = true
+                                    .onTapGesture {
+                                        if self.meeting?.hall_count == 1 {
+                                            self.goToPrograms = true
+                                            self.hallId = (self.meeting?.first_hall_id)!
+                                        } else {
+                                            self.isHallsForProgramPresented = true
+                                        }
+                                    }.sheet(isPresented: $isHallsForProgramPresented){
+                                        HallsForProgram(goToProgram: $goToPrograms, hallId: $hallId)
                                     }
-                                }.sheet(isPresented: $isHallsForProgramPresented){
-                                    HallsForProgram(goToProgram: $goToPrograms, hallId: $hallId)
-                                }.background(
-                                    NavigationLink(destination: ProgramDaysView(hallId: $hallId), isActive: $goToPrograms){
-                                    EmptyView()
-                                })
-                            NavigationLink(destination: SendMailView())
-                            {
+                            }
+                            NavigationLink(destination: ProgramDaysForMailView(hallId: $hallId), isActive: $goToProgramsForMail){
                                 VStack(alignment: .center){
                                     Image("send_mail_button")
                                         .resizable()
                                         .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Mail Gönder").font(.system(size: 20)).foregroundColor(.white)
-                                }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonLightBlue).cornerRadius(10)
+                                }.frame(width: screen_width*0.42, height: screen_height*0.15)
+                                    .background(AppColors.buttonLightBlue).cornerRadius(10)
+                                    .onTapGesture {
+                                        if self.meeting?.hall_count == 1 {
+                                            self.goToProgramsForMail = true
+                                            self.hallId = (self.meeting?.first_hall_id)!
+                                        } else {
+                                            self.isHallsForProgramPresented = true
+                                        }
+                                    }.sheet(isPresented: $isHallsForProgramPresented){
+                                        HallsForProgram(goToProgram: $goToPrograms, hallId: $hallId)
+                                    }
                             }
                         }
-
+                        
                         HStack(spacing: 15){
                             NavigationLink(destination: SurveysView())
                             {
                                 VStack(alignment: .center){
                                     Image("surveys_button")
-                                            .resizable()
-                                            .frame(width: screen_width*0.1, height: screen_width*0.1)
+                                        .resizable()
+                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Anketler").font(.system(size: 20)).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonDarkBlue).cornerRadius(10)
                             }
@@ -178,8 +186,8 @@ struct MainPageView: View{
                             {
                                 VStack(alignment: .center){
                                     Image("score_game_button")
-                                            .resizable()
-                                            .frame(width: screen_width*0.1, height: screen_width*0.1)
+                                        .resizable()
+                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
                                     Text("Doğaya Can Ver").font(.system(size: 20)).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
                             }
@@ -199,37 +207,39 @@ struct MainPageView: View{
                                     pusherManager.setChannel("ios")
                                     self.logOut = true
                                 }
-                            }
+                        }
                         Spacer()
                         HStack{
-                        NavigationLink(destination: AnnouncementsView()){
-                            Label("", systemImage: "bell.fill")
-                                .labelStyle(.iconOnly)
-                                .font(.system(size: 25, weight: .heavy))
-                                .foregroundColor(Color.white).padding()
+                            NavigationLink(destination: AnnouncementsView()){
+                                Label("", systemImage: "bell.fill")
+                                    .labelStyle(.iconOnly)
+                                    .font(.system(size: 25, weight: .heavy))
+                                    .foregroundColor(Color.white).padding()
+                            }
+                            NavigationLink(destination: ProfileView()){
+                                Label("", systemImage: "person.fill")
+                                    .labelStyle(.iconOnly)
+                                    .font(.system(size: 25, weight: .heavy))
+                                    .foregroundColor(Color.white).padding()
+                            }
                         }
-                        NavigationLink(destination: ProfileView()){
-                            Label("", systemImage: "person.fill")
-                                .labelStyle(.iconOnly)
-                                .font(.system(size: 25, weight: .heavy))
-                                .foregroundColor(Color.white).padding()
-                        }
-                        }
-                }
+                    }.padding()
                 }.navigationBarBackButtonHidden(true)
-                }
+                    .overlay(
+                        LoadingView(viewModel: loadingViewModel)
+                    )
+            }
             .background(AppColors.bgBlue)
-
+            
             
         }
-        .onAppear{
-                getMeeting()
-                getParticipant()
-                getVirtualStands()
+        .task{
+            loadingViewModel.startLoading()
+            await getData()
         }
     }
     
-    func getMeeting(){
+    func getData() async{
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
             return
         }
@@ -247,25 +257,23 @@ struct MainPageView: View{
                 let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
                 DispatchQueue.main.async {
                     self.meeting = meeting.data
+                    self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
+                    loadingViewModel.stopLoading()
                 }
-                self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
                 pusherManager.setChannel("meeting-\(String(describing: meeting.data!.id!))")
             } catch {
                 print(error)
             }
         }.resume()
-    }
-    
-    func getParticipant(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/participant") else {
             return
         }
         
-        var request = URLRequest(url: url)
+        var request2 = URLRequest(url: url)
         
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
+        request2.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request2.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request2) {data, _, error in
             guard let data = data, error == nil else {
                 return
             }
@@ -279,18 +287,15 @@ struct MainPageView: View{
                 print(error)
             }
         }.resume()
-    }
-    
-    func getVirtualStands(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/virtual-stand") else {
             return
         }
         
-        var request = URLRequest(url: url)
+        var request3 = URLRequest(url: url)
         
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
+        request3.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request3.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request3) {data, _, error in
             guard let data = data, error == nil else {
                 return
             }
@@ -305,37 +310,6 @@ struct MainPageView: View{
             }
         }.resume()
     }
-    
-    func getAnnouncements(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/announcement") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let announcements = try JSONDecoder().decode(AnnouncementsJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.announcements = announcements.data
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    
-    
-
-    
-    
-
 }
 
 struct HallsForDocument: View {
@@ -352,15 +326,15 @@ struct HallsForDocument: View {
                 VStack(alignment: .center){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
-                        .background(
-                            Circle().fill(AppColors.buttonLightBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            dismiss()
-                        }.frame(width: screen_width*0.1)
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                dismiss()
+                            }.frame(width: screen_width*0.1)
                         Text("Lütfen sunumu görüntülemek istediğiniz salonu seçiniz")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
@@ -368,23 +342,23 @@ struct HallsForDocument: View {
                             .multilineTextAlignment(.center)
                     }.frame(width: screen_width).background(AppColors.bgBlue)
                     Spacer()
-                        ScrollView(.vertical){
-                            VStack{
-                                ForEach(self.halls ?? []){hall in
-                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
-                                        .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                        .background(AppColors.programTitleBlue).cornerRadius(5)
-                                        .onTapGesture {
-                                            self.hallId = hall.id!
-                                            getDocument(HallId: hall.id!)
-                                            self.goToSession = true
-                                            dismiss()
-                                        }
+                    ScrollView(.vertical){
+                        VStack{
+                            ForEach(self.halls ?? []){hall in
+                                Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                    .frame(width: screen_width*0.9, height: screen_height*0.1)
+                                    .background(AppColors.programTitleBlue).cornerRadius(5)
+                                    .onTapGesture {
+                                        self.hallId = hall.id!
+                                        getDocument(HallId: hall.id!)
+                                        self.goToSession = true
+                                        dismiss()
                                     }
-                                }
-                        }.onAppear{
-                            getHalls()
+                            }
                         }
+                    }.onAppear{
+                        getHalls()
+                    }
                     Spacer()
                 }.background(AppColors.bgBlue)
             }
@@ -458,15 +432,15 @@ struct HallsForProgram: View {
                 VStack(alignment: .center){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
-                        .background(
-                            Circle().fill(AppColors.buttonLightBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            dismiss()
-                        }.frame(width: screen_width*0.1)
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                dismiss()
+                            }.frame(width: screen_width*0.1)
                         Text("Lütfen bilimsel programı görüntülemek istediğiniz salonu seçiniz")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
@@ -474,22 +448,22 @@ struct HallsForProgram: View {
                             .multilineTextAlignment(.center)
                     }.frame(width: screen_width).background(AppColors.bgBlue)
                     Spacer()
-                        ScrollView(.vertical){
-                            VStack{
-                                ForEach(self.halls ?? []){hall in
-                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
-                                        .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                        .background(AppColors.programTitleBlue).cornerRadius(5)
-                                        .onTapGesture {
-                                            self.hallId = hall.id!
-                                            self.goToProgram = true
-                                            dismiss()
-                                        }
+                    ScrollView(.vertical){
+                        VStack{
+                            ForEach(self.halls ?? []){hall in
+                                Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                    .frame(width: screen_width*0.9, height: screen_height*0.1)
+                                    .background(AppColors.programTitleBlue).cornerRadius(5)
+                                    .onTapGesture {
+                                        self.hallId = hall.id!
+                                        self.goToProgram = true
+                                        dismiss()
                                     }
-                                }
-                        }.onAppear{
-                            getHalls()
+                            }
                         }
+                    }.onAppear{
+                        getHalls()
+                    }
                     Spacer()
                 }.background(AppColors.bgBlue)
             }
@@ -519,7 +493,7 @@ struct HallsForProgram: View {
             }
         }.resume()
     }
-
+    
 }
 
 struct HallsForAskQuestion: View {
@@ -535,15 +509,15 @@ struct HallsForAskQuestion: View {
                 VStack(alignment: .center){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
-                        .background(
-                            Circle().fill(AppColors.buttonLightBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            dismiss()
-                        }.frame(width: screen_width*0.1)
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                dismiss()
+                            }.frame(width: screen_width*0.1)
                         Text("Lütfen soru sormak istediğiniz salonu seçiniz")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
@@ -551,22 +525,22 @@ struct HallsForAskQuestion: View {
                             .multilineTextAlignment(.center)
                     }.frame(width: screen_width).background(AppColors.bgBlue)
                     Spacer()
-                        ScrollView(.vertical){
-                            VStack{
-                                ForEach(self.halls ?? []){hall in
-                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
-                                        .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                        .background(AppColors.programTitleBlue).cornerRadius(5)
-                                        .onTapGesture {
-                                            self.hallId = hall.id!
-                                            self.goToAskQuestion = true
-                                            dismiss()
-                                        }
+                    ScrollView(.vertical){
+                        VStack{
+                            ForEach(self.halls ?? []){hall in
+                                Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                    .frame(width: screen_width*0.9, height: screen_height*0.1)
+                                    .background(AppColors.programTitleBlue).cornerRadius(5)
+                                    .onTapGesture {
+                                        self.hallId = hall.id!
+                                        self.goToAskQuestion = true
+                                        dismiss()
                                     }
-                                }
-                        }.onAppear{
-                            getHalls()
+                            }
                         }
+                    }.onAppear{
+                        getHalls()
+                    }
                     Spacer()
                 }.background(AppColors.bgBlue)
             }
@@ -596,6 +570,6 @@ struct HallsForAskQuestion: View {
             }
         }.resume()
     }
-
+    
 }
 

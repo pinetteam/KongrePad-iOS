@@ -8,12 +8,9 @@
 import SwiftUI
 
 struct SurveysView: View{
+    @ObservedObject var loadingViewModel = LoadingViewModel()
     @Environment(\.presentationMode) var pm
     @State var goToSurvey = false
-    @State var popUp = false
-    @State var popUpText = ""
-    @State var meeting: Meeting?
-    @State var participant: Participant?
     @State var surveys: [Survey]?
     @State var surveyId = 0
     
@@ -40,7 +37,7 @@ struct SurveysView: View{
                             Text("Anketlerimizi doldurarak bize yardımcı olabilirsiniz")
                                 .foregroundColor(Color.white).font(.system(size:15))
                         }
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .frame(width: screen_width*0.85, height: screen_height*0.14)
                             .background(AppColors.sendMailBlue)
                             .multilineTextAlignment(.center)
                     }
@@ -48,7 +45,7 @@ struct SurveysView: View{
                     .background(AppColors.sendMailBlue)
                     .overlay(Divider().background(.white), alignment: .bottom)
                     Spacer().frame(height: 20)
-                    NavigationLink(destination: SurveyView(surveyId: $surveyId, popUp: $popUp, popUpText: $popUpText), isActive: $goToSurvey){
+                    NavigationLink(destination: SurveyView(surveyId: $surveyId), isActive: $goToSurvey){
                         ScrollView(.vertical){
                             VStack(spacing: 10){
                                 ForEach(Array(self.surveys?.enumerated() ?? [].enumerated()), id: \.element){index, survey in
@@ -89,70 +86,13 @@ struct SurveysView: View{
                     }
                 }
                 .navigationBarBackButtonHidden(true)
-                    
                 }
             .background(AppColors.bgBlue)
         }
-        .alert(popUpText, isPresented: $popUp){
-            Button("OK", role: .cancel){}
-        }
         .onAppear{
-            getMeeting()
             getSurveys()
-            getParticipant()
         }
     }
-    
-    func getMeeting(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.meeting = meeting.data
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    
-    func getParticipant(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/participant") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let participant = try JSONDecoder().decode(ParticipantJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.participant = participant.data
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    
     func getSurveys(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/survey") else {
             return

@@ -27,6 +27,7 @@ struct AppColors{
 
 
 struct KeypadView: View {
+    @EnvironmentObject var alertManager: AlertManager
     @Binding var hallId: Int
     @State var response: String?
     @State var keypad: Keypad?
@@ -62,28 +63,17 @@ struct KeypadView: View {
                         VStack(spacing: 10){
                             ForEach(Array(self.keypad?.options?.enumerated() ?? [].enumerated()), id: \.element){index, option in
                                 HStack{
-                                    if index%2 == 0{
-                                        Text(option.option!)
-                                            .font(.system(size: 20)).bold()
-                                            .foregroundColor(Color.white)
-                                            .frame(width: screen_width*0.4, height: screen_width*0.4)
-                                            .background(AppColors.buttonPurple)
-                                            .cornerRadius(20)
-                                            .onTapGesture{
-                                                sendVote(optionId: option.id!, keypadId: option.keypad_id!)
-                                            }
-                                        if(index < (keypad?.options!.count ?? 0) - 1){
-                                            Text(keypad?.options![index+1].option! ?? "")
-                                                .font(.system(size: 20)).bold()
-                                                .foregroundColor(Color.white)
-                                                .frame(width: screen_width*0.4, height: screen_width*0.4)
-                                                .background(AppColors.buttonPurple)
-                                                .cornerRadius(20)
-                                                .onTapGesture{
-                                                    sendVote(optionId: (keypad?.options![index+1].id)!, keypadId: option.keypad_id!)
-                                                }
+                                    Text(option.option!)
+                                        .font(.system(size: 20)).bold()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding()
+                                        .foregroundColor(Color.white)
+                                        .frame(width: screen_width*0.8)
+                                        .background(AppColors.buttonPurple)
+                                        .cornerRadius(20)
+                                        .onTapGesture{
+                                            sendVote(optionId: option.id!, keypadId: option.keypad_id!)
                                         }
-                                    }
                                 }
                                 
                             }
@@ -93,6 +83,11 @@ struct KeypadView: View {
                 }.background(AppColors.bgBlue)
                     .onAppear{
                         getKeypad(HallId: hallId)
+                    }.onDisappear{
+                        if let text = self.response
+                            {
+                                alertManager.present(text: text)
+                            }
                     }
             }
         }
@@ -147,11 +142,13 @@ struct KeypadView: View {
                     if(response.status!){
                         self.response = "Yanıtınız Gönderildi"
                     } else {
-                        self.response = "Bir Sorun Meydana geldi"
+                        self.response = "Birden fazla yanıt gönderemezsiniz"
                     }
+                    dismiss()
                 }
             } catch {
                 print(error)
+                dismiss()
             }
         }.resume()
     }
@@ -159,6 +156,7 @@ struct KeypadView: View {
 
 
 struct DebateView: View {
+    @EnvironmentObject var alertManager: AlertManager
     @Binding var hallId: Int
     @State var debate: Debate?
     @State var response: String?
@@ -225,13 +223,15 @@ struct DebateView: View {
                 }.background(AppColors.bgBlue)
                     .onAppear{
                         getDebate(HallId: hallId)
+                    }.onDisappear{
+                        if let text = self.response
+                            {
+                                alertManager.present(text: text)
+                            }
                     }
             }
         }
     }
-    
-    
-    
     func getDebate(HallId: Int){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-debate") else {
             return
@@ -252,8 +252,7 @@ struct DebateView: View {
                     DispatchQueue.main.async {
                         self.debate = debate.data
                     }
-                } else
-                {
+                } else {
                     self.debate = nil
                 }
             } catch {
@@ -283,41 +282,16 @@ struct DebateView: View {
                     if(response.status!){
                         self.response = "Oyunuz Gönderildi"
                     } else {
-                        self.response = "Bir Sorun Meydana geldi"
+                        self.response = "Birden fazla yanıt gönderemezsiniz"
                     }
+                    dismiss()
                 }
             } catch {
                 print(error)
+                dismiss()
             }
         }.resume()
     }
 }
 
-struct LoadingView: View {
-    @Binding var isLoading: Bool
-    var body: some View{
-        ZStack{
-            Color(.white)
-                .ignoresSafeArea()
-                .opacity(0.3)
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: AppColors.bgBlue))
-                .scaleEffect(3)
-        }.background(BackgroundClearView())
-            .onDisappear{
-                isLoading = false
-            }
-    }
-}
 
-struct BackgroundClearView: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        DispatchQueue.main.async {
-            view.superview?.superview?.backgroundColor = .clear
-        }
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {}
-}

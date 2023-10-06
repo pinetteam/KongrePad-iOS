@@ -11,6 +11,7 @@ import PusherSwift
 @main
 struct KongrePadApp: App {
     @StateObject var pusherManager = PusherManager.shared
+    @StateObject var alertManager = AlertManager.shared
     
     let persistenceController = PersistenceController.shared
     
@@ -19,15 +20,35 @@ struct KongrePadApp: App {
             LoginView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(pusherManager)
+                .environmentObject(alertManager)
                 .sheet(isPresented: $pusherManager.isKeypadPresented){
                     KeypadView(hallId: $pusherManager.keypadHallId)
+                        .environmentObject(alertManager)
                 }
                 .sheet(isPresented: $pusherManager.isDebatePresented){
                     DebateView(hallId: $pusherManager.debateHallId)
+                        .environmentObject(alertManager)
+                }.alert(alertManager.text, isPresented: $alertManager.isPresented){
+                    Button("OK", role: .cancel){}
                 }
+                
         }
     }
 }
+
+class AlertManager: ObservableObject{
+    static let shared = AlertManager()
+    @Published var isPresented = false
+    @Published var text = ""
+    
+    func present(text: String){
+        DispatchQueue.main.async {
+            self.isPresented = true
+            self.text = text
+        }
+    }
+}
+
 class PusherManager: ObservableObject {
     static let shared = PusherManager()
     @Published var isDebatePresented = false
@@ -54,9 +75,9 @@ class PusherManager: ObservableObject {
         myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in
             if let data: String = event.data {
                 do{
-                    let keypad = try JSONDecoder().decode(KeypadPusherJSON.self, from: Data(data.utf8))
-                    self.keypadHallId = keypad.hall_id!
-                    self.isKeypadPresented = !self.isKeypadPresented
+                    let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
+                    self.keypadHallId = pusherJson.hall_id!
+                    self.isKeypadPresented = pusherJson.on_vote!
                 }
                 catch {
                     print(error)
@@ -66,14 +87,51 @@ class PusherManager: ObservableObject {
         myChannel.bind(eventName: "debate", eventCallback: { (event: PusherEvent) -> Void in
             if let data: String = event.data {
                 do{
-                    let keypad = try JSONDecoder().decode(KeypadPusherJSON.self, from: Data(data.utf8))
-                    self.debateHallId = keypad.hall_id!
-                    self.isDebatePresented = !self.isDebatePresented
+                    let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
+                    self.debateHallId = pusherJson.hall_id!
+                    self.isDebatePresented = pusherJson.on_vote!
                 }
                 catch {
                     print(error)
                 }
             }
         })
+    }
+    class PusherJSON : Codable, Identifiable{
+        
+        var hall_id: Int?
+        var on_vote: Bool?
+    }
+
+}
+
+class LoadingViewModel: ObservableObject {
+    @Published var isLoading = false
+    
+    func startLoading() {
+        isLoading = true
+    }
+    
+    func stopLoading() {
+        isLoading = false
+    }
+}
+
+struct LoadingView: View {
+    @ObservedObject var viewModel: LoadingViewModel
+    
+    var body: some View {
+        if viewModel.isLoading {
+            ZStack {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all)
+                
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .scaleEffect(2.0, anchor: .center)
+                    .foregroundColor(Color.white)
+            }
+            .transition(.opacity)
+        }
     }
 }

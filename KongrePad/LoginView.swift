@@ -147,7 +147,7 @@ struct LoginView: View {
 }
 struct loginWithCode: View {
     @Binding var goToMainPage: Bool
-    @State var code: String = "Lütfen kodunuzu buraya giriniz."
+    @State var code: String = ""
     @Binding var scanError: String
     @Environment (\.dismiss) var dismiss
     var body: some View{
@@ -170,7 +170,8 @@ struct loginWithCode: View {
                         Spacer()
                     }.frame(width: screen_width).background(AppColors.bgBlue)
                     Spacer()
-                    TextField("", text: $code, axis: .vertical)
+                    TextField("", text: $code, prompt: Text("Lütfen kodunuzu buraya giriniz.").foregroundColor(.gray), axis: .vertical)
+                        .tint(.black)
                         .frame(width: screen_width*0.65).padding()
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)

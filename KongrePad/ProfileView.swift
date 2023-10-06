@@ -79,7 +79,7 @@ struct ProfileView: View{
                         }
                     Spacer()
                     ZStack(alignment: .topLeading){
-                        Text("Bilgilerinizde eksik veya hatalı bilgi var ise lütfen ön masa ile irtibata geçiniz")
+                        Text("Bilgilerinizde eksik veya hatalı bilgi var ise lütfen kayıt masası ile irtibata geçiniz")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.8, height: screen_height*0.1).padding()
                             .background(AppColors.bgBlue)

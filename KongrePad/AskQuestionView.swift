@@ -11,10 +11,9 @@ struct AskQuestionView : View {
     @Environment(\.presentationMode) var pm
     @Binding var hallId: Int
     @State var session: Session?
-    @State var question = "Soru sor"
+    @State var question = ""
     @State var is_hidden_name = false
-    @State var popUp = false
-    @State var popUpText = ""
+    @EnvironmentObject var alertManager: AlertManager
     
     var body: some View{
         NavigationStack {
@@ -33,25 +32,37 @@ struct AskQuestionView : View {
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
                         }.frame(width: screen_width*0.1)
-                        Text("\(self.session?.title ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
-                            .multilineTextAlignment(.center)
+                        Spacer()
                     }.frame(width: screen_width)
+                        .background(AppColors.bgBlue)
+                    Text("\(self.session?.title ?? "")")
+                        .foregroundColor(Color.white)
+                        .frame(width: screen_width*0.85, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
                     Spacer()
                     VStack{
                         Text("\(self.session?.speaker_name ?? "")")
                             .foregroundColor(Color.white)
-                            .bold()
+                            .font(.system(size: 20)).bold()
                             .multilineTextAlignment(.center)
-                            .padding()
-                        TextField("soru", text: $question, axis: .vertical)
-                            .frame(width: screen_width*0.85, height: screen_height*0.3)
-                            .background(Color.white).cornerRadius(10).padding()
+                            .padding(.top, 15)
+                        ZStack(alignment: .top){
+                            RoundedRectangle(cornerRadius: 10)
+                                .frame(width: screen_width*0.85, height: screen_height*0.3)
+                                .foregroundColor(.white)
+                            TextField("Soru sor", text: $question, axis: .vertical)
+                                .frame(width: screen_width*0.84)
+                                .background(Color.white)
+                                .tint(.red).padding()
+                                .onChange(of: question) { _ in
+                                    question = String(question.prefix(255))
+                                }
+                        }.padding()
                         HStack{
                             Image(systemName: is_hidden_name ? "checkmark.square" : "square.fill")
                             Text("İsmimi gizle")
+                            Spacer()
+                            Text("\(question.count)/255")
                         }
                         .foregroundColor(Color.white)
                         .frame(width: screen_width*0.5)
@@ -74,9 +85,6 @@ struct AskQuestionView : View {
         }
         .onAppear{
             getSession()
-        }
-        .alert(popUpText, isPresented: $popUp){
-            Button("OK", role: .cancel){}
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -101,11 +109,9 @@ struct AskQuestionView : View {
             do{
                 let response = try JSONDecoder().decode(SessionQuestionResponseJSON.self, from: data)
                 if(response.status!){
-                    self.popUpText = "Sorunuz Gönderildi"
-                    self.popUp = true
+                    alertManager.present(text: "Sorunuz gönderildi")
                 } else {
-                    self.popUpText = "Bir Sorun Meydana geldi"
-                    self.popUp = true
+                    alertManager.present(text: "Bir sorun meydana geldi")
                 }
             } catch {
                 print(error)

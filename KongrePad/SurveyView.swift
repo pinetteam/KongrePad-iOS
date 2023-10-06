@@ -9,11 +9,10 @@ import SwiftUI
 
 struct SurveyView : View {
     @Environment(\.presentationMode) var pm
+    @EnvironmentObject var alertManager: AlertManager
     @State var meeting: Meeting?
     @State var survey: Survey?
     @Binding var surveyId: Int
-    @Binding var popUp: Bool
-    @Binding var popUpText: String
     @State var questions: [SurveyQuestion]?
     @State var error = ""
     var body: some View{
@@ -213,8 +212,7 @@ struct SurveyView : View {
                     self.error = response.errors![0]
                     return
                 }
-                self.popUpText = "Yanıtlarınız gönderildi"
-                self.popUp = true
+                alertManager.present(text: "Yanıtlarınız gönderildi") 
                 DispatchQueue.main.async {
                     pm.wrappedValue.dismiss()
                 }

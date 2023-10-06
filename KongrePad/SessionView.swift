@@ -9,16 +9,12 @@ import SwiftUI
 import PDFKit
 
 struct SessionView : View {
+    @ObservedObject var loadingViewModel = LoadingViewModel()
     @Environment(\.presentationMode) var pm
-    @Binding var pdfURL: URL?
+    @State var pdfURL: URL?
     @State var document: Document?
-    @State var meeting: Meeting?
     @State var bannerName : String = ""
     @Binding var hallId: Int
-    @State var session: Session?
-    
-    
-    
     
     var body: some View{
         NavigationStack {
@@ -28,15 +24,15 @@ struct SessionView : View {
                 VStack(spacing: 0){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.blue)
-                        .background(
-                            Circle().fill(AppColors.buttonLightBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
-                        }.frame(width: screen_width*0.1)
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(Color.blue)
+                            .background(
+                                Circle().fill(AppColors.buttonLightBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }.frame(width: screen_width*0.1)
                         Text("\(document?.title ?? "")")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
@@ -44,31 +40,28 @@ struct SessionView : View {
                             .multilineTextAlignment(.center)
                     }
                     PdfKitRepresentedView(documentURL: $pdfURL)
-                    ZStack(alignment: .trailing){
+                    ZStack(alignment: .center){
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
                         if(self.pdfURL != nil){
-                            HStack{
-                                NavigationLink(destination: AskQuestionView(hallId: $hallId)){
-                                    Text("Soru Sor")
-                                        .foregroundColor(Color.white)
-                                        .frame(width: screen_width*0.3, height: screen_height*0.05)
-                                        .font(.system(size: 20))
-                                        .background(Color.red)
-                                        .cornerRadius(5).padding()
-                                }
+                            NavigationLink(destination: AskQuestionView(hallId: $hallId)){
+                                Text("Soru Sor")
+                                    .foregroundColor(Color.white)
+                                    .frame(width: screen_width*0.3, height: screen_height*0.05)
+                                    .font(.system(size: 20))
+                                    .background(Color.red)
+                                    .cornerRadius(5).padding()
                             }
                         }
                     }
-            
+                    
                 }.background(AppColors.bgBlue)
-        }
-                
+            }
+            
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
-                getMeeting()
-                getDocument()
-            }
+            getDocument()
+        }
     }
     func getDocument(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/active-document") else {
@@ -97,64 +90,7 @@ struct SessionView : View {
             }
         }.resume()
     }
-
-    func getMeeting(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.meeting = meeting.data
-                }
-                self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    
-    
-    
-    
-    func getSession(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/active-session") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let session = try JSONDecoder().decode(SessionJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.session = session.data
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
 }
-
-
-
 struct PdfKitRepresentedView : UIViewRepresentable {
     
     @Binding var documentURL : URL?
@@ -167,6 +103,7 @@ struct PdfKitRepresentedView : UIViewRepresentable {
         pdfView.displayDirection = .vertical
         pdfView.minScaleFactor = 0.5
         pdfView.maxScaleFactor = 5.0
+        pdfView.autoScales = true
         
         return pdfView
     }

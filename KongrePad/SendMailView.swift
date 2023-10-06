@@ -9,11 +9,10 @@ import SwiftUI
 
 struct SendMailView : View {
     @Environment(\.presentationMode) var pm
-    @State var meeting: Meeting?
+    @State var programDay: ProgramDay?
     @State var documents: [Document]?
     @State var selectedDocuments = Set<Int>()
-    @State var popUp = false
-    @State var popUpText = ""
+    @EnvironmentObject var alertManager: AlertManager
     
     var body: some View{
         NavigationStack {
@@ -40,56 +39,118 @@ struct SendMailView : View {
                     }
                     .frame(width: screen_width)
                     .background(AppColors.sendMailBlue)
-                    ScrollView(.vertical){
-                        VStack(alignment: .leading, spacing: 10){
-                            ForEach(documents ?? []){document in
-                                if document.session != nil {
-                                    HStack{
-                                        VStack(alignment: .leading){
-                                            Text(document.session?.start_at! ?? "")
-                                                .foregroundColor(Color.black)
-                                                .bold()
-                                            Spacer()
-                                            Text(document.session?.finish_at! ?? "")
-                                                .foregroundColor(Color.black)
-                                                .bold()
-                                        }
+                    
+                ScrollView(.vertical){
+                    VStack(spacing: 10){
+                        ForEach(self.programDay?.programs ?? []){program in
+                            HStack{
+                                VStack(alignment: .center, spacing: 0){
+                                    Text(program.start_at!)
+                                        .foregroundColor(Color.black)
+                                        .bold()
+                                    RoundedRectangle(cornerRadius: 5)
                                         .frame(maxHeight: .infinity)
-                                        .frame(width: screen_width*0.20)
-                                        .background(AppColors.programDateYellow)
-                                        .overlay (
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(.black)
-                                        )
-                                        .cornerRadius(8)
-                                        VStack(alignment: .leading){
-                                            Text(document.session?.title! ?? "")
-                                                .font(.system(size: 20))
-                                                .multilineTextAlignment(.leading)
-                                        }
-                                        .frame(maxHeight: .infinity)
-                                        .frame(width: screen_width*0.65)
-                                        .background((selectedDocuments.contains(document.id!) || document.is_requested!) ? Color.red : AppColors.programTitleBlue)
-                                        .overlay (
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(.black)
-                                        )
-                                        .cornerRadius(8)
-                                    }.onTapGesture{
-                                        if selectedDocuments.contains(document.id!)
-                                        {
-                                            self.selectedDocuments.remove(document.id!)
-                                        }
-                                        else
-                                        {
-                                            self.selectedDocuments.insert(document.id!)
-                                        }
+                                        .frame(width: screen_width*0.004)
+                                        .foregroundColor(Color.black)
+                                    Text(program.finish_at!)
+                                        .foregroundColor(Color.black)
+                                        .bold()
+                                }
+                                .frame(maxHeight: .infinity)
+                                .frame(width: screen_width*0.20)
+                                .background(AppColors.programDateYellow)
+                                .overlay (
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(.black)
+                                )
+                                .cornerRadius(8)
+                                VStack(alignment: .leading){
+                                    Text(program.title!)
+                                        .font(.system(size: 15))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding()
+                                    ForEach(program.debates ?? []){debate in
+                                        Text("- \(debate.title ?? "")")
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding([.bottom, .trailing, .leading])
                                     }
+                                    
+                                }
+                                .frame(maxHeight: .infinity)
+                                .frame(width: screen_width*0.65)
+                                .background(AppColors.programTitleBlue)
+                                .overlay (
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(.black)
+                                )
+                                .cornerRadius(8)
+                            }
+                            ForEach(program.sessions ?? []){session in
+                                HStack{
+                                    VStack(alignment: .center, spacing: 0){
+                                        Text(session.start_at!)
+                                            .foregroundColor(Color.black)
+                                            .bold()
+                                        RoundedRectangle(cornerRadius: 5)
+                                            .frame(maxHeight: .infinity)
+                                            .frame(width: screen_width*0.004)
+                                            .foregroundColor(Color.black)
+                                        Text(session.finish_at!)
+                                            .foregroundColor(Color.black)
+                                            .bold()
+                                    }
+                                    .frame(maxHeight: .infinity)
+                                    .frame(width: screen_width*0.20)
+                                    .background(AppColors.programDateYellow)
+                                    .overlay (
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(.black)
+                                    )
+                                    .cornerRadius(8)
+                                    VStack(alignment: .leading){
+                                        HStack{
+                                            if (session.document_id != nil && session.is_document_requested! == false ){
+                                                if (session.document_sharing_via_email! != false){
+                                                    Image(systemName: (selectedDocuments.contains(session.document_id ?? 0)) ? "checkmark.square" : "square")
+                                                }
+                                            }
+                                            Text(session.title!)
+                                                .font(.system(size: 15))
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                        }.onTapGesture{
+                                            if (session.document_id != nil){
+                                                if selectedDocuments.contains(session.document_id!)
+                                                {
+                                                    self.selectedDocuments.remove(session.document_id!)
+                                                }
+                                                else
+                                                {
+                                                    self.selectedDocuments.insert(session.document_id!)
+                                                }
+                                            }
+                                        }
+                                        .padding()
+                                        Text("Konuşmacı: \(session.speaker_name!)")
+                                            .foregroundColor(Color.gray)
+                                            .font(.system(size: 12))
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding([.bottom, .trailing, .leading])
+                                    }
+                                    .frame(maxHeight: .infinity)
+                                    .frame(width: screen_width*0.65)
+                                    .background(AppColors.programTitleBlue)
+                                    .overlay (
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(.black)
+                                    )
+                                    .cornerRadius(8)
                                 }
                                 
                             }
-                        }.padding()
-                    }.frame(width: screen_width, height: screen_height*0.7).background(Color.white)
+                               
+                        }
+                    }
+                }.frame(width: screen_width*0.85, height: screen_height*0.8)
                     Spacer()
                     ZStack(alignment: .center){
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
@@ -110,39 +171,10 @@ struct SendMailView : View {
                 }.background(AppColors.bgBlue)
             }
         }
-        .alert(popUpText, isPresented: $popUp){
-            Button("OK", role: .cancel){}
-        }
         .navigationBarBackButtonHidden(true)
         .onAppear{
-            getMeeting()
             getDocuments()
         }
-    }
-    
-        func getMeeting(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.meeting = meeting.data
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
     }
     
 func getDocuments(){
@@ -189,8 +221,7 @@ func getDocuments(){
             let string : String? = String(data: documentsData, encoding: .utf8)
             body = ["documents": string!]
         } catch {
-            self.popUpText = "Bir hata meydana geldi"
-            self.popUp = true
+            alertManager.present(text: "Bir hata meydana geldi")
             return
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: body)
@@ -202,12 +233,10 @@ func getDocuments(){
             do{
                 let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
                 if (response.status != true){
-                    self.popUpText = response.errors![0]
-                    self.popUp = true
+                    alertManager.present(text: response.errors![0])
                     return
                 }
-                self.popUpText = "İstediğiniz dökümanlar kongreden sonra size mail olarak gönderilecek"
-                self.popUp = true
+                alertManager.present(text: "İstediğiniz dökümanlar kongreden sonra size mail olarak gönderilecek")
                 DispatchQueue.main.async {
                     pm.wrappedValue.dismiss()
                 }

@@ -11,6 +11,8 @@ class Session : Codable, Identifiable{
     var program_id: Int?
     var speaker_id: Int?
     var document_id: Int?
+    var is_document_requested: Bool?
+    var document_sharing_via_email: Bool?
     var sort_order: Int?
     var code: String?
     var title: String?

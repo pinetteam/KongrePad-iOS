@@ -12,8 +12,7 @@ struct ScoreGameView: View {
     @Environment(\.presentationMode) var pm
     
     @State var isPresentingScanner = false
-    @State var popUp = false
-    @State var popUpText = ""
+    @EnvironmentObject var alertManager: AlertManager
     @State var scanError : String = ""
     @State var total_point : Int = 0
     @State var scoreGame: ScoreGame?
@@ -57,8 +56,12 @@ struct ScoreGameView: View {
                 }.resume()
                 self.isPresentingScanner = false
             }
-        })
         }
+        )
+        .onDisappear{
+            alertManager.present(text: self.scanError)
+        }
+    }
     
     var body: some View {
         
@@ -93,25 +96,21 @@ struct ScoreGameView: View {
                     }.sheet(isPresented: $isPresentingScanner) {
                         self.scannerSheet
                     }
-                    Text(self.scanError)
-                        .foregroundColor(Color.red)
-                        .font(.system(size: 22))
-                        .multilineTextAlignment(.center)
-                        .frame(width: screen_width*0.8)
                     Spacer().frame(height: screen_height*0.1)
                     ZStack{
                         Image("dogaya_can_ver")
                             .renderingMode(.template)
                             .resizable()
-                            .frame(width: screen_width*0.5, height: screen_width*0.5)
+                            .frame(width: screen_width*0.6, height: screen_width*0.6)
                             .foregroundColor(AppColors.sendButtonGreen)
                         Image("dogaya_can_ver")
                             .renderingMode(.template)
                             .resizable()
-                            .frame(width: screen_width*0.5, height: screen_width*0.5)
+                            .frame(width: screen_width*0.6, height: screen_width*0.6)
                             .foregroundColor(Color.gray)
                             .mask(Rectangle().padding(.bottom, screen_width*0.5*CGFloat(total_point * 100 / (scoreGame?.total_point ?? 1))))
                     }
+                    Spacer().frame(height: screen_height*0.1)
                     Text("\(total_point) Puan")
                         .font(.system(size: 30))
                         .foregroundColor(AppColors.sendButtonGreen)
@@ -147,9 +146,6 @@ struct ScoreGameView: View {
         .onAppear{
             getPoints()
             getScoreGame()
-        }
-        .alert(popUpText, isPresented: $popUp){
-            Button("OK", role: .cancel){}
         }
         .navigationBarBackButtonHidden(true)
         }

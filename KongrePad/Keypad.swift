@@ -32,8 +32,3 @@ class KeypadJSON : Codable, Identifiable{
     var errors: [String]?
     var status: Bool?
 }
-
-class KeypadPusherJSON : Codable, Identifiable{
-    
-    var hall_id: Int?
-}
