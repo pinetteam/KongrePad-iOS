@@ -5,7 +5,7 @@
 //  Created by Mert Demirbağ on 22.08.2023.
 //
 
-class Participant : Codable {
+class Participant : Codable, Identifiable {
     var id: Int?
     var meeting_id: Int?
     var username: String?

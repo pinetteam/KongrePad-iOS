@@ -13,6 +13,7 @@ struct VirtualStandView : View {
     @Binding var pdfURL: URL?
     @State var virtualStand: VirtualStand?
     @Binding var virtualStandId: Int
+    @State var bannerName : String = ""
     
     
     
@@ -22,7 +23,7 @@ struct VirtualStandView : View {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                VStack(spacing: 0){
+                VStack(alignment: .leading, spacing: 0){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
                         .font(.system(size: 20)).bold().padding(8)
@@ -33,20 +34,26 @@ struct VirtualStandView : View {
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
-                        }.frame(width: screen_width*0.1)
-                        Text("\(virtualStand?.title ?? "")")
-                            .font(.system(size: 30))
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .multilineTextAlignment(.center)
+                        }
+                        Spacer()
+                        AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(self.bannerName)")){ image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 100, height:50)
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        .scaledToFill()
+                        Spacer()
                     }
-                    .frame(width: screen_width)
+                    .padding()
+                    .frame(width: screen_width, height: screen_height*0.1)
                     .background(AppColors.bgOrange)
                     PdfKitRepresentedView(documentURL: $pdfURL)
-                    Rectangle().frame(width: screen_width, height: screen_height*0.05).foregroundColor(Color.gray)
                 }
             }
-        }.background(Color.gray)
+        }
         .navigationBarBackButtonHidden(true)
         .onAppear{
                 getVirtualStand()
@@ -71,6 +78,8 @@ struct VirtualStandView : View {
                 let virtualStand = try JSONDecoder().decode(VirtualStandJSON.self, from: data)
                 DispatchQueue.main.async {
                     self.virtualStand = virtualStand.data
+                    self.bannerName = "\(String(describing: virtualStand.data!.file_name!)).\(String(describing: virtualStand.data!.file_extension!))"
+                    self.pdfURL = URL(string: "https://app.kongrepad.com/storage/virtual-stand-pdfs/\(String(describing: virtualStand.data!.pdf_name ?? "")).pdf")!
                 }
             } catch {
                 print(error)

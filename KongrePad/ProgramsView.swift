@@ -27,10 +27,14 @@ struct ProgramsView: View{
                         )
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
-                        }.frame(width: screen_width*0.1)
-                        .padding()
+                        }
+                        .padding(5)
                         Spacer()
-                    }.frame(width: screen_width)
+                        Text("")
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                    }
+                    .padding()
+                    .frame(width: screen_width, height: screen_height*0.1)
                     Spacer().frame(height: 5)
                     VStack(alignment: .center){
                         Text("Bilimsel Program")
@@ -89,7 +93,21 @@ struct ProgramsView: View{
                                                     .frame(maxWidth: .infinity, alignment: .leading)
                                                     .padding([.bottom, .trailing, .leading])
                                             }
-                                            
+                                            if program.chairs != nil{
+                                                VStack{
+                                                    Text("Oturum Başkanları:")
+                                                        .foregroundColor(Color.gray)
+                                                        .font(.system(size: 12))
+                                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                                    ForEach(program.chairs ?? []){chair in
+                                                        Text("\(chair.full_name ?? "")")
+                                                            .foregroundColor(Color.gray)
+                                                            .font(.system(size: 12))
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                    }
+                                                }
+                                                .padding([.bottom, .trailing, .leading])
+                                            }
                                         }
                                         .frame(maxHeight: .infinity)
                                         .frame(width: screen_width*0.65)
@@ -127,14 +145,16 @@ struct ProgramsView: View{
                                                     .font(.system(size: 15))
                                                     .frame(maxWidth: .infinity, alignment: .leading)
                                                     .padding()
-                                                Text("Konuşmacı: \(session.speaker_name!)")
-                                                    .foregroundColor(Color.gray)
-                                                    .font(.system(size: 12))
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                                    .padding([.bottom, .trailing, .leading])
+                                                if session.speaker_name != nil{
+                                                    Text("Konuşmacı: \(session.speaker_name!)")
+                                                        .foregroundColor(Color.gray)
+                                                        .font(.system(size: 12))
+                                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                                        .padding([.bottom, .trailing, .leading])
+                                                }
                                             }
                                             .frame(maxHeight: .infinity)
-                                            .frame(width: screen_width*0.65)
+                                            .frame(width: screen_width*0.61)
                                             .background(AppColors.programTitleBlue)
                                             .overlay (
                                                 RoundedRectangle(cornerRadius: 8)
@@ -142,6 +162,7 @@ struct ProgramsView: View{
                                             )
                                             .cornerRadius(8)
                                         }
+                                        .padding([.leading])
                                         
                                     }
                                        

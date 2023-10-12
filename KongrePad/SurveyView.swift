@@ -10,72 +10,98 @@ import SwiftUI
 struct SurveyView : View {
     @Environment(\.presentationMode) var pm
     @EnvironmentObject var alertManager: AlertManager
-    @State var meeting: Meeting?
     @State var survey: Survey?
     @Binding var surveyId: Int
     @State var questions: [SurveyQuestion]?
     @State var error = ""
+    @State var isLoading = true
+    @State var isSending = false
     var body: some View{
         NavigationStack {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                    VStack(alignment: .center){
-                        HStack(alignment: .top){
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 20)).bold().padding(8)
-                                .foregroundColor(AppColors.bgBlue)
-                                .background(
-                                    Circle().fill(AppColors.logoutButtonBlue)
-                                )
-                                .padding(5)
-                                .onTapGesture {
-                                    pm.wrappedValue.dismiss()
-                                }.frame(width: screen_width*0.1)
-                            Text("\(survey?.title ?? "")")
-                                .foregroundColor(Color.white)
-                                .frame(width: screen_width*0.85, height: screen_height*0.1)
-                                .background(AppColors.sendMailBlue)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(width: screen_width)
-                        .background(AppColors.sendMailBlue)
-                        .overlay(Divider().background(.white), alignment: .bottom)
-                        ScrollView(.vertical){
-                            VStack(alignment: .leading, spacing: 20){
-                                ForEach(self.questions ?? []){question in
-                                    Text(question.question ?? "").bold()
-                                    VStack(alignment: .leading){
-                                        ForEach(question.options ?? []){option in
-                                            HStack{
-                                                Button(action:{
+                VStack(alignment: .center){
+                    HStack(alignment: .top){
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(AppColors.bgBlue)
+                            .background(
+                                Circle().fill(AppColors.logoutButtonBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }
+                        Spacer()
+                        Text("\(survey?.title ?? "")")
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .frame(width: screen_width, height: screen_height*0.1)
+                    .background(AppColors.sendMailBlue)
+                    .overlay(Divider().background(.white), alignment: .bottom)
+                    if !isLoading{
+                    ScrollView(.vertical){
+                        VStack(alignment: .leading, spacing: 20){
+                            ForEach(self.questions ?? []){question in
+                                Text(question.question ?? "").bold()
+                                VStack(alignment: .leading){
+                                    ForEach(question.options ?? []){option in
+                                        HStack{
+                                            Button(action:{
+                                                if self.survey?.is_completed == false{
                                                     self.changeSelectedOption(item: question, optionId: option.id!)
-                                                }){
-                                                    Image(systemName: option.id == question.selectedOptionId ? "circle.fill" : "circle")
-                                                    Text(option.option ?? "").foregroundColor(Color.black).multilineTextAlignment(.leading)
                                                 }
-                                                Spacer()
+                                            }){
+                                                Image(systemName: option.id == question.selected_option ? "circle.fill" : "circle")
+                                                Text(option.option ?? "").foregroundColor(Color.black).multilineTextAlignment(.leading)
                                             }
+                                            Spacer()
                                         }
                                     }
-                                    Divider()
                                 }
-                            }.padding()
-                        }.frame(width: screen_width*0.9, height: screen_height*0.75)
-                            .background(Color.white)
-                            .cornerRadius(20)
+                                Divider()
+                            }
+                        }.padding()
+                    }.frame(width: screen_width*0.9, height: screen_height*0.75)
+                        .background(Color.white)
+                        .cornerRadius(20)
+                } else {
+                                   ProgressView()
+                                       .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
+                                       .frame(width: screen_width, height: screen_height*0.7)
+                                       .background(.white)
+                           }
                         Spacer()
                         ZStack(alignment: .center){
                             Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
                             VStack{
                                 Text(error).padding().foregroundColor(Color.red)
-                                Text("Cevapları Gönder")
-                                    .foregroundColor(Color.white)
-                                    .padding().background(Color.green)
-                                    .cornerRadius(10)
-                                    .onTapGesture {
-                                        sendAnswers()
+                                if !isSending {
+                                    if !(self.survey?.is_completed ?? true){
+                                        Text("Cevapları Gönder")
+                                            .foregroundColor(Color.white)
+                                            .padding().background(Color.green)
+                                            .cornerRadius(10)
+                                            .onTapGesture {
+                                                sendAnswers()
+                                            }
+                                    } else {
+                                        Text("Bu Anketi Zaten Cevapladınız")
+                                            .foregroundColor(Color.white)
+                                            .padding().background(Color.green)
+                                            .cornerRadius(10)
                                     }
+                                } else {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
+                                        .frame(width: screen_width*0.3, height: screen_height*0.05)
+                                        .background(Color.green)
+                                        .cornerRadius(10)
+                                }
                             }
                         }
                     }.background(AppColors.bgBlue)
@@ -83,38 +109,12 @@ struct SurveyView : View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear{
-                getMeeting()
                 getSurvey()
                 getQuestions()
         }
     }
-    
-        func getMeeting(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
-                DispatchQueue.main.sync {
-                    self.meeting = meeting.data
-                }
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    
     func getQuestions(){
+        self.isLoading = true
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/survey/\(self.surveyId)/question") else {
             return
         }
@@ -136,10 +136,19 @@ struct SurveyView : View {
             } catch {
                 print(error)
             }
+            DispatchQueue.main.async {
+                self.isLoading = false
+            }
         }.resume()
     }
     
     
+    func changeSelectedOption(item: SurveyQuestion, optionId: Int) {
+        if let index = questions!.firstIndex(where: { $0.id == item.id }) {
+            questions![index].selected_option = optionId
+            }
+        }
+
     func getSurvey(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/survey/\(self.surveyId)") else {
             return
@@ -166,12 +175,16 @@ struct SurveyView : View {
     }
     
     func sendAnswers(){
+        self.isSending = true
         var flag = false
         var selectedOptions: Array<Int> = []
         questions?.forEach{question in
-            if let optionId = question.selectedOptionId{
+            if let optionId = question.selected_option{
                 selectedOptions.append(optionId)
             } else {
+                DispatchQueue.main.async {
+                    self.isSending = false
+                }
                 self.error = "Bütün soruları cevaplamanız gerekiyor"
                 flag = true
             }
@@ -197,6 +210,9 @@ struct SurveyView : View {
             let string : String? = String(data: optionsData, encoding: .utf8)
             body = ["options": string!]
         } catch {
+            DispatchQueue.main.async {
+                self.isSending = false
+            }
             self.error = "Bir hata meydana geldi"
             return
         }
@@ -209,6 +225,9 @@ struct SurveyView : View {
             do{
                 let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
                 if (response.status != true){
+                    DispatchQueue.main.async {
+                        self.isSending = false
+                    }
                     self.error = response.errors![0]
                     return
                 }
@@ -219,12 +238,9 @@ struct SurveyView : View {
             } catch {
                 print(error)
             }
+            DispatchQueue.main.async {
+                self.isSending = false
+            }
         }.resume()
     }
-    
-    func changeSelectedOption(item: SurveyQuestion, optionId: Int) {
-        if let index = questions!.firstIndex(where: { $0.id == item.id }) {
-            questions![index].selectedOptionId = optionId
-            }
-        }
 }

@@ -80,23 +80,16 @@ struct ScoreGameView: View {
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
-                        }.frame(width: screen_width*0.1)
-                        Rectangle()
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .foregroundColor(AppColors.bgBlue)
-                    }.frame(width: screen_width)
-                    Button(action: {
-                        self.isPresentingScanner = true
-                    }){
-                        Text("Qr Kodu Okut\nDoğaya Can Ver")
-                            .font(.system(size: 25)).padding()
-                            .frame(width: screen_width*0.7, height: screen_height*0.15)
+                        }
+                        Spacer()
+                        Text("Doğaya Can Ver")
                             .foregroundColor(Color.white)
-                            .background(AppColors.sendButtonGreen).cornerRadius(10)
-                    }.sheet(isPresented: $isPresentingScanner) {
-                        self.scannerSheet
+                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .multilineTextAlignment(.center)
                     }
-                    Spacer().frame(height: screen_height*0.1)
+                    .padding()
+                    .frame(width: screen_width, height: screen_height*0.1)
+                    Spacer().frame(height: screen_height*0.05)
                     ZStack{
                         Image("dogaya_can_ver")
                             .renderingMode(.template)
@@ -108,31 +101,58 @@ struct ScoreGameView: View {
                             .resizable()
                             .frame(width: screen_width*0.6, height: screen_width*0.6)
                             .foregroundColor(Color.gray)
-                            .mask(Rectangle().padding(.bottom, screen_width*0.5*CGFloat(total_point * 100 / (scoreGame?.total_point ?? 1))))
+                            .mask(Rectangle().padding(.bottom, screen_width*0.006*CGFloat(total_point * 100 / (scoreGame?.total_point ?? 1))))
                     }
-                    Spacer().frame(height: screen_height*0.1)
                     Text("\(total_point) Puan")
-                        .font(.system(size: 30))
+                        .font(.system(size: 40)).bold()
                         .foregroundColor(AppColors.sendButtonGreen)
-                    Spacer().frame(height: screen_height*0.1)
+                    Spacer().frame(height: screen_height*0.05)
+                    Button(action: {
+                        self.isPresentingScanner = true
+                    }){
+                        Label("Kare Kodu Okut", systemImage: "camera")
+                            .font(.system(size: 25)).padding()
+                            .frame(width: screen_width*0.7, height: screen_height*0.15)
+                            .foregroundColor(Color.white)
+                            .background(AppColors.sendButtonGreen).cornerRadius(10)
+                    }.sheet(isPresented: $isPresentingScanner) {
+                        self.scannerSheet
+                    }
+                    Text("Puanlarım")
+                        .foregroundColor(Color.white)
+                        .frame(width: screen_width*0.85, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
                     ScrollView(.vertical){
+                        if self.scoreGamePoints?.count == 0 {
+                            Text("Şu an hiç puanınız yok")
+                                .foregroundColor(Color.white)
+                                .frame(width: screen_width*0.85, height: screen_height*0.1)
+                                .multilineTextAlignment(.center)
+                            
+                        }
                             VStack(spacing: 10){
                                 ForEach(self.scoreGamePoints ?? []){point in
                                     HStack{
+                                        Text(String(describing: point.point!))
+                                            .font(.system(size: 20))
+                                            .frame(width: screen_width*0.20)
+                                            .frame(maxHeight: .infinity)
+                                            .background(AppColors.programTitleBlue)
+                                            .cornerRadius(5)
+                                        Text(point.title!)
+                                            .font(.system(size: 20))
+                                            .frame(width: screen_width*0.40)
+                                            .frame(maxHeight: .infinity)
+                                            .background(AppColors.programDateYellow)
+                                            .cornerRadius(5)
                                         Text(point.created_at!)
+                                            .multilineTextAlignment(.center)
                                             .foregroundColor(Color.black)
                                             .bold()
                                             .frame(maxHeight: .infinity)
                                             .frame(width: screen_width*0.20)
-                                            .background(AppColors.programDateYellow)
-                                                .cornerRadius(5)
-                                        VStack(alignment: .leading){
-                                            Text(point.title!)
-                                                .font(.system(size: 20))
-                                        }
-                                        .frame(width: screen_width*0.65)
-                                        .background(AppColors.programTitleBlue)
-                                        .cornerRadius(5)
+                                            .background(AppColors.programTitleBlue)
+                                            .cornerRadius(5)
                                     }
                                     
                                 }

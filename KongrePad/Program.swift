@@ -24,6 +24,7 @@ class Program : Codable, Identifiable{
     var type: String?
     var on_air: Int?
     var status: Int?
+    var chairs: [Participant]?
     var sessions: [Session]?
     var debates: [Debate]?
 }

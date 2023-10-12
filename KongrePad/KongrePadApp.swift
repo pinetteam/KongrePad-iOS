@@ -57,6 +57,7 @@ class PusherManager: ObservableObject {
     @Published var keypadHallId = 0
     @Published var pusher: Pusher!
     @Published var channelName: String = "default-channel"
+    @Published var participant: Participant?
 
     private init() {
         pusher = Pusher(
@@ -72,12 +73,15 @@ class PusherManager: ObservableObject {
         pusher.unsubscribe(channelName)
         channelName = channel
         let myChannel = pusher.subscribe(channelName)
+        getParticipant()
         myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in
-            if let data: String = event.data {
+            if let data: String = event.data{
                 do{
-                    let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
-                    self.keypadHallId = pusherJson.hall_id!
-                    self.isKeypadPresented = pusherJson.on_vote!
+                    if self.participant?.type == "attendee" {
+                        let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
+                        self.keypadHallId = pusherJson.hall_id!
+                        self.isKeypadPresented = pusherJson.on_vote!
+                    }
                 }
                 catch {
                     print(error)
@@ -87,9 +91,11 @@ class PusherManager: ObservableObject {
         myChannel.bind(eventName: "debate", eventCallback: { (event: PusherEvent) -> Void in
             if let data: String = event.data {
                 do{
-                    let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
-                    self.debateHallId = pusherJson.hall_id!
-                    self.isDebatePresented = pusherJson.on_vote!
+                    if self.participant?.type == "attendee" {
+                        let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
+                        self.debateHallId = pusherJson.hall_id!
+                        self.isDebatePresented = pusherJson.on_vote!
+                    }
                 }
                 catch {
                     print(error)
@@ -97,6 +103,33 @@ class PusherManager: ObservableObject {
             }
         })
     }
+    
+    
+    func getParticipant(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/participant") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let participant = try JSONDecoder().decode(ParticipantJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.participant = participant.data
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
     class PusherJSON : Codable, Identifiable{
         
         var hall_id: Int?

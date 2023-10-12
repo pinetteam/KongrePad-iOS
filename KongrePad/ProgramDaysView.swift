@@ -10,12 +10,11 @@ import PusherSwift
 
 struct ProgramDaysView: View{
     @Environment(\.presentationMode) var pm
-    @State var meeting: Meeting?
     @Binding var hallId: Int
     @State var virtualStands: [VirtualStand]?
     @State var programs: [Program]?
     @State var programDays: [ProgramDay]?
-    @State var bannerName : String = ""
+    @State var isLoading : Bool = true
     
     var body: some View {
         NavigationStack {
@@ -33,38 +32,52 @@ struct ProgramDaysView: View{
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
-                        }.frame(width: screen_width*0.1)
-                        Text("BİLİMSEL PROGRAM")
+                        }
+                        Spacer()
+                        Text("Bilimsel Program")
                             .font(.system(size: 30))
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }.frame(width: screen_width).background(AppColors.buttonYellow)
+                    }
+                    .padding()
+                    .frame(width: screen_width, height: screen_height*0.1)
+                    .background(AppColors.buttonYellow)
                     Spacer()
-                    VStack(alignment: .center){
-                        ScrollView(.vertical){
-                            VStack(spacing: 10){
-                                ForEach(self.programDays ?? []){day in
-                                    NavigationLink(destination: ProgramsView(programDay: day)){
-                                        HStack{
-                                            Text(day.day!)
-                                                .font(.system(size: 20))
-                                                .foregroundColor(AppColors.bgBlue)
-                                                .padding()
-                                            Spacer()
-                                            Image("double_right_arrow")
-                                                .resizable()
-                                                .frame(width: screen_height*0.035, height: screen_height*0.035)
-                                                .padding()
+                    if !isLoading{
+                        VStack(alignment: .center){
+                            ScrollView(.vertical){
+                                VStack(spacing: 10){
+                                    ForEach(self.programDays ?? []){day in
+                                        NavigationLink(destination: ProgramsView(programDay: day)){
+                                            HStack{
+                                                Image("double_right_arrow")
+                                                    .resizable()
+                                                    .frame(width: screen_height*0.035, height: screen_height*0.035)
+                                                    .padding()
+                                                Text(day.day!)
+                                                    .font(.system(size: 20))
+                                                    .foregroundColor(AppColors.bgBlue)
+                                                    .padding()
+                                                Spacer()
+                                            }
+                                            .frame(width: screen_width*0.9, height: screen_height*0.08)
+                                            .background(AppColors.programButtonBlue)
+                                            .overlay (
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(.black)
+                                            )
+                                            .cornerRadius(8)
                                         }
-                                        .frame(width: screen_width*0.9, height: screen_height*0.08)
-                                        .background(AppColors.programButtonBlue)
-                                        .cornerRadius(5)
-                                        .border(.black)
-                                    }    
+                                    }
                                 }
-                            }
-                        }.frame(width: screen_width*0.9, height: screen_height*0.7)
+                            }.frame(width: screen_width*0.9, height: screen_height*0.7)
+                        }
+                    } else {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
+                                .frame(width: screen_width, height: screen_height*0.7)
+                                .background(AppColors.bgLightYellow)
                     }
                     Spacer()
                 }.navigationBarBackButtonHidden(true)
@@ -72,38 +85,13 @@ struct ProgramDaysView: View{
             .background(AppColors.bgLightYellow)
         }
         .onAppear{
-            getMeeting()
             getPrograms()
         }
     }
     
-    func getMeeting(){
-        guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        URLSession.shared.dataTask(with: request) {data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do{
-                let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
-                DispatchQueue.main.async {
-                    self.meeting = meeting.data
-                }
-                self.bannerName = "\(String(describing: meeting.data!.banner_name!)).\(String(describing: meeting.data!.banner_extension!))"
-            } catch {
-                print(error)
-            }
-        }.resume()
-    }
-    
     func getPrograms(){
+        self.isLoading = true
+        @State var isLoading : Bool = true
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/program") else {
             return
         }
@@ -124,6 +112,9 @@ struct ProgramDaysView: View{
                 }
             } catch {
                 print(error)
+            }
+            DispatchQueue.main.async {
+                self.isLoading = false
             }
         }.resume()
     }

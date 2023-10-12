@@ -10,14 +10,10 @@ struct SurveyQuestion : Codable, Identifiable{
     var id: Int?
     var sort_order: Int?
     var survey_id: Int?
+    var selected_option: Int?
     var question: String?
     var options: [SurveyOption]?
     var status: Int?
-    var selectedOptionId: Int?
-    
-    private enum CodingKeys: String, CodingKey {
-        case id, sort_order, survey_id, question, options, status
-    }
 }
 
 class SurveyQuestionsJSON : Codable, Identifiable{

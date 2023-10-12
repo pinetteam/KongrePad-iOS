@@ -14,6 +14,7 @@ struct SessionView : View {
     @State var pdfURL: URL?
     @State var document: Document?
     @State var bannerName : String = ""
+    @State var isLoading : Bool = true
     @Binding var hallId: Int
     
     var body: some View{
@@ -32,38 +33,61 @@ struct SessionView : View {
                             .padding(5)
                             .onTapGesture {
                                 pm.wrappedValue.dismiss()
-                            }.frame(width: screen_width*0.1)
+                            }
+                        Spacer()
                         Text("\(document?.title ?? "")")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
                             .multilineTextAlignment(.center)
                     }
-                    PdfKitRepresentedView(documentURL: $pdfURL)
+                    .padding()
+                    .frame(width: screen_width, height: screen_height*0.1)
+                    .background(AppColors.bgBlue)
+                    if !isLoading{
+                        if self.pdfURL == nil || self.document?.sharing_via_email! == 0{
+                            Text("Sunum Önizlemeye kapalıdır")
+                                .foregroundColor(.black)
+                                .frame(width: screen_width, height: screen_height*0.8)
+                                .background(AppColors.bgBlue)
+                        } else {
+                            PdfKitRepresentedView(documentURL: $pdfURL)
+                        }
+                    } else {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                            .frame(width: screen_width, height: screen_height*0.8)
+                            .background(AppColors.bgBlue)
+                    }
                     ZStack(alignment: .center){
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
                         if(self.pdfURL != nil){
                             NavigationLink(destination: AskQuestionView(hallId: $hallId)){
-                                Text("Soru Sor")
-                                    .foregroundColor(Color.white)
-                                    .frame(width: screen_width*0.3, height: screen_height*0.05)
-                                    .font(.system(size: 20))
-                                    .background(Color.red)
-                                    .cornerRadius(5).padding()
+                                HStack{
+                                    Image(systemName: "questionmark")
+                                        .font(.system(size: 20)).bold()
+                                        .foregroundColor(.white)
+                                    Text("Soru Sor")
+                                        .foregroundColor(Color.white)
+                                        .font(.system(size: 20))
+                                }
+                                .frame(width: screen_width*0.3, height: screen_height*0.05)
+                                .background(Color.red)
+                                .cornerRadius(5).padding()
                             }
                         }
                     }
                     
-                }.background(AppColors.bgBlue)
+                }.ignoresSafeArea(.all, edges: .bottom).background(AppColors.bgBlue)
             }
             
         }
         .navigationBarBackButtonHidden(true)
-        .onAppear{
+        .task{
             getDocument()
         }
     }
     func getDocument(){
+        self.isLoading = true
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/active-document") else {
             return
         }
@@ -88,6 +112,9 @@ struct SessionView : View {
             } catch {
                 print(error)
             }
+            DispatchQueue.main.async {
+                self.isLoading = false
+            }
         }.resume()
     }
 }
@@ -101,8 +128,6 @@ struct PdfKitRepresentedView : UIViewRepresentable {
             pdfView.document = PDFDocument(url: self.documentURL!)
         }
         pdfView.displayDirection = .vertical
-        pdfView.minScaleFactor = 0.5
-        pdfView.maxScaleFactor = 5.0
         pdfView.autoScales = true
         
         return pdfView

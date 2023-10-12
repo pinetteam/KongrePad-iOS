@@ -30,14 +30,16 @@ struct SendMailView : View {
                         .padding(5)
                         .onTapGesture {
                             pm.wrappedValue.dismiss()
-                        }.frame(width: screen_width*0.1)
-                        Text("Sunumunun mail olarak paylaşılmasına izin veren konuşmacıların sunumlarını kendinize mail olarak gönderebilirsiniz")
+                        }
+                        Spacer()
+                        Text("\(programDay?.day! ?? "")")
                             .foregroundColor(Color.white)
                             .frame(width: screen_width*0.85, height: screen_height*0.1)
                             .background(AppColors.sendMailBlue)
                             .multilineTextAlignment(.center)
                     }
-                    .frame(width: screen_width)
+                    .padding()
+                    .frame(width: screen_width, height: screen_height*0.1)
                     .background(AppColors.sendMailBlue)
                     
                 ScrollView(.vertical){
@@ -74,7 +76,21 @@ struct SendMailView : View {
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .padding([.bottom, .trailing, .leading])
                                     }
-                                    
+                                    if program.chairs != nil{
+                                        VStack{
+                                            Text("Oturum Başkanları:")
+                                                .foregroundColor(Color.gray)
+                                                .font(.system(size: 12))
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                            ForEach(program.chairs ?? []){chair in
+                                                Text("\(chair.full_name ?? "")")
+                                                    .foregroundColor(Color.gray)
+                                                    .font(.system(size: 12))
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                            }
+                                        }
+                                        .padding([.bottom, .trailing, .leading])
+                                    }
                                 }
                                 .frame(maxHeight: .infinity)
                                 .frame(width: screen_width*0.65)
@@ -113,6 +129,8 @@ struct SendMailView : View {
                                                 if (session.document_sharing_via_email! != false){
                                                     Image(systemName: (selectedDocuments.contains(session.document_id ?? 0)) ? "checkmark.square" : "square")
                                                 }
+                                            } else if session.is_document_requested! {
+                                                Image(systemName: "checkmark.square").foregroundColor(.gray)
                                             }
                                             Text(session.title!)
                                                 .font(.system(size: 15))
@@ -130,11 +148,13 @@ struct SendMailView : View {
                                             }
                                         }
                                         .padding()
-                                        Text("Konuşmacı: \(session.speaker_name!)")
-                                            .foregroundColor(Color.gray)
-                                            .font(.system(size: 12))
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding([.bottom, .trailing, .leading])
+                                        if session.speaker_name != nil{
+                                            Text("Konuşmacı: \(session.speaker_name!)")
+                                                .foregroundColor(Color.gray)
+                                                .font(.system(size: 12))
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .padding([.bottom, .trailing, .leading])
+                                        }
                                     }
                                     .frame(maxHeight: .infinity)
                                     .frame(width: screen_width*0.65)
@@ -145,6 +165,7 @@ struct SendMailView : View {
                                     )
                                     .cornerRadius(8)
                                 }
+                                .padding([.leading])
                                 
                             }
                                
@@ -236,7 +257,7 @@ func getDocuments(){
                     alertManager.present(text: response.errors![0])
                     return
                 }
-                alertManager.present(text: "İstediğiniz dökümanlar kongreden sonra size mail olarak gönderilecek")
+                alertManager.present(text: "Paylaşıma izin verilen sunumlardan talep ettikleriniz kongreden sonra tarafınıza mail olarak gönderilecektir.")
                 DispatchQueue.main.async {
                     pm.wrappedValue.dismiss()
                 }

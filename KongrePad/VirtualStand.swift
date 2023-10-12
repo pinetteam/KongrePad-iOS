@@ -11,6 +11,7 @@ class VirtualStand : Codable, Identifiable{
     var meeting_id: Int?
     var file_name: String?
     var file_extension: String?
+    var pdf_name: String?
     var title: String?
     var status: Int?
 }

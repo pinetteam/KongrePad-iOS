@@ -37,7 +37,7 @@
 		08AB71F62A93DD5A00EA59DF /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB71F52A93DD5A00EA59DF /* LoginView.swift */; };
 		08AB71FA2A93EA4700EA59DF /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 08AB71F92A93EA4700EA59DF /* CodeScanner */; };
 		08AB71FC2A94C68A00EA59DF /* Meeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB71FB2A94C68A00EA59DF /* Meeting.swift */; };
-		08AB8E862ACF0FC500AA15DE /* PorgramDaysForMailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB8E852ACF0FC500AA15DE /* PorgramDaysForMailView.swift */; };
+		08AB8E862ACF0FC500AA15DE /* ProgramDaysForMailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB8E852ACF0FC500AA15DE /* ProgramDaysForMailView.swift */; };
 		08B6E9772A96597F00F9B529 /* Participant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B6E9762A96597F00F9B529 /* Participant.swift */; };
 		08D643062AA16E1400C7E676 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D643052AA16E1400C7E676 /* Program.swift */; };
 		08D643082AA1708200C7E676 /* ProgramsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D643072AA1708200C7E676 /* ProgramsView.swift */; };
@@ -80,7 +80,7 @@
 		08AB71F52A93DD5A00EA59DF /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		08AB71F72A93EA0500EA59DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		08AB71FB2A94C68A00EA59DF /* Meeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meeting.swift; sourceTree = "<group>"; };
-		08AB8E852ACF0FC500AA15DE /* PorgramDaysForMailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PorgramDaysForMailView.swift; sourceTree = "<group>"; };
+		08AB8E852ACF0FC500AA15DE /* ProgramDaysForMailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramDaysForMailView.swift; sourceTree = "<group>"; };
 		08B6E9762A96597F00F9B529 /* Participant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Participant.swift; sourceTree = "<group>"; };
 		08D643052AA16E1400C7E676 /* Program.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
 		08D643072AA1708200C7E676 /* ProgramsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramsView.swift; sourceTree = "<group>"; };
@@ -127,7 +127,7 @@
 				08AB71F72A93EA0500EA59DF /* Info.plist */,
 				08AB71E02A8D223800EA59DF /* KongrePadApp.swift */,
 				08AB71E22A8D223800EA59DF /* MainPageView.swift */,
-				08AB8E852ACF0FC500AA15DE /* PorgramDaysForMailView.swift */,
+				08AB8E852ACF0FC500AA15DE /* ProgramDaysForMailView.swift */,
 				08D643132AA399DF00C7E676 /* Hall.swift */,
 				089FB4B12A9FEDAD00F4D531 /* AppConstants.swift */,
 				08320E6E2AA8B68E0046AE41 /* Keypad.swift */,
@@ -266,7 +266,7 @@
 				08D643062AA16E1400C7E676 /* Program.swift in Sources */,
 				08320E692AA437B40046AE41 /* ScoreGame.swift in Sources */,
 				08D6430E2AA375DD00C7E676 /* Survey.swift in Sources */,
-				08AB8E862ACF0FC500AA15DE /* PorgramDaysForMailView.swift in Sources */,
+				08AB8E862ACF0FC500AA15DE /* ProgramDaysForMailView.swift in Sources */,
 				08B6E9772A96597F00F9B529 /* Participant.swift in Sources */,
 				08D643102AA37A3800C7E676 /* SurveyQuestion.swift in Sources */,
 				08AB71ED2A8D223900EA59DF /* KongrePad.xcdatamodeld in Sources */,
@@ -435,7 +435,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -471,7 +471,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
