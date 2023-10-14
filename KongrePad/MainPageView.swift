@@ -266,6 +266,11 @@ struct MainPageView: View{
                 }
                 pusherManager.setChannel("meeting-\(String(describing: meeting.data!.id!))")
             } catch {
+                let userDefault = UserDefaults.standard
+                userDefault.set(nil, forKey: "token")
+                userDefault.synchronize()
+                pusherManager.setChannel("ios")
+                self.logOut = true
                 print(error)
             }
         }.resume()

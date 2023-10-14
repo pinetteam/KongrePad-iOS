@@ -44,9 +44,14 @@ struct SessionView : View {
                     .frame(width: screen_width, height: screen_height*0.1)
                     .background(AppColors.bgBlue)
                     if !isLoading{
-                        if self.pdfURL == nil || self.document?.sharing_via_email! == 0{
-                            Text("Sunum Önizlemeye kapalıdır")
-                                .foregroundColor(.black)
+                        if self.pdfURL == nil {
+                            Text("Aktif sunum yok")
+                                .foregroundColor(Color.white)
+                                .frame(width: screen_width, height: screen_height*0.8)
+                                .background(AppColors.bgBlue)
+                        } else if self.document?.allowed_to_review! == 0{
+                            Text("Sunum önizlemeye kapalıdır")
+                                .foregroundColor(Color.white)
                                 .frame(width: screen_width, height: screen_height*0.8)
                                 .background(AppColors.bgBlue)
                         } else {

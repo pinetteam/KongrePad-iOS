@@ -25,15 +25,15 @@ struct AskQuestionView : View {
                 VStack(alignment: .center){
                     HStack(alignment: .top){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(AppColors.bgBlue)
-                        .background(
-                            Circle().fill(AppColors.logoutButtonBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
-                        }
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(AppColors.bgBlue)
+                            .background(
+                                Circle().fill(AppColors.logoutButtonBlue)
+                            )
+                            .padding(5)
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }
                         Spacer()
                         Text("Soru Sor")
                             .foregroundColor(Color.white)
@@ -43,30 +43,27 @@ struct AskQuestionView : View {
                     .padding()
                     .frame(width: screen_width, height: screen_height*0.1)
                     .background(AppColors.bgBlue)
-                    Text("Oturum: \(self.session?.title ?? "")")
-                        .foregroundColor(Color.white)
-                        .frame(height: screen_height*0.1)
-                        .frame(maxWidth: .infinity, alignment: .leading).padding()
-                    Text("Konuşmacı: \(self.session?.speaker_name ?? "")")
-                        .foregroundColor(Color.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                    Spacer()
+                    if self.session != nil{
                     if session?.questions_allowed == 1{
+                        Text("Oturum: \(self.session?.title ?? "")")
+                            .foregroundColor(Color.white)
+                            .frame(height: screen_height*0.1)
+                            .frame(maxWidth: .infinity, alignment: .leading).padding()
+                        Text("Konuşmacı: \(self.session?.speaker_name ?? "")")
+                            .foregroundColor(Color.white)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                        Spacer()
                         VStack{
-                            ZStack(alignment: .top){
-                                RoundedRectangle(cornerRadius: 10)
-                                    .frame(width: screen_width*0.85, height: screen_height*0.3)
-                                    .foregroundColor(.white)
-                                TextField("Soru sor", text: $question, axis: .vertical)
-                                    .frame(width: screen_width*0.84)
-                                    .background(Color.white)
-                                    .tint(.red).padding()
-                                    .focused($showKeyboard)
-                                    .onChange(of: question) { _ in
-                                        question = String(question.prefix(255))
-                                    }
-                            }.padding()
+                            TextField("Soru sor", text: $question, axis: .vertical)
+                                .lineLimit(7...)
+                                .frame(width: screen_width*0.84)
+                                .textFieldStyle(.roundedBorder)
+                                .tint(.red)
+                                .focused($showKeyboard)
+                                .onChange(of: question) { _ in
+                                    question = String(question.prefix(255))
+                                }.padding()
                             HStack{
                                 HStack{
                                     Image(systemName: is_hidden_name ? "checkmark.square" : "square").foregroundColor(.black)
@@ -97,14 +94,20 @@ struct AskQuestionView : View {
                                     }
                                 }
                         } else {
-                           ProgressView()
-                               .frame(width: screen_width*0.9, height: screen_height*0.08)
-                               .foregroundColor(Color.white)
-                               .background(AppColors.sendButtonGreen)
-                               .cornerRadius(5)
-                       }
+                            ProgressView()
+                                .frame(width: screen_width*0.9, height: screen_height*0.08)
+                                .foregroundColor(Color.white)
+                                .background(AppColors.sendButtonGreen)
+                                .cornerRadius(5)
+                        }
                     } else if session?.questions_allowed == 0 {
                         Text("Bu Oturumda Soru alınmamaktadır")
+                            .foregroundColor(Color.white)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                    }
+                    } else {
+                        Text("Aktif oturum yok")
                             .foregroundColor(Color.white)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding()

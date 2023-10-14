@@ -112,7 +112,7 @@ class PusherManager: ObservableObject {
         
         var request = URLRequest(url: url)
         
-        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token") ?? "")", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         URLSession.shared.dataTask(with: request) {data, _, error in
             guard let data = data, error == nil else {

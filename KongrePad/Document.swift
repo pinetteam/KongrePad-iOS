@@ -12,6 +12,7 @@ struct Document : Codable, Identifiable{
     var file_name: String?
     var file_extension: String?
     var title: String?
+    var allowed_to_review: Int?
     var sharing_via_email: Int?
     var status: Int?
     var is_requested: Bool?
