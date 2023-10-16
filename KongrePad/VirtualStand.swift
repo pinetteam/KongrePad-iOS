@@ -5,7 +5,7 @@
 //  Created by Mert Demirbağ on 23.08.2023.
 //
 
-class VirtualStand : Codable, Identifiable{
+struct VirtualStand : Codable, Identifiable{
     
     var id: Int?
     var meeting_id: Int?
@@ -14,6 +14,11 @@ class VirtualStand : Codable, Identifiable{
     var pdf_name: String?
     var title: String?
     var status: Int?
+    var on_hover: Bool?
+    
+    private enum CodingKeys: String, CodingKey {
+        case id, meeting_id, file_name, file_extension, pdf_name, title, status
+    }
 }
 
 class VirtualStandJSON : Codable, Identifiable{

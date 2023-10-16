@@ -30,6 +30,7 @@ struct MainPageView: View{
     @State var bannerName : String = ""
     @State var pdfURL: URL?
     @State var standPdfURL: URL?
+    @GestureState var standLongPress = false
     var body: some View {
         NavigationStack {
             GeometryReader{ geometry in
@@ -73,22 +74,28 @@ struct MainPageView: View{
                                     {
                                         HStack(alignment: .center, spacing: 10){
                                             ForEach(self.virtualStands ?? []){stand in
-                                                AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")){ image in
+                                                AsyncImage(url: URL(string: stand.on_hover ?? false ? "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))" : "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!))_grayscale.\(String(describing: stand.file_extension!))" )){ image in
                                                     image
                                                         .resizable()
                                                         .aspectRatio(contentMode: .fit)
                                                         .frame(width: 100, height:50)
+                                                        .onTapGesture{
+                                                            self.selectedVirtualStandId = stand.id!
+                                                            self.goToVirtualStand = true
+                                                        }
+                                                        .onLongPressGesture(minimumDuration: 20, maximumDistance: 100, pressing: { pressing in
+                                                            if let index = virtualStands!.firstIndex(where: { $0.id == stand.id }) {
+                                                                virtualStands![index].on_hover = pressing
+                                                            }
+                                                        }, perform: {})
+                                                        
                                                 } placeholder: {
                                                     ProgressView()
                                                 }
                                                 .scaledToFill()
-                                                .onTapGesture{
-                                                    self.selectedVirtualStandId = stand.id!
-                                                    self.goToVirtualStand = true
-                                                }
                                             }
                                         }
-                                    }
+                                    }.buttonStyle(EmptyButtonStyle())
                                 }
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 20)).bold()

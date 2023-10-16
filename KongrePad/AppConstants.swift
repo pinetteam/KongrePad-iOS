@@ -191,31 +191,29 @@ struct DebateView: View {
                     ScrollView(.vertical){
                         VStack(spacing: 10){
                             ForEach(Array(self.debate?.teams?.enumerated() ?? [].enumerated()), id: \.element){index, team in
-                                HStack{
-                                    if index%2 == 0{
-                                        Text(team.title!)
-                                            .font(.system(size: 20)).bold()
-                                            .foregroundColor(Color.white)
-                                            .frame(width: screen_width*0.4, height: screen_width*0.4)
-                                            .background(AppColors.buttonPurple)
-                                            .cornerRadius(20)
-                                            .onTapGesture{
-                                                sendVote(teamId: team.id!, debateId: team.debate_id!)
-                                            }
-                                        if(index < (debate?.teams!.count ?? 0) - 1){
-                                            Text(debate?.teams![index+1].title! ?? "")
+                                if let data = Data(base64Encoded: team.logo ?? "" ,options: .ignoreUnknownCharacters){
+                                            let image = UIImage(data: data)
+                                            Image(uiImage: image ?? UIImage())
+                                                .resizable()
+                                                .ignoresSafeArea()
+                                                .aspectRatio(contentMode: .fit).padding()
+                                                .frame(width: screen_width*0.5, height: screen_width*0.5)
+                                                .background(AppColors.buttonPurple)
+                                                .cornerRadius(20)
+                                                .onTapGesture{
+                                                    sendVote(teamId: team.id!, debateId: team.debate_id!)
+                                                }
+                                        }else{
+                                            Text(team.title!)
                                                 .font(.system(size: 20)).bold()
                                                 .foregroundColor(Color.white)
                                                 .frame(width: screen_width*0.4, height: screen_width*0.4)
                                                 .background(AppColors.buttonPurple)
                                                 .cornerRadius(20)
                                                 .onTapGesture{
-                                                    sendVote(teamId: (debate?.teams![index+1].id)!, debateId: team.debate_id!)
+                                                    sendVote(teamId: team.id!, debateId: team.debate_id!)
                                                 }
                                         }
-                                    }
-                                }
-                                
                             }
                         }
                     }
@@ -294,4 +292,9 @@ struct DebateView: View {
     }
 }
 
+struct EmptyButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+    }
+}
 

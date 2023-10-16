@@ -7,9 +7,38 @@
 
 import SwiftUI
 import PusherSwift
+import PushNotifications
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    var window: UIWindow?
+    let pushNotifications = PushNotifications.shared
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
+        self.pushNotifications.registerForRemoteNotifications()
+        try! self.pushNotifications.addDeviceInterest(interest: "kongrepad")
+
+        return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        self.pushNotifications.registerDeviceToken(deviceToken)
+    }
+
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        self.pushNotifications.handleNotification(userInfo: userInfo)
+        print(userInfo)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Remote notification support is unavailable due to error: \(error.localizedDescription)")
+    }
+}
+
 
 @main
 struct KongrePadApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var pusherManager = PusherManager.shared
     @StateObject var alertManager = AlertManager.shared
     
@@ -58,6 +87,7 @@ class PusherManager: ObservableObject {
     @Published var pusher: Pusher!
     @Published var channelName: String = "default-channel"
     @Published var participant: Participant?
+    let pushNotifications = PushNotifications.shared
 
     private init() {
         pusher = Pusher(
@@ -73,6 +103,7 @@ class PusherManager: ObservableObject {
         pusher.unsubscribe(channelName)
         channelName = channel
         let myChannel = pusher.subscribe(channelName)
+        try! self.pushNotifications.addDeviceInterest(interest: channelName)
         getParticipant()
         myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in
             if let data: String = event.data{
