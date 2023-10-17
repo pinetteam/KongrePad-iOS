@@ -9,75 +9,6 @@ import SwiftUI
 import PusherSwift
 import PushNotifications
 
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
-    let pushNotifications = PushNotifications.shared
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
-        self.pushNotifications.registerForRemoteNotifications()
-        try! self.pushNotifications.addDeviceInterest(interest: "kongrepad")
-
-        return true
-    }
-
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        self.pushNotifications.registerDeviceToken(deviceToken)
-    }
-
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        self.pushNotifications.handleNotification(userInfo: userInfo)
-        print(userInfo)
-    }
-
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("Remote notification support is unavailable due to error: \(error.localizedDescription)")
-    }
-}
-
-
-@main
-struct KongrePadApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var pusherManager = PusherManager.shared
-    @StateObject var alertManager = AlertManager.shared
-    
-    let persistenceController = PersistenceController.shared
-    
-    var body: some Scene {
-        WindowGroup {
-            LoginView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(pusherManager)
-                .environmentObject(alertManager)
-                .sheet(isPresented: $pusherManager.isKeypadPresented){
-                    KeypadView(hallId: $pusherManager.keypadHallId)
-                        .environmentObject(alertManager)
-                }
-                .sheet(isPresented: $pusherManager.isDebatePresented){
-                    DebateView(hallId: $pusherManager.debateHallId)
-                        .environmentObject(alertManager)
-                }.alert(alertManager.text, isPresented: $alertManager.isPresented){
-                    Button("OK", role: .cancel){}
-                }
-                
-        }
-    }
-}
-
-class AlertManager: ObservableObject{
-    static let shared = AlertManager()
-    @Published var isPresented = false
-    @Published var text = ""
-    
-    func present(text: String){
-        DispatchQueue.main.async {
-            self.isPresented = true
-            self.text = text
-        }
-    }
-}
-
 class PusherManager: ObservableObject {
     static let shared = PusherManager()
     @Published var isDebatePresented = false
@@ -103,8 +34,10 @@ class PusherManager: ObservableObject {
         pusher.unsubscribe(channelName)
         channelName = channel
         let myChannel = pusher.subscribe(channelName)
-        try! self.pushNotifications.addDeviceInterest(interest: channelName)
         getParticipant()
+        if self.participant?.type == "atendee" {
+            try! self.pushNotifications.addDeviceInterest(interest: channelName)
+        }
         myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in
             if let data: String = event.data{
                 do{
@@ -168,6 +101,101 @@ class PusherManager: ObservableObject {
     }
 
 }
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    var window: UIWindow?
+    let pushNotifications = PushNotifications.shared
+    @ObservedObject var pusherManager = PusherManager.shared
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
+        self.pushNotifications.registerForRemoteNotifications()
+        try! self.pushNotifications.addDeviceInterest(interest: "debug-kongrepad")
+
+        return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        self.pushNotifications.registerDeviceToken(deviceToken)
+    }
+
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        self.pushNotifications.handleNotification(userInfo: userInfo)
+        var userData :PusherBeamsJSON?
+        do {
+            let data = try JSONSerialization.data(withJSONObject: userInfo["data"], options: [])
+            userData = try JSONDecoder().decode(PusherBeamsJSON.self, from: data)
+        } catch {
+            print(error)
+        }
+        // notification geldi
+        if (userData?.event == "debate") {
+            pusherManager.debateHallId = userData?.hall_id ?? 0
+            pusherManager.isDebatePresented = true
+        } else if userData?.event == "keypad" {
+            pusherManager.keypadHallId = userData?.hall_id ?? 0
+            pusherManager.isKeypadPresented = true
+        }
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Remote notification support is unavailable due to error: \(error.localizedDescription)")
+    }
+    
+    
+    
+    class PusherBeamsJSON : Codable, Identifiable{
+        
+        var hall_id: Int?
+        var event: String?
+    }
+}
+
+
+@main
+struct KongrePadApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject var pusherManager = PusherManager.shared
+    @StateObject var alertManager = AlertManager.shared
+    
+    let persistenceController = PersistenceController.shared
+    
+    var body: some Scene {
+        WindowGroup {
+            LoginView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(pusherManager)
+                .environmentObject(alertManager)
+                .sheet(isPresented: $pusherManager.isKeypadPresented){
+                    KeypadView(hallId: $pusherManager.keypadHallId)
+                        .environmentObject(alertManager)
+                }
+                .sheet(isPresented: $pusherManager.isDebatePresented){
+                    DebateView(hallId: $pusherManager.debateHallId)
+                        .environmentObject(alertManager)
+                }.alert(isPresented: $alertManager.isPresented){
+                    Alert(title: Text(alertManager.title), message: Text(alertManager.text), dismissButton: .default(Text("Tamam")))
+                }
+                
+        }
+    }
+}
+
+class AlertManager: ObservableObject{
+    static let shared = AlertManager()
+    @Published var isPresented = false
+    @Published var text = ""
+    @Published var title = ""
+    
+    func present(title: String, text: String){
+        DispatchQueue.main.async {
+            self.isPresented = true
+            self.text = text
+            self.title = title
+        }
+    }
+}
+
 
 class LoadingViewModel: ObservableObject {
     @Published var isLoading = false

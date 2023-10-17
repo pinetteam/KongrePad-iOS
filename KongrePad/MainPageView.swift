@@ -12,6 +12,7 @@ struct MainPageView: View{
     @Environment(\.presentationMode) var pm
     @ObservedObject var loadingViewModel = LoadingViewModel()
     @EnvironmentObject var pusherManager: PusherManager
+    @EnvironmentObject var alertManager: AlertManager
     @State var isHallsForDocumentPresented = false
     @State var isHallsForProgramPresented = false
     @State var isHallsForSendMailPresented = false
@@ -42,9 +43,9 @@ struct MainPageView: View{
                             .resizable()
                             .frame(width: screen_width, height:screen_height*0.15)
                     } placeholder: {
-                        Rectangle().frame(width: screen_width, height:screen_height*0.15)
+                        Text(self.meeting?.title ?? "").font(.largeTitle).frame(width: screen_width, height:screen_height*0.15).foregroundColor(.white)
                     }
-                    ZStack(alignment: .top){
+                    ZStack(alignment: .center){
                         Ellipse()
                             .fill(AppColors.bgLightBlue)
                             .frame(width: screen_width*1.5, height: screen_height*0.2)
@@ -54,21 +55,21 @@ struct MainPageView: View{
                             .frame(width: screen_width, height: screen_height*0.1)
                             .shadow(radius: 6)
                         VStack{
-                            Spacer().frame(height: 10)
                             Text("\(participant?.full_name ?? "")")
                                 .foregroundColor(.white)
-                                .font(.system(size: 30)).bold().padding(.top, 10)
+                                .font(.title)
                         }
                     }
                     Spacer()
-                    VStack(alignment: .center, spacing: 1){
-                        Rectangle()
-                            .frame(width: screen_width*0.9, height: screen_height*0.002)
-                            .foregroundColor(Color.white)
-                            HStack(alignment: .center, spacing: 10){
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 20)).bold()
+                    if self.virtualStands?.count != 0 {
+                        VStack(alignment: .center, spacing: 1){
+                            Rectangle()
+                                .frame(width: screen_width*0.9, height: screen_height*0.002)
                                 .foregroundColor(Color.white)
+                            HStack(alignment: .center, spacing: 10){
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 20)).bold()
+                                    .foregroundColor(Color.white)
                                 ScrollView(.horizontal){
                                     NavigationLink(destination: VirtualStandView(pdfURL: $standPdfURL, virtualStandId: $selectedVirtualStandId), isActive: $goToVirtualStand)
                                     {
@@ -88,7 +89,7 @@ struct MainPageView: View{
                                                                 virtualStands![index].on_hover = pressing
                                                             }
                                                         }, perform: {})
-                                                        
+                                                    
                                                 } placeholder: {
                                                     ProgressView()
                                                 }
@@ -97,24 +98,27 @@ struct MainPageView: View{
                                         }
                                     }.buttonStyle(EmptyButtonStyle())
                                 }
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 20)).bold()
-                                .foregroundColor(Color.white)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 20)).bold()
+                                    .foregroundColor(Color.white)
                             }.frame(width: screen_width*0.9, height: screen_height*0.06)
-                        Rectangle()
-                            .frame(width: screen_width*0.9, height: screen_height*0.002)
-                            .foregroundColor(Color.white)
+                            Rectangle()
+                                .frame(width: screen_width*0.9, height: screen_height*0.002)
+                                .foregroundColor(Color.white)
+                        }
+                        .shadow(radius: 6)
                     }
-                    .shadow(radius: 6)
                     Spacer()
-                    VStack(alignment: .center, spacing: 15){
+                    VStack(alignment: .center){
                         HStack{
                             NavigationLink(destination: SessionView(hallId: $hallId), isActive: $goToSession){
                                 VStack(alignment: .center){
-                                    Image("play_button")
+                                    Image(systemName: "play.fill")
                                         .resizable()
-                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
-                                    Text("Sunum İzle").font(.system(size: 20)).foregroundColor(.white)
+                                        .scaledToFit()
+                                        .frame(height: screen_width*0.1)
+                                        .foregroundColor(.white)
+                                    Text("Sunum İzle").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonPurple).cornerRadius(10)
                                     .onTapGesture {
                                         if self.meeting?.session_hall_count == 1 {
@@ -130,9 +134,11 @@ struct MainPageView: View{
                             NavigationLink(destination: AskQuestionView(hallId: $hallId), isActive: $goToAskQuestion){
                                 VStack(alignment: .center){
                                     Image(systemName: "questionmark")
-                                        .font(.system(size: 50)).bold()
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: screen_width*0.1)
                                         .foregroundColor(.white)
-                                    Text("Soru Sor").font(.system(size: 20)).foregroundColor(.white)
+                                    Text("Soru Sor").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonRed).cornerRadius(10)
                                     .onTapGesture {
                                         if self.meeting?.question_hall_count == 1 {
@@ -149,10 +155,12 @@ struct MainPageView: View{
                         HStack(){
                             NavigationLink(destination: ProgramDaysView(hallId: $hallId), isActive: $goToPrograms){
                                 VStack(alignment: .center){
-                                    Image("program_button")
+                                    Image(systemName: "book.fill")
                                         .resizable()
-                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
-                                    Text("Bilimsel Program").font(.system(size: 20)).foregroundColor(.white)
+                                        .scaledToFit()
+                                        .frame(height: screen_width*0.1)
+                                        .foregroundColor(.white)
+                                    Text("Bilimsel Program").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonYellow).cornerRadius(10)
                                     .onTapGesture {
                                         if self.meeting?.program_hall_count == 1 {
@@ -167,10 +175,12 @@ struct MainPageView: View{
                             }
                             NavigationLink(destination: ProgramDaysForMailView(hallId: $hallId), isActive: $goToProgramsForMail){
                                 VStack(alignment: .center){
-                                    Image("send_mail_button")
+                                    Image(systemName: "envelope.open.fill")
                                         .resizable()
-                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
-                                    Text("Mail Gönder").font(.system(size: 20)).foregroundColor(.white)
+                                        .scaledToFit()
+                                        .frame(height: screen_width*0.1)
+                                        .foregroundColor(.white)
+                                    Text("Mail Gönder").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15)
                                     .background(AppColors.buttonLightBlue).cornerRadius(10)
                                     .onTapGesture {
@@ -185,62 +195,71 @@ struct MainPageView: View{
                                     }
                             }
                         }
-                        
                         HStack(){
                             NavigationLink(destination: SurveysView())
                             {
                                 VStack(alignment: .center){
-                                    Image("surveys_button")
+                                    Image(systemName: "checklist.checked")
                                         .resizable()
-                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
-                                    Text("Anketler").font(.system(size: 20)).foregroundColor(.white)
+                                        .scaledToFit()
+                                        .frame(height: screen_width*0.1)
+                                        .foregroundColor(.white)
+                                    Text("Anketler").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonDarkBlue).cornerRadius(10)
                             }
                             NavigationLink(destination: ScoreGameView())
                             {
                                 VStack(alignment: .center){
-                                    Image("score_game_button")
+                                    Image(systemName: "leaf.fill")
                                         .resizable()
-                                        .frame(width: screen_width*0.1, height: screen_width*0.1)
-                                    Text("Doğaya Can Ver").font(.system(size: 20)).foregroundColor(.white)
+                                        .scaledToFit()
+                                        .frame(height: screen_width*0.1)
+                                        .foregroundColor(.white)
+                                    Text("Doğaya Can Ver").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
                             }
                         }
                     }
                     Spacer()
-                    HStack(alignment: .center){
+                    HStack(alignment: .center, spacing: 0){
                         NavigationLink(destination: LoginView(), isActive: $logOut){
-                            Image("logout_button")
-                                .resizable()
-                                .frame(width: screen_width*0.07, height: screen_width*0.08)
-                                .padding()
+                            Image(systemName: "power")
+                                .foregroundColor(Color.white)
+                                .font(.system(size: 25, weight: .heavy))
                                 .onTapGesture {
                                     let userDefault = UserDefaults.standard
                                     userDefault.set(nil, forKey: "token")
                                     userDefault.synchronize()
                                     pusherManager.setChannel("ios")
+                                    alertManager.present(title: "Başarılı", text: "Başarıyla çıkış yaptınız!")
                                     self.logOut = true
                                 }
                         }
                         Spacer()
                         HStack{
                             NavigationLink(destination: AnnouncementsView()){
-                                Image(systemName: "bell.fill")
-                                    .foregroundColor(Color.white).padding()
+                                Image(systemName: "bell")
+                                    .foregroundColor(Color.white)
                                     .font(.system(size: 25, weight: .heavy))
                             }
                             NavigationLink(destination: ProfileView()){
-                                Image(systemName: "person.fill")
-                                    .foregroundColor(Color.white).padding()
+                                Image(systemName: "person")
+                                    .foregroundColor(Color.white)
                                     .font(.system(size: 25, weight: .heavy))
                             }
                         }
-                    }.padding()
+                    }.padding(.top, 5)
+                        .overlay(Rectangle()
+                            .frame(width: nil, height: 1, alignment: .top).foregroundColor(Color.gray), alignment: .top)
+                        .frame(width: screen_width*0.85)
+                        .padding()
+                        .shadow(radius: 6)
                 }.navigationBarBackButtonHidden(true)
                     .overlay(
                         LoadingView(viewModel: loadingViewModel)
                     )
             }
+            .ignoresSafeArea(.all, edges: .bottom)
             .background(AppColors.bgBlue)
             
             
@@ -343,31 +362,34 @@ struct HallsForDocument: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
+                            .foregroundColor(AppColors.bgBlue)
                             .background(
-                                Circle().fill(AppColors.buttonLightBlue)
+                                Circle().fill(.white)
                             )
-                            .padding(5)
                             .onTapGesture {
                                 dismiss()
                             }.frame(width: screen_width*0.1)
-                        Text("Lütfen sunumu görüntülemek istediğiniz salonu seçiniz")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
-                            .multilineTextAlignment(.center)
-                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                        Spacer()
+                    }
+                    Text("Salon Seçiniz")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.bgBlue)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer()
                     ScrollView(.vertical){
                         VStack{
                             ForEach(self.halls ?? []){hall in
                                 if hall.show_on_session == 1{
-                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                    Text(hall.title!).foregroundColor(AppColors.bgBlue).font(.title2)
                                         .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                        .background(AppColors.programTitleBlue).cornerRadius(5)
+                                        .background(AppColors.programTitleBlue).cornerRadius(10)
                                         .onTapGesture {
                                             self.hallId = hall.id!
                                             getDocument(HallId: hall.id!)
@@ -451,31 +473,34 @@ struct HallsForSendMail: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
+                            .foregroundColor(AppColors.bgBlue)
                             .background(
-                                Circle().fill(AppColors.buttonLightBlue)
+                                Circle().fill(.white)
                             )
-                            .padding(5)
                             .onTapGesture {
                                 dismiss()
                             }.frame(width: screen_width*0.1)
-                        Text("Lütfen bilimsel programı görüntülemek istediğiniz salonu seçiniz")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
-                            .multilineTextAlignment(.center)
-                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                        Spacer()
+                    }
+                    Text("Salon Seçiniz")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.bgBlue)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer()
                     ScrollView(.vertical){
                         VStack{
                             ForEach(self.halls ?? []){hall in
                                 if hall.show_on_send_mail == 1{
-                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                    Text(hall.title!).foregroundColor(AppColors.bgBlue).font(.title2)
                                         .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                        .background(AppColors.programTitleBlue).cornerRadius(5)
+                                        .background(AppColors.programTitleBlue).cornerRadius(10)
                                         .onTapGesture {
                                             self.hallId = hall.id!
                                             self.goToProgramsForMail = true
@@ -530,31 +555,34 @@ struct HallsForProgram: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
+                            .foregroundColor(AppColors.bgBlue)
                             .background(
-                                Circle().fill(AppColors.buttonLightBlue)
+                                Circle().fill(.white)
                             )
-                            .padding(5)
                             .onTapGesture {
                                 dismiss()
                             }.frame(width: screen_width*0.1)
-                        Text("Lütfen bilimsel programı görüntülemek istediğiniz salonu seçiniz")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
-                            .multilineTextAlignment(.center)
-                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                        Spacer()
+                    }
+                    Text("Salon Seçiniz")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.bgBlue)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer()
                     ScrollView(.vertical){
                         VStack{
                             ForEach(self.halls ?? []){hall in
                                 if hall.show_on_view_program == 1{
-                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                    Text(hall.title!).foregroundColor(AppColors.bgBlue).font(.title2)
                                         .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                        .background(AppColors.programTitleBlue).cornerRadius(5)
+                                        .background(AppColors.programTitleBlue).cornerRadius(10)
                                         .onTapGesture {
                                             self.hallId = hall.id!
                                             self.goToProgram = true
@@ -609,31 +637,34 @@ struct HallsForAskQuestion: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
+                            .foregroundColor(AppColors.bgBlue)
                             .background(
-                                Circle().fill(AppColors.buttonLightBlue)
+                                Circle().fill(.white)
                             )
-                            .padding(5)
                             .onTapGesture {
                                 dismiss()
                             }.frame(width: screen_width*0.1)
-                        Text("Lütfen soru sormak istediğiniz salonu seçiniz")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.bgBlue)
-                            .multilineTextAlignment(.center)
-                    }.frame(width: screen_width).background(AppColors.bgBlue)
+                        Spacer()
+                    }
+                    Text("Salon Seçiniz")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.bgBlue)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer()
                     ScrollView(.vertical){
                         VStack{
                             ForEach(self.halls ?? []){hall in
                                 if hall.show_on_ask_question == 1{
-                                    Text(hall.title!).foregroundColor(AppColors.bgBlue)
+                                    Text(hall.title!).foregroundColor(AppColors.bgBlue).font(.title2)
                                         .frame(width: screen_width*0.9, height: screen_height*0.1)
-                                        .background(AppColors.programTitleBlue).cornerRadius(5)
+                                        .background(AppColors.programTitleBlue).cornerRadius(10)
                                         .onTapGesture {
                                             self.hallId = hall.id!
                                             self.goToAskQuestion = true

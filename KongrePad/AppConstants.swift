@@ -30,6 +30,7 @@ struct KeypadView: View {
     @EnvironmentObject var alertManager: AlertManager
     @Binding var hallId: Int
     @State var response: String?
+    @State var success: Bool?
     @State var keypad: Keypad?
     @Environment (\.dismiss) var dismiss
     var body: some View{
@@ -38,59 +39,59 @@ struct KeypadView: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(AppColors.bgBlue)
-                        .background(
-                            Circle().fill(AppColors.logoutButtonBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            dismiss()
-                        }.frame(width: screen_width*0.1)
-                        Text("\(keypad?.keypad ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.sendMailBlue)
+                    ZStack{
+                        Text("Lütfen size en uygun yanıtı seçiniz.")
+                            .foregroundColor(Color.white).font(.title2)
+                            .frame(width: screen_width*0.9, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .frame(width: screen_width)
-                    .background(AppColors.sendMailBlue)
-                    .overlay(Divider().background(.white), alignment: .bottom)
+                    }.padding().frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer()
-                    ScrollView(.vertical){
-                        VStack(spacing: 10){
-                            ForEach(Array(self.keypad?.options?.enumerated() ?? [].enumerated()), id: \.element){index, option in
-                                HStack{
-                                    Text(option.option!)
-                                        .font(.system(size: 20)).bold()
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding()
-                                        .foregroundColor(Color.white)
-                                        .frame(width: screen_width*0.8)
-                                        .background(AppColors.buttonPurple)
-                                        .cornerRadius(20)
-                                        .onTapGesture{
+                    Text(keypad?.keypad ?? "")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.white)
+                        .frame(width: screen_width*0.9)
+                    if self.keypad != nil {
+                        ScrollView(.vertical){
+                            VStack(spacing: 20){
+                                ForEach(Array(self.keypad?.options?.enumerated() ?? [].enumerated()), id: \.element){index, option in
+                                    HStack(){
+                                        Image(systemName: "greaterthan.circle.fill")
+                                            .foregroundColor(.white)
+                                        Text(option.option!)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding()
+                                            .foregroundColor(.white)
+                                    }
+                                    .frame(width: screen_width*0.9)
+                                    .background(.gray)
+                                    .cornerRadius(10)
+                                    .onTapGesture{
                                             sendVote(optionId: option.id!, keypadId: option.keypad_id!)
                                         }
+                                    
                                 }
-                                
                             }
                         }
+                    } else {
+                        Text("Aktif Keypad Yok")
+                            .font(.system(size: 20)).bold()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .foregroundColor(Color.white)
+                            .frame(width: screen_width*0.8)
                     }
-                    Text(response ?? "").foregroundColor(Color.white)
                 }.background(AppColors.bgBlue)
                     .onAppear{
                         getKeypad(HallId: hallId)
                     }.onDisappear{
                         if let text = self.response
                             {
-                                alertManager.present(text: text)
+                            alertManager.present(title: self.success ?? false ? "Başarılı" : "Uyarı", text: text)
                             }
                     }
             }
-        }
+        }.interactiveDismissDisabled()
     }
     func getKeypad(HallId: Int){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-keypad") else {
@@ -108,6 +109,7 @@ struct KeypadView: View {
             
             do{
                 let keypad = try JSONDecoder().decode(KeypadJSON.self, from: data)
+                self.success = keypad.status!
                 if keypad.status!{
                     DispatchQueue.main.async {
                         self.keypad = keypad.data
@@ -140,9 +142,9 @@ struct KeypadView: View {
                 let response = try JSONDecoder().decode(SessionQuestionResponseJSON.self, from: data)
                 DispatchQueue.main.async {
                     if(response.status!){
-                        self.response = "Yanıtınız Gönderildi"
+                        self.response = "Yanıtınız gönderildi!"
                     } else {
-                        self.response = "Birden fazla yanıt gönderemezsiniz"
+                        self.response = "Daha önceden yanıt verdiniz!"
                     }
                     dismiss()
                 }
@@ -160,6 +162,7 @@ struct DebateView: View {
     @Binding var hallId: Int
     @State var debate: Debate?
     @State var response: String?
+    @State var success: Bool?
     @Environment (\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
@@ -167,27 +170,15 @@ struct DebateView: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(AppColors.bgBlue)
-                        .background(
-                            Circle().fill(AppColors.logoutButtonBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            dismiss()
-                        }.frame(width: screen_width*0.1)
-                        Text("\(debate?.title ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.sendMailBlue)
+                    ZStack{
+                        Text("Lütfen oy vermek istediğiniz takımı seçiniz.")
+                            .foregroundColor(Color.white).font(.title2)
+                            .frame(width: screen_width*0.9, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .frame(width: screen_width)
-                    .background(AppColors.sendMailBlue)
-                    .overlay(Divider().background(.white), alignment: .bottom)
+                    }.padding().frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer()
+                    if self.debate != nil {
                     ScrollView(.vertical){
                         VStack(spacing: 10){
                             ForEach(Array(self.debate?.teams?.enumerated() ?? [].enumerated()), id: \.element){index, team in
@@ -197,9 +188,9 @@ struct DebateView: View {
                                                 .resizable()
                                                 .ignoresSafeArea()
                                                 .aspectRatio(contentMode: .fit).padding()
-                                                .frame(width: screen_width*0.5, height: screen_width*0.5)
-                                                .background(AppColors.buttonPurple)
-                                                .cornerRadius(20)
+                                                .frame(width: screen_width*0.7, height: screen_width*0.7)
+                                                .background(.gray)
+                                                .cornerRadius(10)
                                                 .onTapGesture{
                                                     sendVote(teamId: team.id!, debateId: team.debate_id!)
                                                 }
@@ -207,9 +198,9 @@ struct DebateView: View {
                                             Text(team.title!)
                                                 .font(.system(size: 20)).bold()
                                                 .foregroundColor(Color.white)
-                                                .frame(width: screen_width*0.4, height: screen_width*0.4)
+                                                .frame(width: screen_width*0.7, height: screen_width*0.7)
                                                 .background(AppColors.buttonPurple)
-                                                .cornerRadius(20)
+                                                .cornerRadius(10)
                                                 .onTapGesture{
                                                     sendVote(teamId: team.id!, debateId: team.debate_id!)
                                                 }
@@ -217,18 +208,25 @@ struct DebateView: View {
                             }
                         }
                     }
-                    Text(response ?? "").foregroundColor(Color.white)
+                } else {
+                    Text("Aktif Münazara Yok")
+                        .font(.system(size: 20)).bold()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .foregroundColor(Color.white)
+                        .frame(width: screen_width*0.8)
+                }
                 }.background(AppColors.bgBlue)
                     .onAppear{
                         getDebate(HallId: hallId)
                     }.onDisappear{
                         if let text = self.response
                             {
-                                alertManager.present(text: text)
+                            alertManager.present(title: self.success ?? false ? "Başarılı" : "Uyarı", text: text)
                             }
                     }
             }
-        }
+        }.interactiveDismissDisabled()
     }
     func getDebate(HallId: Int){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-debate") else {
@@ -277,10 +275,11 @@ struct DebateView: View {
             do{
                 let response = try JSONDecoder().decode(SessionQuestionResponseJSON.self, from: data)
                 DispatchQueue.main.async {
+                    self.success = response.status!
                     if(response.status!){
-                        self.response = "Oyunuz Gönderildi"
+                        self.response = "Oyunuz gönderildi!"
                     } else {
-                        self.response = "Birden fazla yanıt gönderemezsiniz"
+                        self.response = "Daha önceden oy kullandınız!"
                     }
                     dismiss()
                 }

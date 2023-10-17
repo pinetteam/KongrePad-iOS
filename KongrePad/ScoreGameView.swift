@@ -59,7 +59,11 @@ struct ScoreGameView: View {
         }
         )
         .onDisappear{
-            alertManager.present(text: self.scanError)
+            if self.scanError != ""{
+                let error = self.scanError
+                self.scanError = ""
+                alertManager.present(title: "Başarılı", text: error)
+            }
         }
     }
     
@@ -70,26 +74,25 @@ struct ScoreGameView: View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(AppColors.bgBlue)
-                        .background(
-                            Circle().fill(AppColors.logoutButtonBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
+                    ZStack{
+                        HStack(alignment: .center){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.bgBlue)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Spacer()
                         }
-                        Spacer()
                         Text("Doğaya Can Ver")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .foregroundColor(Color.white).font(.title)
+                            .frame(width: screen_width*0.7, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    Spacer().frame(height: screen_height*0.05)
+                    }.padding().frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom)
                     ZStack{
                         Image("dogaya_can_ver")
                             .renderingMode(.template)
@@ -103,66 +106,64 @@ struct ScoreGameView: View {
                             .foregroundColor(Color.gray)
                             .mask(Rectangle().padding(.bottom, screen_width*0.006*CGFloat(total_point * 100 / (scoreGame?.total_point ?? 1))))
                     }
-                    Text("\(total_point) Puan")
-                        .font(.system(size: 40)).bold()
+                    Text("\(total_point) puan")
+                        .font(.largeTitle).bold()
                         .foregroundColor(AppColors.sendButtonGreen)
-                    Spacer().frame(height: screen_height*0.05)
-                    Button(action: {
-                        self.isPresentingScanner = true
-                    }){
-                        Label("Kare Kodu Okut", systemImage: "camera")
-                            .font(.system(size: 25)).padding()
-                            .frame(width: screen_width*0.7, height: screen_height*0.15)
-                            .foregroundColor(Color.white)
-                            .background(AppColors.sendButtonGreen).cornerRadius(10)
-                    }.sheet(isPresented: $isPresentingScanner) {
-                        self.scannerSheet
-                    }
-                    Text("Puanlarım")
-                        .foregroundColor(Color.white)
-                        .frame(width: screen_width*0.85, height: screen_height*0.1)
-                        .multilineTextAlignment(.center)
-                    ScrollView(.vertical){
-                        if self.scoreGamePoints?.count == 0 {
-                            Text("Şu an hiç puanınız yok")
-                                .foregroundColor(Color.white)
-                                .frame(width: screen_width*0.85, height: screen_height*0.1)
-                                .multilineTextAlignment(.center)
-                            
-                        }
+                    VStack(spacing: 0){
+                        Text("Puan Geçmişim")
+                            .foregroundColor(Color.white).font(.title2)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, 5)
+                        ScrollView(.vertical){
+                            if self.scoreGamePoints?.count == 0 {
+                                Text("Şu an hiç puanınız yok")
+                                    .foregroundColor(Color.gray).font(.footnote)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                             VStack(spacing: 10){
                                 ForEach(self.scoreGamePoints ?? []){point in
                                     HStack{
                                         Text(String(describing: point.point!))
-                                            .font(.system(size: 20))
-                                            .frame(width: screen_width*0.20)
+                                            .foregroundColor(.white).bold()
+                                            .frame(width: screen_width*0.15)
                                             .frame(maxHeight: .infinity)
-                                            .background(AppColors.programTitleBlue)
-                                            .cornerRadius(5)
-                                        Text(point.title!)
-                                            .font(.system(size: 20))
-                                            .frame(width: screen_width*0.40)
-                                            .frame(maxHeight: .infinity)
-                                            .background(AppColors.programDateYellow)
-                                            .cornerRadius(5)
-                                        Text(point.created_at!)
-                                            .multilineTextAlignment(.center)
-                                            .foregroundColor(Color.black)
-                                            .bold()
-                                            .frame(maxHeight: .infinity)
-                                            .frame(width: screen_width*0.20)
-                                            .background(AppColors.programTitleBlue)
-                                            .cornerRadius(5)
+                                            .background(AppColors.sendButtonGreen)
+                                            .cornerRadius(10)
+                                        VStack{
+                                            Text(point.title!)
+                                                .foregroundColor(.white)
+                                            Text(point.created_at!)
+                                                .font(.footnote)
+                                                .foregroundColor(.white)
+                                        }
+                                        .frame(maxHeight: .infinity)
+                                        .frame(width: screen_width*0.75)
+                                        .background(.gray)
+                                        .cornerRadius(10)
                                     }
                                     
                                 }
                             }
-                        }.frame(width: screen_width*0.7, height: screen_height*0.5)
-                        
+                        }.frame(width: screen_width*0.9, height: screen_height*0.3)
+                    }.padding([.trailing, .leading])
+                    Spacer()
+                    ZStack{
+                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
+                        Button(action: {
+                            self.isPresentingScanner = true
+                        }){
+                            Label("Kare Kodu Okut", systemImage: "camera")
+                                .padding()
+                                .foregroundColor(Color.white)
+                                .background(AppColors.sendButtonGreen).cornerRadius(10)
+                        }.sheet(isPresented: $isPresentingScanner) {
+                            self.scannerSheet
+                        }
+                    }.overlay(Rectangle().frame(width: nil, height: 1, alignment: .top).foregroundColor(Color.gray), alignment: .top)
                     }
                 }.background(AppColors.bgBlue)
-            
             }
+        .ignoresSafeArea(.all, edges: .bottom)
         .onAppear{
             getPoints()
             getScoreGame()

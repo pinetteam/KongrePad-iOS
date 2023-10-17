@@ -23,3 +23,10 @@ class HallsJSON : Codable, Identifiable{
     var errors: [String]?
     var status: Bool?
 }
+
+class HallJSON : Codable, Identifiable{
+    
+    var data: Hall?
+    var errors: [String]?
+    var status: Bool?
+}

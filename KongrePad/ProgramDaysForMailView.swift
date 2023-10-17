@@ -21,28 +21,27 @@ struct ProgramDaysForMailView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.black)
-                        .background(
-                            Circle().fill(Color.white)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
-                        }
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(AppColors.buttonYellow)
+                            .background(
+                                Circle().fill(.white)
+                            )
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }.frame(width: screen_width*0.1)
                         Spacer()
-                        Text("Mail Gönder")
-                            .font(.system(size: 30))
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .multilineTextAlignment(.center)
                     }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.bgLightBlue)
-                    Spacer()
+                    Text("Gün Seçiniz")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.buttonYellow)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
+                    Spacer().frame(height: 10)
                     if !isLoading {
                     VStack(alignment: .center){
                         ScrollView(.vertical){
@@ -50,23 +49,24 @@ struct ProgramDaysForMailView: View{
                                 ForEach(self.programDays ?? []){day in
                                     NavigationLink(destination: SendMailView(programDay: day)){
                                         HStack{
-                                            Image("double_right_arrow")
+                                            Image(systemName: "chevron.right.2")
                                                 .resizable()
-                                                .frame(width: screen_height*0.035, height: screen_height*0.035)
+                                                .scaledToFit()
+                                                .frame(height: screen_height*0.035).foregroundColor(.black)
                                                 .padding()
                                             Text(day.day!)
                                                 .font(.system(size: 20))
-                                                .foregroundColor(AppColors.bgBlue)
+                                                .foregroundColor(.black)
                                                 .padding()
                                             Spacer()
                                         }
                                         .frame(width: screen_width*0.9, height: screen_height*0.08)
                                         .background(AppColors.programButtonBlue)
                                         .overlay (
-                                            RoundedRectangle(cornerRadius: 8)
+                                            RoundedRectangle(cornerRadius: 10)
                                                 .stroke(.black)
                                         )
-                                        .cornerRadius(8)
+                                        .cornerRadius(10)
                                     }
                                 }
                             }
@@ -76,24 +76,29 @@ struct ProgramDaysForMailView: View{
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
                             .frame(width: screen_width, height: screen_height*0.7)
-                            .background(AppColors.bgBlue)
+                            .background(AppColors.bgLightYellow)
                 }
-                    HStack{
-                        Image("send_mail_button")
-                            .resizable()
-                            .frame(width: screen_width*0.05, height: screen_width*0.05)
-                        Text("İzin Verilen Tüm Sunumları Gönder")
-                            .foregroundColor(Color.white)
-                    }
-                    .padding().background(AppColors.buttonLightBlue).bold()
-                    .cornerRadius(5)
-                    .onTapGesture {
-                        sendMail()
-                    }
                     Spacer()
+                    ZStack{
+                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.buttonYellow)
+                        HStack{
+                            Image(systemName: "envelope.open.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: screen_width*0.05)
+                                .foregroundColor(.black)
+                            Text("İzin Verilen Tüm Sunumları Gönder")
+                                .foregroundColor(.black)
+                        }
+                        .padding().background(AppColors.bgLightYellow)
+                        .cornerRadius(10)
+                        .onTapGesture {
+                            sendMail()
+                        }
+                    }
                 }.navigationBarBackButtonHidden(true)
                 }
-            .background(AppColors.bgBlue)
+            .background(AppColors.bgLightYellow)
         }
         .onAppear{
             getPrograms()
@@ -148,10 +153,10 @@ struct ProgramDaysForMailView: View{
             do{
                 let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
                 if (response.status != true){
-                    alertManager.present(text: response.errors![0])
+                    alertManager.present(title: "Hata", text: response.errors![0])
                     return
                 }
-                alertManager.present(text: "İstediğiniz dökümanlar kongreden sonra size mail olarak gönderilecek")
+                alertManager.present(title: "Başarılı", text: "İstediğiniz dökümanlar kongreden sonra size mail olarak gönderilecek")
                 DispatchQueue.main.async {
                     pm.wrappedValue.dismiss()
                 }

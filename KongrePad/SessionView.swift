@@ -23,35 +23,40 @@ struct SessionView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(spacing: 0){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(Color.blue)
-                            .background(
-                                Circle().fill(AppColors.buttonLightBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                        Spacer()
-                        Text("\(document?.title ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                    ZStack{
+                        HStack(alignment: .center){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.bgBlue)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Spacer()
+                        }
+                        Text("Sunum İzle")
+                            .foregroundColor(Color.white).font(.title)
+                            .frame(width: screen_width*0.7, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.bgBlue)
+                    }.padding()
+                        .frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     if !isLoading{
-                        if self.pdfURL == nil {
-                            Text("Aktif sunum yok")
-                                .foregroundColor(Color.white)
+                        if self.document == nil{
+                            Text("Oturum henüz başlamamıştır!").bold()
+                                .foregroundColor(Color.white).font(.title2)
                                 .frame(width: screen_width, height: screen_height*0.8)
                                 .background(AppColors.bgBlue)
                         } else if self.document?.allowed_to_review! == 0{
-                            Text("Sunum önizlemeye kapalıdır")
-                                .foregroundColor(Color.white)
+                            Text("Sunum önizlemeye kapalıdır!").bold()
+                                .foregroundColor(Color.white).font(.title2)
+                                .frame(width: screen_width, height: screen_height*0.8)
+                                .background(AppColors.bgBlue)
+                        } else if self.pdfURL == nil{
+                            Text("Bu oturum için yüklenmiş sunum bulunmamaktadır!").bold()
+                                .foregroundColor(Color.white).font(.title2)
                                 .frame(width: screen_width, height: screen_height*0.8)
                                 .background(AppColors.bgBlue)
                         } else {
@@ -69,18 +74,18 @@ struct SessionView : View {
                             NavigationLink(destination: AskQuestionView(hallId: $hallId)){
                                 HStack{
                                     Image(systemName: "questionmark")
-                                        .font(.system(size: 20)).bold()
+                                        .bold()
                                         .foregroundColor(.white)
                                     Text("Soru Sor")
                                         .foregroundColor(Color.white)
-                                        .font(.system(size: 20))
-                                }
-                                .frame(width: screen_width*0.3, height: screen_height*0.05)
-                                .background(Color.red)
-                                .cornerRadius(5).padding()
+                                }.padding()
+                                .padding(.leading, 20)
+                                .padding(.trailing, 20)
+                                .background(AppColors.buttonRed)
+                                .cornerRadius(10)
                             }
                         }
-                    }
+                    }.shadow(radius: 6)
                     
                 }.ignoresSafeArea(.all, edges: .bottom).background(AppColors.bgBlue)
             }

@@ -17,47 +17,62 @@ struct AnnouncementsView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.black)
-                        .background(
-                            Circle().fill(Color.white)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
-                        }
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(AppColors.notificationsRed)
+                            .background(
+                                Circle().fill(.white)
+                            )
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }.frame(width: screen_width*0.1)
                         Spacer()
-                        Text("Duyurular")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .multilineTextAlignment(.center)
                     }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.notificationsRed)
-                    Rectangle().frame(width: screen_width, height: screen_height*0.01).foregroundColor(Color.gray)
+                    Text("Duyurular")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.notificationsRed)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     VStack(alignment: .leading){
                         ScrollView(.vertical){
                             VStack(alignment:.leading, spacing: 10){
                                 ForEach(self.announcements ?? []){announcement in
                                     HStack{
                                         Label(announcement.title!, systemImage: "bell.fill")
-                                            .font(.system(size: 20))
-                                            .foregroundColor(.white)
+                                            .foregroundColor(.black)
                                             .frame(width: screen_width*0.8, alignment: .leading)
-                                            .cornerRadius(5)
                                             .multilineTextAlignment(.leading)
                                     }
-                                    Divider().overlay(.white)
+                                    Divider().overlay(.black)
                                 }
                             }.padding()
-                        }.frame(width: screen_width, height: screen_height*0.8)
+                        }.frame(width: screen_width, height: screen_height*0.7)
                             .frame(maxHeight: .infinity)
                             .background(Color.gray)
                     }
-                    Rectangle().frame(width: screen_width, height: screen_height*0.05).foregroundColor(Color.gray).ignoresSafeArea(.all)
+                    Spacer()
+                    ZStack{
+                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.notificationsRed)
+                        HStack{
+                            Image(systemName: "bell.badge.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: screen_width*0.05)
+                                .foregroundColor(.black)
+                            Text("Tüm Duyuruları okudum")
+                                .foregroundColor(.black)
+                        }
+                        .padding().background(.gray)
+                        .cornerRadius(10)
+                        .onTapGesture {
+                            //
+                        }
+                    }
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .top).foregroundColor(Color.gray), alignment: .top).shadow(radius: 6)
                 }.background(Color.gray)
                 }.navigationBarBackButtonHidden(true)
         }

@@ -23,37 +23,42 @@ struct AskQuestionView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(AppColors.bgBlue)
-                            .background(
-                                Circle().fill(AppColors.logoutButtonBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                        Spacer()
+                    ZStack{
+                        HStack(alignment: .center){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.bgBlue)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Spacer()
+                        }
                         Text("Soru Sor")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .foregroundColor(Color.white).font(.title)
+                            .frame(width: screen_width*0.7, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.bgBlue)
+                    }.padding()
+                        .frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     if self.session != nil{
                     if session?.questions_allowed == 1{
-                        Text("Oturum: \(self.session?.title ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(height: screen_height*0.1)
-                            .frame(maxWidth: .infinity, alignment: .leading).padding()
-                        Text("Konuşmacı: \(self.session?.speaker_name ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                        Spacer()
+                        VStack{
+                            Text("Oturum")
+                                .foregroundColor(Color.white).font(.title2)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(self.session?.title ?? "")
+                                .foregroundColor(Color.gray).font(.footnote)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text("Konuşmacı")
+                                .foregroundColor(Color.white).font(.title3)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(self.session?.speaker_name ?? "")
+                                .foregroundColor(Color.gray).font(.footnote)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }.padding()
                         VStack{
                             TextField("Soru sor", text: $question, axis: .vertical)
                                 .lineLimit(7...)
@@ -79,14 +84,14 @@ struct AskQuestionView : View {
                             .background(.white)
                             .cornerRadius(5)
                             .padding()
-                        }.frame(width: screen_width*0.9).background(Color.red).cornerRadius(10)
+                        }.frame(width: screen_width*0.9).background(AppColors.buttonRed).cornerRadius(10)
                         Spacer().frame(height: 15)
                         if !asking{
                             Text("Gönder")
                                 .frame(width: screen_width*0.9, height: screen_height*0.08)
                                 .foregroundColor(Color.white)
                                 .background(question.count > 0 && question.count <= 256 ? AppColors.sendButtonGreen : .gray)
-                                .cornerRadius(5)
+                                .cornerRadius(10)
                                 .onTapGesture {
                                     if question.count > 0 && question.count <= 256
                                     {
@@ -97,8 +102,8 @@ struct AskQuestionView : View {
                             ProgressView()
                                 .frame(width: screen_width*0.9, height: screen_height*0.08)
                                 .foregroundColor(Color.white)
-                                .background(AppColors.sendButtonGreen)
-                                .cornerRadius(5)
+                                .background(.gray)
+                                .cornerRadius(10)
                         }
                     } else if session?.questions_allowed == 0 {
                         Text("Bu Oturumda Soru alınmamaktadır")
@@ -146,12 +151,12 @@ struct AskQuestionView : View {
             do{
                 let response = try JSONDecoder().decode(SessionQuestionResponseJSON.self, from: data)
                 if(response.status!){
-                    alertManager.present(text: "Sorunuz gönderildi")
+                    alertManager.present(title: "Başarılı", text: "Sorunuz gönderildi")
                     DispatchQueue.main.async {
                         pm.wrappedValue.dismiss()
                     }
                 } else {
-                    alertManager.present(text: "Bir sorun meydana geldi")
+                    alertManager.present(title: "Hata", text: "Bir sorun meydana geldi")
                 }
             } catch {
                 print(error)

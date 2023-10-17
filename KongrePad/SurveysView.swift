@@ -22,27 +22,26 @@ struct SurveysView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(AppColors.bgBlue)
-                            .background(
-                                Circle().fill(AppColors.logoutButtonBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                        Spacer()
+                        ZStack{
+                        HStack(alignment: .center){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.bgBlue)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Spacer()
+                        }
                         Text("Anketler")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                            .foregroundColor(Color.white).font(.title)
+                            .frame(width: screen_width*0.7, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.sendMailBlue)
-                    .overlay(Divider().background(.white), alignment: .bottom)
+                    }.padding()
+                        .frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer().frame(height: 20)
                     if !isLoading {
                         if self.participant?.type == "attendee" {
@@ -51,11 +50,12 @@ struct SurveysView: View{
                                     VStack(spacing: 10){
                                         ForEach(Array(self.surveys?.enumerated() ?? [].enumerated()), id: \.element){index, survey in
                                             HStack{
-                                                Image("surveys_button")
+                                                Image(systemName: "checklist.checked")
                                                     .resizable()
-                                                    .frame(width: screen_width*0.06, height: screen_width*0.06).padding()
+                                                    .scaledToFit()
+                                                    .frame(height: screen_width*0.06).padding()
+                                                    .foregroundColor(.white)
                                                 Text(survey.title!)
-                                                    .font(.system(size: 15)).bold()
                                                     .foregroundColor(Color.white)
                                                     .frame(maxWidth: .infinity, alignment: .leading)
                                             }
@@ -63,17 +63,17 @@ struct SurveysView: View{
                                             .frame(width: screen_width*0.8)
                                             .background(survey.is_completed! ? Color.red : AppColors.buttonDarkBlue)
                                             .overlay (
-                                                RoundedRectangle(cornerRadius: 8)
+                                                RoundedRectangle(cornerRadius: 10)
                                                     .stroke(.black)
                                             )
-                                            .cornerRadius(8)
+                                            .cornerRadius(10)
                                             .onTapGesture{
                                                 self.surveyId = survey.id!
                                                 self.goToSurvey = true
                                             }
                                         }
                                     }
-                                }.frame(width: screen_width*0.85, height: screen_height*0.8)
+                                }.frame(width: screen_width*0.9, height: screen_height*0.8)
                             }
                         } else {
                            Text("Anketlere Katılma İzniniz Yok")

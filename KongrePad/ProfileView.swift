@@ -18,76 +18,84 @@ struct ProfileView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.black)
-                        .background(
-                            Circle().fill(AppColors.buttonLightBlue)
-                        )
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
+                    ZStack{
+                        HStack(alignment: .center){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.bgBlue)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Spacer()
                         }
-                        .padding(5)
-                        Spacer()
                         Text("Hesabım")
-                            .foregroundColor(.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                        Spacer()
+                            .foregroundColor(Color.white).font(.title)
+                            .frame(width: screen_width*0.7, height: screen_height*0.1)
+                            .multilineTextAlignment(.center)
+                    }.padding().frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
+                    Spacer().frame(height: 20)
                         VStack(spacing: 20){
                             Image("default_profile_photo")
                                 .resizable()
                                 .clipShape(Circle()).frame(width: screen_width*0.3, height: screen_width*0.3)
-                            Label((self.participant?.full_name) ?? "", systemImage: "person")
+                                .overlay(
+                                    Circle()
+                                        .stroke(AppColors.logoutButtonBlue, lineWidth: 2)
+                                )
+                            Label((self.participant?.full_name) ?? "", systemImage: "person.fill")
                                 .padding()
                                 .foregroundColor(Color.white)
-                                .frame(width: screen_width*0.7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 10)
                                             .stroke(AppColors.logoutButtonBlue, lineWidth: 2)
                                     )
-                            Label((self.participant?.email) ?? "", systemImage: "envelope")
+                            Label((self.participant?.email) ?? "", systemImage: "envelope.open.fill")
                                 .padding()
                                 .foregroundColor(Color.white)
-                                .frame(width: screen_width*0.7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 10)
                                             .stroke(AppColors.logoutButtonBlue, lineWidth: 2)
-                                    )
-                            Label((self.participant?.phone) ?? "", systemImage: "phone")
+                                )
+                            Label((self.participant?.phone) ?? "", systemImage: "phone.fill")
                                 .padding()
                                 .foregroundColor(Color.white)
-                                .frame(width: screen_width*0.7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 10)
                                             .stroke(AppColors.logoutButtonBlue, lineWidth: 2)
                                     )
-                            Label((self.participant?.organisation) ?? "", systemImage: "house")
+                            Label((self.participant?.organisation) ?? "", systemImage: "building.columns.fill")
                                 .padding()
                                 .foregroundColor(Color.white)
-                                .frame(width: screen_width*0.7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 10)
                                             .stroke(AppColors.logoutButtonBlue, lineWidth: 2)
                                     )
-                        }
+                        }.frame(width: screen_width*0.9)
                     Spacer()
-                    ZStack(alignment: .topLeading){
-                        Text("Bilgilerinizde eksik veya hatalı bilgi var ise lütfen kayıt masası ile irtibata geçiniz")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.8, height: screen_height*0.1).padding()
-                            .background(AppColors.bgBlue)
+                    
+                    ZStack(alignment: .center){
+                            Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
+                            Text("Bilgilerinizde eksik veya hatalı bilgi var ise lütfen kayıt masası ile irtibata geçiniz.")
                             .multilineTextAlignment(.center)
-                    }
+                            .font(.footnote)
+                            .foregroundColor(Color.white).padding()
+                        }
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .top).foregroundColor(Color.gray), alignment: .top).shadow(radius: 6)
                     }.navigationBarBackButtonHidden(true)
                 }
                 .background(AppColors.bgBlue)
                 
                 
             }
+        .ignoresSafeArea(.all, edges: .bottom)
             .onAppear{
                 getParticipant()
             }

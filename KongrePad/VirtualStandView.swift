@@ -24,32 +24,30 @@ struct VirtualStandView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .leading, spacing: 0){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.black)
-                        .background(
-                            Circle().fill(Color.white)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
-                        }
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(AppColors.bgOrange)
+                            .background(
+                                Circle().fill(.white)
+                            )
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }.frame(width: screen_width*0.1)
                         Spacer()
+                    }
                         AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(self.bannerName)")){ image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 100, height:50)
+                                .frame(height: screen_height*0.05)
                         } placeholder: {
                             ProgressView()
                         }
-                        .scaledToFill()
-                        Spacer()
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.bgOrange)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.bgOrange)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     PdfKitRepresentedView(documentURL: $pdfURL)
                 }
             }

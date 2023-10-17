@@ -10,6 +10,7 @@ import SwiftUI
 struct SendMailView : View {
     @Environment(\.presentationMode) var pm
     @State var programDay: ProgramDay?
+    @State var goToMainPage: Bool = false
     @State var documents: [Document]?
     @State var selectedDocuments = Set<Int>()
     @EnvironmentObject var alertManager: AlertManager
@@ -20,41 +21,41 @@ struct SendMailView : View {
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(AppColors.bgBlue)
-                        .background(
-                            Circle().fill(AppColors.logoutButtonBlue)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
+                    ZStack{
+                        HStack(alignment: .center){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.buttonYellow)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Spacer()
                         }
-                        Spacer()
-                        Text("\(programDay?.day! ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .background(AppColors.sendMailBlue)
+                        Text("Mail Gönder")
+                            .foregroundColor(Color.white).font(.title)
+                            .frame(width: screen_width*0.7, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.sendMailBlue)
-                    
+                    }.padding()
+                        .frame(width: screen_width).background(AppColors.buttonYellow)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                 ScrollView(.vertical){
                     VStack(spacing: 10){
                         ForEach(self.programDay?.programs ?? []){program in
                             HStack{
                                 VStack(alignment: .center, spacing: 0){
                                     Text(program.start_at!)
+                                        .padding([.bottom, .top])
                                         .foregroundColor(Color.black)
                                         .bold()
-                                    RoundedRectangle(cornerRadius: 5)
+                                    RoundedRectangle(cornerRadius: 10)
                                         .frame(maxHeight: .infinity)
                                         .frame(width: screen_width*0.004)
                                         .foregroundColor(Color.black)
                                     Text(program.finish_at!)
+                                        .padding([.bottom, .top])
                                         .foregroundColor(Color.black)
                                         .bold()
                                 }
@@ -62,13 +63,12 @@ struct SendMailView : View {
                                 .frame(width: screen_width*0.20)
                                 .background(AppColors.programDateYellow)
                                 .overlay (
-                                    RoundedRectangle(cornerRadius: 8)
+                                    RoundedRectangle(cornerRadius: 10)
                                         .stroke(.black)
                                 )
-                                .cornerRadius(8)
+                                .cornerRadius(10)
                                 VStack(alignment: .leading){
                                     Text(program.title!)
-                                        .font(.system(size: 15))
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding()
                                     ForEach(program.debates ?? []){debate in
@@ -96,22 +96,24 @@ struct SendMailView : View {
                                 .frame(width: screen_width*0.65)
                                 .background(AppColors.programTitleBlue)
                                 .overlay (
-                                    RoundedRectangle(cornerRadius: 8)
+                                    RoundedRectangle(cornerRadius: 10)
                                         .stroke(.black)
                                 )
-                                .cornerRadius(8)
+                                .cornerRadius(10)
                             }
                             ForEach(program.sessions ?? []){session in
                                 HStack{
                                     VStack(alignment: .center, spacing: 0){
                                         Text(session.start_at!)
+                                            .padding([.bottom, .top])
                                             .foregroundColor(Color.black)
                                             .bold()
-                                        RoundedRectangle(cornerRadius: 5)
+                                        RoundedRectangle(cornerRadius: 10)
                                             .frame(maxHeight: .infinity)
                                             .frame(width: screen_width*0.004)
                                             .foregroundColor(Color.black)
                                         Text(session.finish_at!)
+                                            .padding([.bottom, .top])
                                             .foregroundColor(Color.black)
                                             .bold()
                                     }
@@ -119,10 +121,10 @@ struct SendMailView : View {
                                     .frame(width: screen_width*0.20)
                                     .background(AppColors.programDateYellow)
                                     .overlay (
-                                        RoundedRectangle(cornerRadius: 8)
+                                        RoundedRectangle(cornerRadius: 10)
                                             .stroke(.black)
                                     )
-                                    .cornerRadius(8)
+                                    .cornerRadius(10)
                                     VStack(alignment: .leading){
                                         HStack{
                                             if (session.document_id != nil && session.is_document_requested! == false ){
@@ -133,7 +135,6 @@ struct SendMailView : View {
                                                 Image(systemName: "checkmark.square").foregroundColor(.gray)
                                             }
                                             Text(session.title!)
-                                                .font(.system(size: 15))
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                         }.onTapGesture{
                                             if (session.document_id != nil){
@@ -157,13 +158,13 @@ struct SendMailView : View {
                                         }
                                     }
                                     .frame(maxHeight: .infinity)
-                                    .frame(width: screen_width*0.65)
+                                    .frame(width: screen_width*0.61)
                                     .background(AppColors.programTitleBlue)
                                     .overlay (
-                                        RoundedRectangle(cornerRadius: 8)
+                                        RoundedRectangle(cornerRadius: 10)
                                             .stroke(.black)
                                     )
-                                    .cornerRadius(8)
+                                    .cornerRadius(10)
                                 }
                                 .padding([.leading])
                                 
@@ -171,27 +172,36 @@ struct SendMailView : View {
                                
                         }
                     }
-                }.frame(width: screen_width*0.85, height: screen_height*0.8)
+                }.frame(width: screen_width*0.85, height: screen_height*0.7)
+                        .frame(maxHeight: .infinity)
                     Spacer()
                     ZStack(alignment: .center){
-                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
-                        HStack{
-                            Image("send_mail_button")
-                                .resizable()
-                                .frame(width: screen_width*0.05, height: screen_width*0.05)
-                            Text("Mail Gönder")
-                                .foregroundColor(Color.white)
+                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.buttonYellow)
+                        NavigationLink(destination: MainPageView(), isActive: $goToMainPage){
+                            HStack{
+                                Image(systemName: "envelope.open.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: screen_width*0.05)
+                                    .foregroundColor(.white)
+                                Text("Mail Gönder")
+                                    .foregroundColor(Color.white)
+                            }
+                            .padding()
+                            .padding(.leading, 20)
+                            .padding(.trailing, 20)
+                            .background(AppColors.bgBlue)
+                            .cornerRadius(10)
+                            .onTapGesture {
+                                sendMail()
+                            }
                         }
-                        .padding().background(AppColors.buttonLightBlue).bold()
-                        .cornerRadius(5)
-                        .onTapGesture {
-                            sendMail()
-                        }
-                    }
-                    
-                }.background(AppColors.bgBlue)
+                    }.shadow(radius: 6)
+                }
+                .background(AppColors.bgLightYellow)
             }
         }
+        .ignoresSafeArea(.all, edges: .bottom)
         .navigationBarBackButtonHidden(true)
         .onAppear{
             getDocuments()
@@ -242,7 +252,7 @@ func getDocuments(){
             let string : String? = String(data: documentsData, encoding: .utf8)
             body = ["documents": string!]
         } catch {
-            alertManager.present(text: "Bir hata meydana geldi")
+            alertManager.present(title:"Hata", text: "Bir hata meydana geldi")
             return
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: body)
@@ -254,12 +264,12 @@ func getDocuments(){
             do{
                 let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
                 if (response.status != true){
-                    alertManager.present(text: response.errors![0])
+                    alertManager.present(title: "Hata", text: response.errors![0])
                     return
                 }
-                alertManager.present(text: "Paylaşıma izin verilen sunumlardan talep ettikleriniz kongreden sonra tarafınıza mail olarak gönderilecektir.")
+                alertManager.present(title: "Başarılı", text: "Paylaşıma izin verilen sunumlardan talep ettikleriniz kongreden sonra tarafınıza mail olarak gönderilecektir.")
                 DispatchQueue.main.async {
-                    pm.wrappedValue.dismiss()
+                    self.goToMainPage = true
                 }
             } catch {
                 print(error)

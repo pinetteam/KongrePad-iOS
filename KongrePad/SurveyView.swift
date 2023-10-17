@@ -21,28 +21,27 @@ struct SurveyView : View {
             GeometryReader{ geometry in
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
-                VStack(alignment: .center){
-                    HStack(alignment: .top){
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(AppColors.bgBlue)
-                            .background(
-                                Circle().fill(AppColors.logoutButtonBlue)
-                            )
-                            .padding(5)
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }
-                        Spacer()
-                        Text("\(survey?.title ?? "")")
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
+                VStack(alignment: .center, spacing: 0){
+                        ZStack{
+                        HStack(alignment: .center){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.bgBlue)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    pm.wrappedValue.dismiss()
+                                }.frame(width: screen_width*0.1)
+                            Spacer()
+                        }
+                        Text("Anket")
+                            .foregroundColor(Color.white).font(.title)
+                            .frame(width: screen_width*0.7, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.sendMailBlue)
-                    .overlay(Divider().background(.white), alignment: .bottom)
+                    }.padding()
+                        .frame(width: screen_width).background(AppColors.bgBlue)
+                        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     if !isLoading{
                     ScrollView(.vertical){
                         VStack(alignment: .leading, spacing: 20){
@@ -50,14 +49,16 @@ struct SurveyView : View {
                                 Text(question.question ?? "").bold()
                                 VStack(alignment: .leading){
                                     ForEach(question.options ?? []){option in
-                                        HStack{
+                                        HStack(alignment: .top){
                                             Button(action:{
                                                 if self.survey?.is_completed == false{
                                                     self.changeSelectedOption(item: question, optionId: option.id!)
                                                 }
                                             }){
-                                                Image(systemName: option.id == question.selected_option ? "circle.fill" : "circle")
-                                                Text(option.option ?? "").foregroundColor(Color.black).multilineTextAlignment(.leading)
+                                                HStack(alignment: .top){
+                                                    Image(systemName: option.id == question.selected_option ? "circle.fill" : "circle").foregroundColor(AppColors.bgBlue)
+                                                    Text(option.option ?? "").foregroundColor(Color.black).multilineTextAlignment(.leading)
+                                                }
                                             }
                                             Spacer()
                                         }
@@ -66,47 +67,53 @@ struct SurveyView : View {
                                 Divider()
                             }
                         }.padding()
-                    }.frame(width: screen_width*0.9, height: screen_height*0.75)
+                    }.frame(width: screen_width, height: screen_height*0.75)
+                            .frame(maxHeight: .infinity)
                         .background(Color.white)
-                        .cornerRadius(20)
                 } else {
-                                   ProgressView()
-                                       .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
-                                       .frame(width: screen_width, height: screen_height*0.7)
-                                       .background(.white)
-                           }
-                        Spacer()
-                        ZStack(alignment: .center){
-                            Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
-                            VStack{
-                                Text(error).padding().foregroundColor(Color.red)
-                                if !isSending {
-                                    if !(self.survey?.is_completed ?? true){
-                                        Text("Cevapları Gönder")
-                                            .foregroundColor(Color.white)
-                                            .padding().background(Color.green)
-                                            .cornerRadius(10)
-                                            .onTapGesture {
-                                                sendAnswers()
-                                            }
-                                    } else {
-                                        Text("Bu Anketi Zaten Cevapladınız")
-                                            .foregroundColor(Color.white)
-                                            .padding().background(Color.green)
-                                            .cornerRadius(10)
-                                    }
-                                } else {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
-                                        .frame(width: screen_width*0.3, height: screen_height*0.05)
-                                        .background(Color.green)
+                   ProgressView()
+                       .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
+                       .frame(width: screen_width, height: screen_height*0.74)
+                       .background(.white)
+                   }
+                    ZStack(alignment: .center){
+                        Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
+                        VStack{
+                            if !isSending {
+                                if !(self.survey?.is_completed ?? true){
+                                    Text("Cevapları Gönder")
+                                        .foregroundColor(Color.white)
+                                        .padding().background(Color.green)
                                         .cornerRadius(10)
+                                        .onTapGesture {
+                                            sendAnswers()
+                                        }
+                                } else {
+                                    HStack{
+                                        Image(systemName: "checkmark")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: screen_width*0.05)
+                                            .foregroundColor(.black)
+                                        Text("Bu Anketi Zaten Cevapladınız")
+                                            .foregroundColor(Color.black)
+                                    }
+                                    .padding().background(.gray)
+                                    .cornerRadius(10)
                                 }
+                            } else {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
+                                    .frame(width: screen_width*0.3, height: screen_height*0.05)
+                                    .background(Color.green)
+                                    .cornerRadius(10)
                             }
                         }
-                    }.background(AppColors.bgBlue)
+                    }
+                }.background(.white)
             }
         }
+        .ignoresSafeArea(.all, edges: .bottom)
         .navigationBarBackButtonHidden(true)
         .onAppear{
                 getSurvey()
@@ -185,7 +192,7 @@ struct SurveyView : View {
                 DispatchQueue.main.async {
                     self.isSending = false
                 }
-                self.error = "Bütün soruları cevaplamanız gerekiyor"
+                alertManager.present(title: "Uyarı", text: "Bütün soruları cevaplamanız gerekiyor!")
                 flag = true
             }
         }
@@ -213,7 +220,7 @@ struct SurveyView : View {
             DispatchQueue.main.async {
                 self.isSending = false
             }
-            self.error = "Bir hata meydana geldi"
+            alertManager.present(title: "Hata", text: "Bir hata meydana geldi!")
             return
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: body)
@@ -231,7 +238,7 @@ struct SurveyView : View {
                     self.error = response.errors![0]
                     return
                 }
-                alertManager.present(text: "Yanıtlarınız gönderildi") 
+                alertManager.present(title: "Başarılı", text: "Teşekkürler, ankete başarıyla katıldınız!")
                 DispatchQueue.main.async {
                     pm.wrappedValue.dismiss()
                 }

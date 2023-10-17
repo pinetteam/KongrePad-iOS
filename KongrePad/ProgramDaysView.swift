@@ -22,52 +22,52 @@ struct ProgramDaysView: View{
                 let screen_width = geometry.size.width
                 let screen_height = geometry.size.height
                 VStack(alignment: .center, spacing: 0){
-                    HStack(alignment: .top){
+                    ZStack{
+                    HStack(alignment: .center){
                         Image(systemName: "chevron.left")
-                        .font(.system(size: 20)).bold().padding(8)
-                        .foregroundColor(Color.black)
-                        .background(
-                            Circle().fill(Color.white)
-                        )
-                        .padding(5)
-                        .onTapGesture {
-                            pm.wrappedValue.dismiss()
-                        }
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(AppColors.buttonYellow)
+                            .background(
+                                Circle().fill(.white)
+                            )
+                            .onTapGesture {
+                                pm.wrappedValue.dismiss()
+                            }.frame(width: screen_width*0.1)
                         Spacer()
-                        Text("Bilimsel Program")
-                            .font(.system(size: 30))
-                            .foregroundColor(Color.white)
-                            .frame(width: screen_width*0.85, height: screen_height*0.1)
-                            .multilineTextAlignment(.center)
                     }
-                    .padding()
-                    .frame(width: screen_width, height: screen_height*0.1)
-                    .background(AppColors.buttonYellow)
-                    Spacer()
+                    Text("Gün Seçiniz")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.buttonYellow)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
+                    Spacer().frame(height: 10)
                     if !isLoading{
                         VStack(alignment: .center){
                             ScrollView(.vertical){
                                 VStack(spacing: 10){
                                     ForEach(self.programDays ?? []){day in
-                                        NavigationLink(destination: ProgramsView(programDay: day)){
+                                        NavigationLink(destination: ProgramsView(programDay: day, hallId: hallId)){
                                             HStack{
-                                                Image("double_right_arrow")
+                                                Image(systemName: "chevron.right.2")
                                                     .resizable()
-                                                    .frame(width: screen_height*0.035, height: screen_height*0.035)
+                                                    .scaledToFit()
+                                                    .frame(height: screen_height*0.035).foregroundColor(.black)
                                                     .padding()
                                                 Text(day.day!)
                                                     .font(.system(size: 20))
-                                                    .foregroundColor(AppColors.bgBlue)
+                                                    .foregroundColor(.black)
                                                     .padding()
                                                 Spacer()
                                             }
                                             .frame(width: screen_width*0.9, height: screen_height*0.08)
                                             .background(AppColors.programButtonBlue)
                                             .overlay (
-                                                RoundedRectangle(cornerRadius: 8)
+                                                RoundedRectangle(cornerRadius: 10)
                                                     .stroke(.black)
                                             )
-                                            .cornerRadius(8)
+                                            .cornerRadius(10)
                                         }
                                     }
                                 }

@@ -39,9 +39,6 @@
 		08AB71FC2A94C68A00EA59DF /* Meeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB71FB2A94C68A00EA59DF /* Meeting.swift */; };
 		08AB8E862ACF0FC500AA15DE /* ProgramDaysForMailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB8E852ACF0FC500AA15DE /* ProgramDaysForMailView.swift */; };
 		08AB8E882ADC6DEB00AA15DE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08AB8E872ADC6DEB00AA15DE /* GoogleService-Info.plist */; };
-		08AB8E8F2ADC755500AA15DE /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 08AB8E8E2ADC755500AA15DE /* FirebaseInAppMessaging-Beta */; };
-		08AB8E912ADC755500AA15DE /* FirebaseInAppMessagingSwift-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 08AB8E902ADC755500AA15DE /* FirebaseInAppMessagingSwift-Beta */; };
-		08AB8E932ADC755500AA15DE /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 08AB8E922ADC755500AA15DE /* FirebaseMessaging */; };
 		08AB8E972ADD685D00AA15DE /* PushNotifications in Frameworks */ = {isa = PBXBuildFile; productRef = 08AB8E962ADD685D00AA15DE /* PushNotifications */; };
 		08B6E9772A96597F00F9B529 /* Participant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B6E9762A96597F00F9B529 /* Participant.swift */; };
 		08D643062AA16E1400C7E676 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D643052AA16E1400C7E676 /* Program.swift */; };
@@ -107,9 +104,6 @@
 				08AB71FA2A93EA4700EA59DF /* CodeScanner in Frameworks */,
 				08AB8E972ADD685D00AA15DE /* PushNotifications in Frameworks */,
 				087B495B2A97682F00BEC00C /* PusherSwift in Frameworks */,
-				08AB8E932ADC755500AA15DE /* FirebaseMessaging in Frameworks */,
-				08AB8E912ADC755500AA15DE /* FirebaseInAppMessagingSwift-Beta in Frameworks */,
-				08AB8E8F2ADC755500AA15DE /* FirebaseInAppMessaging-Beta in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,9 +201,6 @@
 			packageProductDependencies = (
 				08AB71F92A93EA4700EA59DF /* CodeScanner */,
 				087B495A2A97682F00BEC00C /* PusherSwift */,
-				08AB8E8E2ADC755500AA15DE /* FirebaseInAppMessaging-Beta */,
-				08AB8E902ADC755500AA15DE /* FirebaseInAppMessagingSwift-Beta */,
-				08AB8E922ADC755500AA15DE /* FirebaseMessaging */,
 				08AB8E962ADD685D00AA15DE /* PushNotifications */,
 			);
 			productName = KongrePad;
@@ -456,7 +447,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -493,7 +484,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -571,21 +562,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 08AB71F82A93EA4700EA59DF /* XCRemoteSwiftPackageReference "CodeScanner" */;
 			productName = CodeScanner;
-		};
-		08AB8E8E2ADC755500AA15DE /* FirebaseInAppMessaging-Beta */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 08AB8E892ADC755500AA15DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = "FirebaseInAppMessaging-Beta";
-		};
-		08AB8E902ADC755500AA15DE /* FirebaseInAppMessagingSwift-Beta */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 08AB8E892ADC755500AA15DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = "FirebaseInAppMessagingSwift-Beta";
-		};
-		08AB8E922ADC755500AA15DE /* FirebaseMessaging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 08AB8E892ADC755500AA15DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseMessaging;
 		};
 		08AB8E962ADD685D00AA15DE /* PushNotifications */ = {
 			isa = XCSwiftPackageProductDependency;
