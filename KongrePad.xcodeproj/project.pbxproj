@@ -144,8 +144,8 @@
 				087B49572A96BB2300BEC00C /* Announcement.swift */,
 				08AB71FB2A94C68A00EA59DF /* Meeting.swift */,
 				08B6E9762A96597F00F9B529 /* Participant.swift */,
-				08AB71E42A8D223900EA59DF /* Assets.xcassets */,
 				08AB71F52A93DD5A00EA59DF /* LoginView.swift */,
+				08AB71E42A8D223900EA59DF /* Assets.xcassets */,
 				087B49622A9D455800BEC00C /* SessionView.swift */,
 				0838153E2AA3EE7600E79B15 /* AskQuestionView.swift */,
 				08320E602AA401020046AE41 /* SendMailView.swift */,
@@ -447,7 +447,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -484,7 +484,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

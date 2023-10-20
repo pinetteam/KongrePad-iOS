@@ -68,26 +68,50 @@ struct SendMailView : View {
                                 )
                                 .cornerRadius(10)
                                 VStack(alignment: .leading){
+                                    if program.logo_name != nil {
+                                        AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/program-logos/\(getLogoName(program: program))")){ image in
+                                            image
+                                                .resizable()
+                                                .ignoresSafeArea()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(height: screen_height*0.05)
+                                        } placeholder: {
+                                            ProgressView()
+                                        }
+                                        .padding([.top, .leading, .trailing])
+                                    }
                                     Text(program.title!)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding()
+                                    if program.description != nil{
+                                        VStack{
+                                            Text(program.description!)
+                                                .foregroundColor(Color.gray)
+                                                .font(.footnote)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                        }
+                                        .padding([.bottom, .trailing, .leading])
+                                    }
                                     ForEach(program.debates ?? []){debate in
                                         Text("- \(debate.title ?? "")")
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .padding([.bottom, .trailing, .leading])
-                                    }
-                                    if program.chairs != nil{
-                                        VStack{
-                                            Text("Oturum Başkanları:")
-                                                .foregroundColor(Color.gray)
-                                                .font(.system(size: 12))
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                            ForEach(program.chairs ?? []){chair in
-                                                Text("\(chair.full_name ?? "")")
+                                        if debate.description != nil{
+                                            VStack{
+                                                Text(debate.description!)
                                                     .foregroundColor(Color.gray)
-                                                    .font(.system(size: 12))
+                                                    .font(.footnote)
                                                     .frame(maxWidth: .infinity, alignment: .leading)
                                             }
+                                            .padding([.bottom, .trailing, .leading])
+                                        }
+                                    }
+                                    if program.chairs?.count != 0{
+                                        VStack{
+                                            Text(getChairs(program: program).dropLast())
+                                                .foregroundColor(Color.gray)
+                                                .font(.footnote)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
                                         }
                                         .padding([.bottom, .trailing, .leading])
                                     }
@@ -149,10 +173,19 @@ struct SendMailView : View {
                                             }
                                         }
                                         .padding()
+                                        if session.description != nil{
+                                            VStack{
+                                                Text(session.description!)
+                                                    .foregroundColor(Color.gray)
+                                                    .font(.footnote)
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                            }
+                                            .padding([.bottom, .trailing, .leading])
+                                        }
                                         if session.speaker_name != nil{
                                             Text("Konuşmacı: \(session.speaker_name!)")
                                                 .foregroundColor(Color.gray)
-                                                .font(.system(size: 12))
+                                                .font(.footnote)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .padding([.bottom, .trailing, .leading])
                                         }
@@ -208,7 +241,21 @@ struct SendMailView : View {
         }
     }
     
-func getDocuments(){
+    func getLogoName(program: Program) -> String {
+        let result: String = program.logo_name! + "." + program.logo_extension!
+        return result
+    }
+    
+    func getChairs(program: Program) -> String {
+        var result: String = "Oturum Başkanları:"
+        
+        program.chairs?.forEach {chair in
+            result += " " + chair.full_name! + ","
+        }
+        return result
+    }
+    
+    func getDocuments(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/document") else {
             return
         }

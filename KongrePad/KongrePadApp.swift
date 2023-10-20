@@ -35,6 +35,9 @@ class PusherManager: ObservableObject {
         channelName = channel
         let myChannel = pusher.subscribe(channelName)
         getParticipant()
+        if channel == "ios" {
+            try! self.pushNotifications.clearDeviceInterests()
+        }
         if self.participant?.type == "atendee" {
             try! self.pushNotifications.addDeviceInterest(interest: channelName)
         }

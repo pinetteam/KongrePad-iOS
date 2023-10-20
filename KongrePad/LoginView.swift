@@ -88,7 +88,9 @@ struct LoginView: View {
                     VStack(alignment: .center){
                         Image(uiImage: UIImage(named: "logo")!)
                             .resizable()
-                            .frame(width: screen_width*0.5, height: screen_width*0.5)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: screen_width*0.5)
+                            .frame(height: screen_width*0.5)
                             .padding(30)
                             .background(Color.white)
                             .clipShape(Circle())

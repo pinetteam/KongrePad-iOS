@@ -12,6 +12,7 @@ struct ScoreGameView: View {
     @Environment(\.presentationMode) var pm
     
     @State var isPresentingScanner = false
+    @State var isPresentingPoints = false
     @EnvironmentObject var alertManager: AlertManager
     @State var scanError : String = ""
     @State var total_point : Int = 0
@@ -109,43 +110,18 @@ struct ScoreGameView: View {
                     Text("\(total_point) puan")
                         .font(.largeTitle).bold()
                         .foregroundColor(AppColors.sendButtonGreen)
-                    VStack(spacing: 0){
-                        Text("Puan Geçmişim")
-                            .foregroundColor(Color.white).font(.title2)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, 5)
-                        ScrollView(.vertical){
-                            if self.scoreGamePoints?.count == 0 {
-                                Text("Şu an hiç puanınız yok")
-                                    .foregroundColor(Color.gray).font(.footnote)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            VStack(spacing: 10){
-                                ForEach(self.scoreGamePoints ?? []){point in
-                                    HStack{
-                                        Text(String(describing: point.point!))
-                                            .foregroundColor(.white).bold()
-                                            .frame(width: screen_width*0.15)
-                                            .frame(maxHeight: .infinity)
-                                            .background(AppColors.sendButtonGreen)
-                                            .cornerRadius(10)
-                                        VStack{
-                                            Text(point.title!)
-                                                .foregroundColor(.white)
-                                            Text(point.created_at!)
-                                                .font(.footnote)
-                                                .foregroundColor(.white)
-                                        }
-                                        .frame(maxHeight: .infinity)
-                                        .frame(width: screen_width*0.75)
-                                        .background(.gray)
-                                        .cornerRadius(10)
-                                    }
-                                    
-                                }
-                            }
-                        }.frame(width: screen_width*0.9, height: screen_height*0.3)
-                    }.padding([.trailing, .leading])
+                    Spacer()
+                    Button(action: {
+                        self.isPresentingPoints = true
+                    }){
+                        Label("Puan Geçmişim", systemImage: "list.number")
+                            .padding()
+                            .foregroundColor(Color.white)
+                            .background(AppColors.sendButtonGreen).cornerRadius(10)
+                    }.sheet(isPresented: $isPresentingPoints) {
+                        ScoreGamePointsView(scoreGamePoints: $scoreGamePoints)
+                    }
+                    
                     Spacer()
                     ZStack{
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
@@ -222,5 +198,74 @@ struct ScoreGameView: View {
                 print(error)
             }
         }.resume()
+    }
+}
+
+struct ScoreGamePointsView: View {
+    @Binding var scoreGamePoints: [ScoreGamePoint]?
+    @Environment (\.dismiss) var dismiss
+    var body: some View{
+        NavigationStack{
+            GeometryReader{ geometry in
+                let screen_width = geometry.size.width
+                let screen_height = geometry.size.height
+                VStack(alignment: .center){
+                    ZStack{
+                    HStack(alignment: .center){
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 20)).bold().padding(8)
+                            .foregroundColor(AppColors.bgBlue)
+                            .background(
+                                Circle().fill(.white)
+                            )
+                            .onTapGesture {
+                                dismiss()
+                            }.frame(width: screen_width*0.1)
+                        Spacer()
+                    }
+                    Text("Puan Geçmişim")
+                        .foregroundColor(Color.white).font(.title)
+                        .frame(width: screen_width*0.7, height: screen_height*0.1)
+                        .multilineTextAlignment(.center)
+                }.padding()
+                    .frame(width: screen_width).background(AppColors.bgBlue)
+                    .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
+                    VStack(spacing: 0){
+                        ScrollView(.vertical){
+                            if self.scoreGamePoints?.count == 0 {
+                                Text("Şu an hiç puanınız yok")
+                                    .foregroundColor(Color.gray).font(.footnote)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            VStack(spacing: 10){
+                                ForEach(self.scoreGamePoints ?? []){point in
+                                    HStack{
+                                        Text(String(describing: point.point!))
+                                            .foregroundColor(.white).bold()
+                                            .frame(width: screen_width*0.15)
+                                            .frame(maxHeight: .infinity)
+                                            .background(AppColors.sendButtonGreen)
+                                            .cornerRadius(10)
+                                        VStack{
+                                            Text(point.title!)
+                                                .foregroundColor(.white)
+                                            Text(point.created_at!)
+                                                .font(.footnote)
+                                                .foregroundColor(.white)
+                                        }
+                                        .frame(maxHeight: .infinity)
+                                        .frame(width: screen_width*0.75)
+                                        .background(.gray)
+                                        .cornerRadius(10)
+                                    }
+                                    
+                                }
+                            }
+                        }.frame(width: screen_width*0.9, height: screen_height*0.8)
+                    }.padding([.trailing, .leading])
+                    Spacer()
+                }.background(AppColors.bgBlue)
+            }
+        }
     }
 }

@@ -163,6 +163,7 @@ struct DebateView: View {
     @State var debate: Debate?
     @State var response: String?
     @State var success: Bool?
+    @State var isLoading: Bool = true
     @Environment (\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
@@ -178,22 +179,26 @@ struct DebateView: View {
                     }.padding().frame(width: screen_width).background(AppColors.bgBlue)
                         .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     Spacer()
-                    if self.debate != nil {
-                    ScrollView(.vertical){
-                        VStack(spacing: 10){
-                            ForEach(Array(self.debate?.teams?.enumerated() ?? [].enumerated()), id: \.element){index, team in
-                                if let data = Data(base64Encoded: team.logo ?? "" ,options: .ignoreUnknownCharacters){
-                                            let image = UIImage(data: data)
-                                            Image(uiImage: image ?? UIImage())
-                                                .resizable()
-                                                .ignoresSafeArea()
-                                                .aspectRatio(contentMode: .fit).padding()
-                                                .frame(width: screen_width*0.7, height: screen_width*0.7)
-                                                .background(.gray)
-                                                .cornerRadius(10)
-                                                .onTapGesture{
-                                                    sendVote(teamId: team.id!, debateId: team.debate_id!)
-                                                }
+                    if !isLoading {
+                        if self.debate != nil {
+                            ScrollView(.vertical){
+                                VStack(spacing: 10){
+                                    ForEach(Array(self.debate?.teams?.enumerated() ?? [].enumerated()), id: \.element){index, team in
+                                        if team.logo_name != nil{
+                                            AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/team-logos/\(getLogoName(team: team))")){ image in
+                                                image
+                                                    .resizable()
+                                                    .ignoresSafeArea()
+                                                    .aspectRatio(contentMode: .fit).padding()
+                                                    .frame(width: screen_width*0.7, height: screen_width*0.7)
+                                            } placeholder: {
+                                                ProgressView()
+                                            }
+                                            .background(.gray)
+                                            .cornerRadius(10)
+                                            .onTapGesture{
+                                                sendVote(teamId: team.id!, debateId: team.debate_id!)
+                                            }
                                         }else{
                                             Text(team.title!)
                                                 .font(.system(size: 20)).bold()
@@ -205,16 +210,22 @@ struct DebateView: View {
                                                     sendVote(teamId: team.id!, debateId: team.debate_id!)
                                                 }
                                         }
+                                    }
+                                }
                             }
+                        } else {
+                            Text("Aktif Münazara Yok")
+                                .font(.system(size: 20)).bold()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .foregroundColor(Color.white)
+                                .frame(width: screen_width*0.8)
                         }
-                    }
-                } else {
-                    Text("Aktif Münazara Yok")
-                        .font(.system(size: 20)).bold()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .foregroundColor(Color.white)
-                        .frame(width: screen_width*0.8)
+                    }  else {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
+                            .frame(width: screen_width, height: screen_height*0.7)
+                            .background(AppColors.bgBlue)
                 }
                 }.background(AppColors.bgBlue)
                     .onAppear{
@@ -228,7 +239,14 @@ struct DebateView: View {
             }
         }.interactiveDismissDisabled()
     }
+    
+    func getLogoName(team: DebateTeam) -> String {
+        var result: String = team.logo_name! + "." + team.logo_extension!
+        return result
+    }
+    
     func getDebate(HallId: Int){
+        self.isLoading = true
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(HallId)/active-debate") else {
             return
         }
@@ -253,6 +271,9 @@ struct DebateView: View {
                 }
             } catch {
                 print(error)
+            }
+            DispatchQueue.main.async {
+                self.isLoading = false
             }
         }.resume()
     }

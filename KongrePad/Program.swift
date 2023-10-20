@@ -18,7 +18,8 @@ class Program : Codable, Identifiable{
     var code: String?
     var title: String?
     var description: String?
-    var logo: String?
+    var logo_name: String?
+    var logo_extension: String?
     var start_at: String?
     var finish_at: String?
     var type: String?

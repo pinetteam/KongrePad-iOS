@@ -98,6 +98,7 @@ struct ProgramDaysForMailView: View{
                     }
                 }.navigationBarBackButtonHidden(true)
                 }
+            .ignoresSafeArea(.all, edges: .bottom)
             .background(AppColors.bgLightYellow)
         }
         .onAppear{
