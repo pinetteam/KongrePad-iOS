@@ -75,6 +75,7 @@ class PusherManager: ObservableObject {
     
     
     func getParticipant(){
+        print("başladı")
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/participant") else {
             return
         }
@@ -97,6 +98,7 @@ class PusherManager: ObservableObject {
                 print(error)
             }
         }.resume()
+        print("bitti")
     }
     
     class PusherJSON : Codable, Identifiable{
