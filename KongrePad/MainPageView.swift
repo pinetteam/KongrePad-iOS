@@ -266,11 +266,11 @@ struct MainPageView: View{
         }
         .task{
             loadingViewModel.startLoading()
-            await getData()
+            getData()
         }
     }
     
-    func getData() async{
+    func getData(){
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
             return
         }

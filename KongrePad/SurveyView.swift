@@ -220,7 +220,7 @@ struct SurveyView : View {
             DispatchQueue.main.async {
                 self.isSending = false
             }
-            alertManager.present(title: "Hata", text: "Bir hata meydana geldi!")
+            alertManager.present(title: "Hata", text: "Bir sorun meydana geldi!")
             return
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: body)

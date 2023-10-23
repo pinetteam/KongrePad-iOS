@@ -151,12 +151,12 @@ struct AskQuestionView : View {
             do{
                 let response = try JSONDecoder().decode(SessionQuestionResponseJSON.self, from: data)
                 if(response.status!){
-                    alertManager.present(title: "Başarılı", text: "Sorunuz gönderildi")
+                    alertManager.present(title: "Başarılı", text: "Sorunuz gönderildi!")
                     DispatchQueue.main.async {
                         pm.wrappedValue.dismiss()
                     }
                 } else {
-                    alertManager.present(title: "Hata", text: "Bir sorun meydana geldi")
+                    alertManager.present(title: "Hata", text: "Bir sorun meydana geldi!")
                 }
             } catch {
                 print(error)

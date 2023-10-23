@@ -63,7 +63,7 @@ struct AnnouncementsView: View{
                                 .scaledToFit()
                                 .frame(height: screen_width*0.05)
                                 .foregroundColor(.black)
-                            Text("Tüm Duyuruları okudum")
+                            Text("Tüm duyuruları okudum")
                                 .foregroundColor(.black)
                         }
                         .padding().background(.gray)
@@ -73,7 +73,8 @@ struct AnnouncementsView: View{
                         }
                     }
                     .overlay(Rectangle().frame(width: nil, height: 1, alignment: .top).foregroundColor(Color.gray), alignment: .top).shadow(radius: 6)
-                }.background(Color.gray)
+                }
+                .ignoresSafeArea(.all, edges: .bottom).background(Color.gray)
                 }.navigationBarBackButtonHidden(true)
         }
         .onAppear{

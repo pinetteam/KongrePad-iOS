@@ -155,6 +155,7 @@ struct LoginView: View {
                         }.sheet(isPresented: $isPresentingLoginWithCode){
                             loginWithCode(goToMainPage: $goToMainPage, scanError: $scanError)
                         }
+                        Text("v1.1.7").font(.footnote).foregroundColor(.black)
                     }.padding()
                 }.frame(width: screen_width, height: screen_height)
                     .background(AppColors.bgBlue)

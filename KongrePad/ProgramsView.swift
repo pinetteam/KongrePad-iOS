@@ -85,14 +85,14 @@ struct ProgramsView: View{
                                                 .stroke(.black)
                                         )
                                         .cornerRadius(10)
-                                        VStack(alignment: .leading){
+                                        VStack(alignment: .leading, spacing: 0){
                                             if program.logo_name != nil {
                                                 AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/program-logos/\(getLogoName(program: program))")){ image in
                                                     image
                                                         .resizable()
                                                         .ignoresSafeArea()
                                                         .aspectRatio(contentMode: .fit)
-                                                        .frame(height: screen_height*0.05)
+                                                        .frame(width: screen_width*0.325)
                                                 } placeholder: {
                                                     ProgressView()
                                                 }
@@ -100,38 +100,23 @@ struct ProgramsView: View{
                                             }
                                             Text(program.title!)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                                .padding()
+                                                .frame(maxHeight: .infinity)
+                                                .padding([.bottom, .trailing, .leading, .top])
+                                            if program.chairs?.count != 0{
+                                            Text(getChairs(program: program).dropLast())
+                                                .foregroundColor(Color.gray)
+                                                .font(.footnote)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .fixedSize(horizontal: false, vertical: true)
+                                                .padding([.bottom, .trailing, .leading])
+                                            }
                                             if program.description != nil{
-                                                VStack{
                                                     Text(program.description!)
                                                         .foregroundColor(Color.gray)
                                                         .font(.footnote)
                                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                                }
-                                                .padding([.bottom, .trailing, .leading])
-                                            }
-                                            ForEach(program.debates ?? []){debate in
-                                                Text("- \(debate.title ?? "")")
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                                    .padding([.bottom, .trailing, .leading])
-                                                if debate.description != nil{
-                                                    VStack{
-                                                        Text(debate.description!)
-                                                            .foregroundColor(Color.gray)
-                                                            .font(.footnote)
-                                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                                    }
-                                                    .padding([.bottom, .trailing, .leading])
-                                                }
-                                            }
-                                            if program.chairs?.count != 0{
-                                                VStack{
-                                                    Text(getChairs(program: program).dropLast())
-                                                        .foregroundColor(Color.gray)
-                                                        .font(.footnote)
-                                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                                }
-                                                .padding([.bottom, .trailing, .leading])
+                                                        .fixedSize(horizontal: false, vertical: true)
+                                                        .padding([.bottom, .trailing, .leading])
                                             }
                                         }
                                         .frame(maxHeight: .infinity)
@@ -143,6 +128,7 @@ struct ProgramsView: View{
                                         )
                                         .cornerRadius(10)
                                     }
+                                    .frame(maxHeight: .infinity)
                                     ForEach(program.sessions ?? []){session in
                                         HStack{
                                             VStack(alignment: .center, spacing: 0){
@@ -167,17 +153,15 @@ struct ProgramsView: View{
                                                     .stroke(.black)
                                             )
                                             .cornerRadius(10)
-                                            VStack(alignment: .leading){
+                                            VStack(alignment: .leading, spacing: 0){
                                                 Text(session.title!)
                                                     .frame(maxWidth: .infinity, alignment: .leading)
                                                     .padding()
-                                                if session.description != nil{
-                                                    VStack{
-                                                        Text(session.description!)
-                                                            .foregroundColor(Color.gray)
-                                                            .font(.footnote)
-                                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                                    }
+                                            if session.description != nil{
+                                                Text(session.description!)
+                                                    .foregroundColor(Color.gray)
+                                                    .font(.footnote)
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
                                                     .padding([.bottom, .trailing, .leading])
                                                 }
                                                 if session.speaker_name != nil{
@@ -200,10 +184,73 @@ struct ProgramsView: View{
                                         .padding([.leading])
                                         
                                     }
+                                    
+                                    ForEach(program.debates ?? []){debate in
+                                        HStack {
+                                            VStack(alignment: .center, spacing: 0){
+                                                Text(program.start_at!)
+                                                    .padding([.bottom, .top])
+                                                    .foregroundColor(Color.black)
+                                                    .bold()
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .frame(maxHeight: .infinity)
+                                                    .frame(width: screen_width*0.004)
+                                                    .foregroundColor(Color.black)
+                                                Text(program.finish_at!)
+                                                    .padding([.bottom, .top])
+                                                    .foregroundColor(Color.black)
+                                                    .bold()
+                                            }
+                                            .frame(maxHeight: .infinity)
+                                            .frame(width: screen_width*0.20)
+                                            .background(AppColors.programDateYellow)
+                                            .overlay (
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(.black)
+                                            )
+                                            .cornerRadius(10)
+                                            VStack{
+                                                Text(debate.title!)
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .fixedSize(horizontal: false, vertical: true)
+                                                    .padding([.top, .bottom, .trailing, .leading])
+                                                if debate.description != nil{
+                                                    Text(debate.description!)
+                                                        .foregroundColor(Color.gray)
+                                                        .font(.footnote)
+                                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                                        .fixedSize(horizontal: false, vertical: true)
+                                                        .padding([.bottom, .trailing, .leading])
+                                                }
+                                                ForEach(debate.teams ?? []){team in
+                                                    Label(team.title!, systemImage: "person.3.fill")
+                                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                                        .padding([.bottom, .trailing, .leading])
+                                                    if team.description != nil{
+                                                        Text(team.description!)
+                                                            .foregroundColor(Color.black)
+                                                            .font(.footnote)
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .fixedSize(horizontal: false, vertical: true)
+                                                            .padding([.bottom, .trailing, .leading])
+                                                    }
+                                                }
+                                            }
+                                            .frame(maxHeight: .infinity)
+                                            .frame(width: screen_width*0.61)
+                                            .background(AppColors.programTitleBlue)
+                                            .overlay (
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(.black)
+                                            )
+                                            .cornerRadius(10)
+                                        }
+                                        .padding(.leading)
+                                    }
                                        
                                 }
                             }
-                        }.frame(width: screen_width*0.85, height: screen_height*0.8)
+                        }
                     }
                 }.navigationBarBackButtonHidden(true)
                 }

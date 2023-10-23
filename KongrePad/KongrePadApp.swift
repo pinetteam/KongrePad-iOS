@@ -39,6 +39,8 @@ class PusherManager: ObservableObject {
             try! self.pushNotifications.clearDeviceInterests()
         }
         if self.participant?.type == "atendee" {
+            self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
+            self.pushNotifications.registerForRemoteNotifications()
             try! self.pushNotifications.addDeviceInterest(interest: channelName)
         }
         myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in

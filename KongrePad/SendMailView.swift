@@ -67,14 +67,14 @@ struct SendMailView : View {
                                         .stroke(.black)
                                 )
                                 .cornerRadius(10)
-                                VStack(alignment: .leading){
+                                VStack(alignment: .leading, spacing: 0){
                                     if program.logo_name != nil {
                                         AsyncImage(url: URL(string: "https://app.kongrepad.com/storage/program-logos/\(getLogoName(program: program))")){ image in
                                             image
                                                 .resizable()
                                                 .ignoresSafeArea()
                                                 .aspectRatio(contentMode: .fit)
-                                                .frame(height: screen_height*0.05)
+                                                .frame(width: screen_width*0.325)
                                         } placeholder: {
                                             ProgressView()
                                         }
@@ -82,38 +82,24 @@ struct SendMailView : View {
                                     }
                                     Text(program.title!)
                                         .frame(maxWidth: .infinity, alignment: .leading)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .frame(maxHeight: .infinity)
                                         .padding()
+                                if program.chairs?.count != 0{
+                                Text(getChairs(program: program).dropLast())
+                                    .foregroundColor(Color.gray)
+                                    .font(.footnote)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .padding([.bottom, .trailing, .leading])
+                                }
                                     if program.description != nil{
-                                        VStack{
                                             Text(program.description!)
                                                 .foregroundColor(Color.gray)
                                                 .font(.footnote)
+                                                .fixedSize(horizontal: false, vertical: true)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
-                                        .padding([.bottom, .trailing, .leading])
-                                    }
-                                    ForEach(program.debates ?? []){debate in
-                                        Text("- \(debate.title ?? "")")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding([.bottom, .trailing, .leading])
-                                        if debate.description != nil{
-                                            VStack{
-                                                Text(debate.description!)
-                                                    .foregroundColor(Color.gray)
-                                                    .font(.footnote)
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                            }
-                                            .padding([.bottom, .trailing, .leading])
-                                        }
-                                    }
-                                    if program.chairs?.count != 0{
-                                        VStack{
-                                            Text(getChairs(program: program).dropLast())
-                                                .foregroundColor(Color.gray)
-                                                .font(.footnote)
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
-                                        .padding([.bottom, .trailing, .leading])
+                                                .padding([.bottom, .trailing, .leading])
                                     }
                                 }
                                 .frame(maxHeight: .infinity)
@@ -149,7 +135,7 @@ struct SendMailView : View {
                                             .stroke(.black)
                                     )
                                     .cornerRadius(10)
-                                    VStack(alignment: .leading){
+                                    VStack(alignment: .leading, spacing: 0){
                                         HStack{
                                             if (session.document_id != nil && session.is_document_requested! == false ){
                                                 if (session.document_sharing_via_email! != false){
@@ -201,6 +187,69 @@ struct SendMailView : View {
                                 }
                                 .padding([.leading])
                                 
+                            }
+                            
+                            ForEach(program.debates ?? []){debate in
+                                HStack {
+                                    VStack(alignment: .center, spacing: 0){
+                                        Text(program.start_at!)
+                                            .padding([.bottom, .top])
+                                            .foregroundColor(Color.black)
+                                            .bold()
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .frame(maxHeight: .infinity)
+                                            .frame(width: screen_width*0.004)
+                                            .foregroundColor(Color.black)
+                                        Text(program.finish_at!)
+                                            .padding([.bottom, .top])
+                                            .foregroundColor(Color.black)
+                                            .bold()
+                                    }
+                                    .frame(maxHeight: .infinity)
+                                    .frame(width: screen_width*0.20)
+                                    .background(AppColors.programDateYellow)
+                                    .overlay (
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(.black)
+                                    )
+                                    .cornerRadius(10)
+                                    VStack{
+                                        Text(debate.title!)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .padding([.top, .bottom, .trailing, .leading])
+                                        if debate.description != nil{
+                                            Text(debate.description!)
+                                                .foregroundColor(Color.gray)
+                                                .font(.footnote)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .fixedSize(horizontal: false, vertical: true)
+                                                .padding([.bottom, .trailing, .leading])
+                                        }
+                                        ForEach(debate.teams ?? []){team in
+                                            Label(team.title!, systemImage: "person.3.fill")
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .padding([.bottom, .trailing, .leading])
+                                            if team.description != nil{
+                                                Text(team.description!)
+                                                    .foregroundColor(Color.black)
+                                                    .font(.footnote)
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .fixedSize(horizontal: false, vertical: true)
+                                                    .padding([.bottom, .trailing, .leading])
+                                            }
+                                        }
+                                    }
+                                    .frame(maxHeight: .infinity)
+                                    .frame(width: screen_width*0.61)
+                                    .background(AppColors.programTitleBlue)
+                                    .overlay (
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(.black)
+                                    )
+                                    .cornerRadius(10)
+                                }
+                                .padding(.leading)
                             }
                                
                         }
@@ -299,7 +348,7 @@ struct SendMailView : View {
             let string : String? = String(data: documentsData, encoding: .utf8)
             body = ["documents": string!]
         } catch {
-            alertManager.present(title:"Hata", text: "Bir hata meydana geldi")
+            alertManager.present(title:"Hata", text: "Bir sorun meydana geldi!")
             return
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: body)
