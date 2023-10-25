@@ -13,6 +13,7 @@ struct SessionView : View {
     @Environment(\.presentationMode) var pm
     @State var pdfURL: URL?
     @State var document: Document?
+    @State var session: Session?
     @State var bannerName : String = ""
     @State var isLoading : Bool = true
     @Binding var hallId: Int
@@ -44,7 +45,7 @@ struct SessionView : View {
                         .frame(width: screen_width).background(AppColors.bgBlue)
                         .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom).shadow(radius: 6)
                     if !isLoading{
-                        if self.document == nil{
+                        if self.session == nil{
                             Text("Oturum henüz başlamamıştır!").bold()
                                 .foregroundColor(Color.white).font(.title2)
                                 .frame(width: screen_width, height: screen_height*0.8)
@@ -93,6 +94,7 @@ struct SessionView : View {
         }
         .navigationBarBackButtonHidden(true)
         .task{
+            getSession()
             getDocument()
         }
     }
@@ -124,6 +126,31 @@ struct SessionView : View {
             }
             DispatchQueue.main.async {
                 self.isLoading = false
+            }
+        }.resume()
+    }
+    
+    func getSession(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/active-session") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let session = try JSONDecoder().decode(SessionJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.session = session.data
+                }
+            } catch {
+                print(error)
             }
         }.resume()
     }

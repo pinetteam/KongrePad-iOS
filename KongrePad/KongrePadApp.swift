@@ -33,16 +33,11 @@ class PusherManager: ObservableObject {
     func setChannel(_ channel: String) {
         pusher.unsubscribe(channelName)
         channelName = channel
-        let myChannel = pusher.subscribe(channelName)
         getParticipant()
         if channel == "ios" {
             try! self.pushNotifications.clearDeviceInterests()
         }
-        if self.participant?.type == "atendee" {
-            self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
-            self.pushNotifications.registerForRemoteNotifications()
-            try! self.pushNotifications.addDeviceInterest(interest: channelName)
-        }
+        let myChannel = pusher.subscribe(channelName)
         myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in
             if let data: String = event.data{
                 do{
@@ -75,7 +70,6 @@ class PusherManager: ObservableObject {
     
     
     func getParticipant(){
-        print("başladı")
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/participant") else {
             return
         }
@@ -93,12 +87,16 @@ class PusherManager: ObservableObject {
                 let participant = try JSONDecoder().decode(ParticipantJSON.self, from: data)
                 DispatchQueue.main.async {
                     self.participant = participant.data
+                    if self.participant?.type == "attendee" {
+                        self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
+                        self.pushNotifications.registerForRemoteNotifications()
+                        try! self.pushNotifications.addDeviceInterest(interest: self.channelName)
+                    }
                 }
             } catch {
                 print(error)
             }
         }.resume()
-        print("bitti")
     }
     
     class PusherJSON : Codable, Identifiable{

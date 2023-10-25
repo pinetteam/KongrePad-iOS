@@ -160,12 +160,11 @@ struct SendMailView : View {
                                         }
                                         .padding()
                                         if session.description != nil{
-                                            VStack{
-                                                Text(session.description!)
-                                                    .foregroundColor(Color.gray)
-                                                    .font(.footnote)
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                            }
+                                        Text(session.description!)
+                                            .foregroundColor(Color.gray)
+                                            .font(.footnote)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .fixedSize(horizontal: false, vertical: true)
                                             .padding([.bottom, .trailing, .leading])
                                         }
                                         if session.speaker_name != nil{
@@ -229,6 +228,7 @@ struct SendMailView : View {
                                         ForEach(debate.teams ?? []){team in
                                             Label(team.title!, systemImage: "person.3.fill")
                                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                                .fixedSize(horizontal: false, vertical: true)
                                                 .padding([.bottom, .trailing, .leading])
                                             if team.description != nil{
                                                 Text(team.description!)

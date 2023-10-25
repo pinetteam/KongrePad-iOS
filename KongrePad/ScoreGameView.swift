@@ -17,6 +17,7 @@ struct ScoreGameView: View {
     @State var scanError : String = ""
     @State var total_point : Int = 0
     @State var scoreGame: ScoreGame?
+    @State var is_scanned: Bool = false
     @State var scoreGamePoints: [ScoreGamePoint]?
     
     var scannerSheet : some View {
@@ -46,10 +47,12 @@ struct ScoreGameView: View {
                         let response = try JSONDecoder().decode(ScoreGamePointsResponseJSON.self, from: data)
                         if (response.status != true){
                             self.isPresentingScanner = false
+                            self.is_scanned = false
                             self.scanError = response.errors![0]
                             return
                         }
-                        self.scanError = "qr Kod başarıyla okutuldu"
+                        self.scanError = "Tebrikler! Doğaya can verdiniz."
+                        self.is_scanned = true
                         getPoints()
                     } catch {
                         print(error)
@@ -63,7 +66,7 @@ struct ScoreGameView: View {
             if self.scanError != ""{
                 let error = self.scanError
                 self.scanError = ""
-                alertManager.present(title: "Başarılı", text: error)
+                alertManager.present(title: self.is_scanned ? "Başarılı" : "Hata", text: error)
             }
         }
     }

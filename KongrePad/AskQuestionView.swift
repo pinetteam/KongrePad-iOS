@@ -112,10 +112,10 @@ struct AskQuestionView : View {
                             .padding()
                     }
                     } else {
-                        Text("Aktif oturum yok")
-                            .foregroundColor(Color.white)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding()
+                        Text("Oturum henüz başlamamıştır!").bold()
+                            .foregroundColor(Color.white).font(.title2)
+                            .frame(width: screen_width, height: screen_height*0.8)
+                            .background(AppColors.bgBlue)
                     }
                     Spacer()
                 }.background(AppColors.bgBlue)

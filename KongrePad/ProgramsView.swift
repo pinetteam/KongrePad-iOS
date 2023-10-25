@@ -101,6 +101,7 @@ struct ProgramsView: View{
                                             Text(program.title!)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .frame(maxHeight: .infinity)
+                                                .fixedSize(horizontal: false, vertical: true)
                                                 .padding([.bottom, .trailing, .leading, .top])
                                             if program.chairs?.count != 0{
                                             Text(getChairs(program: program).dropLast())
@@ -156,12 +157,14 @@ struct ProgramsView: View{
                                             VStack(alignment: .leading, spacing: 0){
                                                 Text(session.title!)
                                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .fixedSize(horizontal: false, vertical: true)
                                                     .padding()
                                             if session.description != nil{
                                                 Text(session.description!)
                                                     .foregroundColor(Color.gray)
                                                     .font(.footnote)
                                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .fixedSize(horizontal: false, vertical: true)
                                                     .padding([.bottom, .trailing, .leading])
                                                 }
                                                 if session.speaker_name != nil{
@@ -169,6 +172,7 @@ struct ProgramsView: View{
                                                         .foregroundColor(Color.gray)
                                                         .font(.footnote)
                                                         .frame(maxWidth: .infinity, alignment: .leading)
+                                                        .fixedSize(horizontal: false, vertical: true)
                                                         .padding([.bottom, .trailing, .leading])
                                                 }
                                             }
@@ -225,6 +229,7 @@ struct ProgramsView: View{
                                                 ForEach(debate.teams ?? []){team in
                                                     Label(team.title!, systemImage: "person.3.fill")
                                                         .frame(maxWidth: .infinity, alignment: .leading)
+                                                        .fixedSize(horizontal: false, vertical: true)
                                                         .padding([.bottom, .trailing, .leading])
                                                     if team.description != nil{
                                                         Text(team.description!)
