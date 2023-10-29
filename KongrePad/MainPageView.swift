@@ -62,7 +62,7 @@ struct MainPageView: View{
                     }
                     Spacer()
                     if self.virtualStands?.count != 0 {
-                        VStack(alignment: .center, spacing: 1){
+                        VStack(alignment: .center, spacing: 3){
                             Rectangle()
                                 .frame(width: screen_width*0.9, height: screen_height*0.002)
                                 .foregroundColor(Color.white)
@@ -141,7 +141,10 @@ struct MainPageView: View{
                                     Text("Soru Sor").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonRed).cornerRadius(10)
                                     .onTapGesture {
-                                        if self.meeting?.question_hall_count == 1 {
+                                        if self.participant?.type! != "attendee" {
+                                            alertManager.present(title: "Uyarı", text: "Soru sorma izniniz yok!")
+                                        }
+                                        else if self.meeting?.question_hall_count == 1 {
                                             self.goToAskQuestion = true
                                             self.hallId = (self.meeting?.question_first_hall_id)!
                                         } else {
@@ -184,7 +187,10 @@ struct MainPageView: View{
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15)
                                     .background(AppColors.buttonLightBlue).cornerRadius(10)
                                     .onTapGesture {
-                                        if self.meeting?.mail_hall_count == 1 {
+                                        if self.participant?.type! != "attendee" {
+                                            alertManager.present(title: "Uyarı", text: "Mail gönderme izniniz yok!")
+                                        }
+                                        else if self.meeting?.mail_hall_count == 1 {
                                             self.goToProgramsForMail = true
                                             self.hallId = (self.meeting?.mail_first_hall_id)!
                                         } else {

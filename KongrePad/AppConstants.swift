@@ -116,6 +116,7 @@ struct KeypadView: View {
                     }
                 } else {
                     self.keypad = nil
+                    dismiss()
                 }
             } catch {
                 print(error)
@@ -268,6 +269,7 @@ struct DebateView: View {
                     }
                 } else {
                     self.debate = nil
+                    dismiss()
                 }
             } catch {
                 print(error)

@@ -69,7 +69,7 @@ struct AnnouncementsView: View{
                         .padding().background(.gray)
                         .cornerRadius(10)
                         .onTapGesture {
-                            //
+                            UIApplication.shared.applicationIconBadgeNumber = 0
                         }
                     }
                     .overlay(Rectangle().frame(width: nil, height: 1, alignment: .top).foregroundColor(Color.gray), alignment: .top).shadow(radius: 6)

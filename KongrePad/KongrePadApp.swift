@@ -32,40 +32,13 @@ class PusherManager: ObservableObject {
 
     func setChannel(_ channel: String) {
         pusher.unsubscribe(channelName)
-        channelName = channel
+        DispatchQueue.main.async {
+            self.channelName = channel
+        }
         getParticipant()
-        if channel == "ios" {
+        if channelName == "ios" {
             try! self.pushNotifications.clearDeviceInterests()
         }
-        let myChannel = pusher.subscribe(channelName)
-        myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in
-            if let data: String = event.data{
-                do{
-                    if self.participant?.type == "attendee" {
-                        let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
-                        self.keypadHallId = pusherJson.hall_id!
-                        self.isKeypadPresented = pusherJson.on_vote!
-                    }
-                }
-                catch {
-                    print(error)
-                }
-            }
-        })
-        myChannel.bind(eventName: "debate", eventCallback: { (event: PusherEvent) -> Void in
-            if let data: String = event.data {
-                do{
-                    if self.participant?.type == "attendee" {
-                        let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
-                        self.debateHallId = pusherJson.hall_id!
-                        self.isDebatePresented = pusherJson.on_vote!
-                    }
-                }
-                catch {
-                    print(error)
-                }
-            }
-        })
     }
     
     
@@ -87,10 +60,39 @@ class PusherManager: ObservableObject {
                 let participant = try JSONDecoder().decode(ParticipantJSON.self, from: data)
                 DispatchQueue.main.async {
                     self.participant = participant.data
-                    if self.participant?.type == "attendee" {
-                        self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
-                        self.pushNotifications.registerForRemoteNotifications()
-                        try! self.pushNotifications.addDeviceInterest(interest: self.channelName)
+                    if participant.status ?? false {
+                        try! self.pushNotifications.addDeviceInterest(interest: "\(self.channelName)-\(participant.data!.type!)")
+                    }
+                    if participant.data?.type == "attendee" {
+                        let myChannel = self.pusher.subscribe(self.channelName)
+                        myChannel.bind(eventName: "keypad", eventCallback: { (event: PusherEvent) -> Void in
+                            if let data: String = event.data{
+                                do{
+                                    if self.participant?.type == "attendee" {
+                                        let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
+                                        self.keypadHallId = pusherJson.hall_id!
+                                        self.isKeypadPresented = pusherJson.on_vote!
+                                    }
+                                }
+                                catch {
+                                    print(error)
+                                }
+                            }
+                        })
+                        myChannel.bind(eventName: "debate", eventCallback: { (event: PusherEvent) -> Void in
+                            if let data: String = event.data {
+                                do{
+                                    if self.participant?.type == "attendee" {
+                                        let pusherJson = try JSONDecoder().decode(PusherJSON.self, from: Data(data.utf8))
+                                        self.debateHallId = pusherJson.hall_id!
+                                        self.isDebatePresented = pusherJson.on_vote!
+                                    }
+                                }
+                                catch {
+                                    print(error)
+                                }
+                            }
+                        })
                     }
                 }
             } catch {
