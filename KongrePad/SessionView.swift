@@ -13,6 +13,7 @@ struct SessionView : View {
     @Environment(\.presentationMode) var pm
     @State var pdfURL: URL?
     @State var document: Document?
+    @State var participant: Participant?
     @State var session: Session?
     @State var bannerName : String = ""
     @State var isLoading : Bool = true
@@ -71,7 +72,7 @@ struct SessionView : View {
                     }
                     ZStack(alignment: .center){
                         Rectangle().frame(width: screen_width, height: screen_height*0.1).foregroundColor(AppColors.bgBlue)
-                        if(self.pdfURL != nil){
+                        if(self.session != nil && self.participant?.type == "attendee"){
                             NavigationLink(destination: AskQuestionView(hallId: $hallId)){
                                 HStack{
                                     Image(systemName: "questionmark")
@@ -80,14 +81,13 @@ struct SessionView : View {
                                     Text("Soru Sor")
                                         .foregroundColor(Color.white)
                                 }.padding()
-                                .padding(.leading, 20)
-                                .padding(.trailing, 20)
-                                .background(AppColors.buttonRed)
-                                .cornerRadius(10)
+                                    .padding(.leading, 20)
+                                    .padding(.trailing, 20)
+                                    .background(AppColors.buttonRed)
+                                    .cornerRadius(10)
                             }
                         }
                     }.shadow(radius: 6)
-                    
                 }.ignoresSafeArea(.all, edges: .bottom).background(AppColors.bgBlue)
             }
             
@@ -96,6 +96,7 @@ struct SessionView : View {
         .task{
             getSession()
             getDocument()
+            getParticipant()
         }
     }
     func getDocument(){
@@ -148,6 +149,30 @@ struct SessionView : View {
                 let session = try JSONDecoder().decode(SessionJSON.self, from: data)
                 DispatchQueue.main.async {
                     self.session = session.data
+                }
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    func getParticipant(){
+        guard let url = URL(string: "https://app.kongrepad.com/api/v1/participant") else {
+            return
+        }
+        
+        var request2 = URLRequest(url: url)
+        
+        request2.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+        request2.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request2) {data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do{
+                let participant = try JSONDecoder().decode(ParticipantJSON.self, from: data)
+                DispatchQueue.main.async {
+                    self.participant = participant.data
                 }
             } catch {
                 print(error)

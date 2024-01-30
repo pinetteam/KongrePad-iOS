@@ -16,6 +16,7 @@ struct LoginView: View {
     @State var goToMainPage = false
     @State var scanError : String = ""
     @EnvironmentObject var alertManager: AlertManager
+    @EnvironmentObject var pusherManager: PusherManager
     
     var scannerSheet : some View {
         CodeScannerView(codeTypes: [.qr], completion: {
@@ -50,6 +51,7 @@ struct LoginView: View {
                         self.goToMainPage = true
                         userDefault.set(token, forKey: "token")
                         userDefault.synchronize()
+                        getMeeting()
                         self.scanError = ""
                     } catch {
                         print(error)
@@ -172,10 +174,35 @@ struct LoginView: View {
         }
         
     }
+    
+    func getMeeting() {
+        
+            guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
+                return
+            }
+            
+            var request = URLRequest(url: url)
+            
+            request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            URLSession.shared.dataTask(with: request) {data, _, error in
+                guard let data = data, error == nil else {
+                    return
+                }
+                
+                do{
+                    let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
+                    pusherManager.setChannel("meeting-\(String(describing: meeting.data!.id!))")
+                } catch {
+                    print(error)
+                }
+            }.resume()
+    }
 }
 struct loginWithCode: View {
     @Binding var goToMainPage: Bool
     @EnvironmentObject var alertManager: AlertManager
+    @EnvironmentObject var pusherManager: PusherManager
     @State var isPresentingKvkk = false
     @State var code: String = ""
     @Binding var scanError: String
@@ -295,11 +322,36 @@ struct loginWithCode: View {
                 self.goToMainPage = true
                 userDefault.set(token, forKey: "token")
                 userDefault.synchronize()
+                getMeeting()
                 self.scanError = ""
                 dismiss()
             } catch {
                 print(error)
             }
         }.resume()
+    }
+    
+    func getMeeting() {
+        
+            guard let url = URL(string: "https://app.kongrepad.com/api/v1/meeting") else {
+                return
+            }
+            
+            var request = URLRequest(url: url)
+            
+            request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            URLSession.shared.dataTask(with: request) {data, _, error in
+                guard let data = data, error == nil else {
+                    return
+                }
+                
+                do{
+                    let meeting = try JSONDecoder().decode(MeetingJSON.self, from: data)
+                    pusherManager.setChannel("meeting-\(String(describing: meeting.data!.id!))")
+                } catch {
+                    print(error)
+                }
+            }.resume()
     }
 }

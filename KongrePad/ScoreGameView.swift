@@ -29,7 +29,6 @@ struct ScoreGameView: View {
                 }
                 
                 var request = URLRequest(url: url)
-                
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.addValue("Bearer \(UserDefaults.standard.string(forKey: "token")!)", forHTTPHeaderField: "Authorization")

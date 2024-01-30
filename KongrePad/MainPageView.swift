@@ -111,7 +111,7 @@ struct MainPageView: View{
                     Spacer()
                     VStack(alignment: .center){
                         HStack{
-                            NavigationLink(destination: SessionView(hallId: $hallId), isActive: $goToSession){
+                            NavigationLink(destination: SessionView(participant: self.participant, hallId: $hallId), isActive: $goToSession){
                                 VStack(alignment: .center){
                                     Image(systemName: "play.fill")
                                         .resizable()
@@ -296,7 +296,6 @@ struct MainPageView: View{
                     self.meeting = meeting.data
                     self.bannerName = "\(String(describing: meeting.data!.banner_name ?? "")).\(String(describing: meeting.data!.banner_extension ?? ""))"
                 }
-                pusherManager.setChannel("meeting-\(String(describing: meeting.data!.id!))")
             } catch {
                 let userDefault = UserDefaults.standard
                 userDefault.set(nil, forKey: "token")

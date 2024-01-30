@@ -9,7 +9,10 @@ import SwiftUI
 
 struct AnnouncementsView: View{
     @Environment(\.presentationMode) var pm
+    @EnvironmentObject var alertManager: AlertManager
     @State var announcements: [Announcement]?
+    @State var back: Bool = false
+    @State var isPresented: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -19,15 +22,17 @@ struct AnnouncementsView: View{
                 VStack(alignment: .center, spacing: 0){
                     ZStack{
                     HStack(alignment: .center){
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20)).bold().padding(8)
-                            .foregroundColor(AppColors.notificationsRed)
-                            .background(
-                                Circle().fill(.white)
-                            )
-                            .onTapGesture {
-                                pm.wrappedValue.dismiss()
-                            }.frame(width: screen_width*0.1)
+                        NavigationLink(destination: MainPageView(), isActive: $back){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20)).bold().padding(8)
+                                .foregroundColor(AppColors.notificationsRed)
+                                .background(
+                                    Circle().fill(.white)
+                                )
+                                .onTapGesture {
+                                    self.back = true
+                                }.frame(width: screen_width*0.1)
+                        }
                         Spacer()
                     }
                     Text("Duyurular")
@@ -70,6 +75,9 @@ struct AnnouncementsView: View{
                         .cornerRadius(10)
                         .onTapGesture {
                             UIApplication.shared.applicationIconBadgeNumber = 0
+                            self.isPresented = true
+                        }.alert(isPresented: $isPresented){
+                            Alert(title: Text("Başarılı"), message: Text("Tüm duyuruları okundu!"), dismissButton: .default(Text("Tamam")))
                         }
                     }
                     .overlay(Rectangle().frame(width: nil, height: 1, alignment: .top).foregroundColor(Color.gray), alignment: .top).shadow(radius: 6)

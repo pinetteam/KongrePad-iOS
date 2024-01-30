@@ -113,9 +113,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     let pushNotifications = PushNotifications.shared
     @ObservedObject var pusherManager = PusherManager.shared
+    @StateObject var alertManager = AlertManager.shared
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328") // Can be found here: https://dash.pusher.com
+        self.pushNotifications.start(instanceId: "8dedc4bd-d0d1-4d83-825f-071ab329a328")
         self.pushNotifications.registerForRemoteNotifications()
         try! self.pushNotifications.addDeviceInterest(interest: "debug-kongrepad")
 
@@ -142,14 +143,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else if userData?.event == "keypad" {
             pusherManager.keypadHallId = userData?.hall_id ?? 0
             pusherManager.isKeypadPresented = true
+        } else if userData?.event == "announcement" {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                let window = windowScene.windows.first!
+                window.rootViewController = UIHostingController(rootView: AnnouncementsView())
+            }
         }
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Remote notification support is unavailable due to error: \(error.localizedDescription)")
     }
-    
-    
     
     class PusherBeamsJSON : Codable, Identifiable{
         
@@ -183,7 +187,7 @@ struct KongrePadApp: App {
                 }.alert(isPresented: $alertManager.isPresented){
                     Alert(title: Text(alertManager.title), message: Text(alertManager.text), dismissButton: .default(Text("Tamam")))
                 }
-                
+            
         }
     }
 }
