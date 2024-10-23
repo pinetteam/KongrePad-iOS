@@ -87,7 +87,7 @@ struct SendMailView : View {
                                         .padding()
                                 if program.chairs?.count != 0{
                                 Text(getChairs(program: program).dropLast())
-                                    .foregroundColor(Color.gray)
+                                    .foregroundColor(Color.black)
                                     .font(.footnote)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -95,7 +95,7 @@ struct SendMailView : View {
                                 }
                                     if program.description != nil{
                                             Text(program.description!)
-                                                .foregroundColor(Color.gray)
+                                                .foregroundColor(Color.black)
                                                 .font(.footnote)
                                                 .fixedSize(horizontal: false, vertical: true)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -161,7 +161,7 @@ struct SendMailView : View {
                                         .padding()
                                         if session.description != nil{
                                         Text(session.description!)
-                                            .foregroundColor(Color.gray)
+                                            .foregroundColor(Color.black)
                                             .font(.footnote)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .fixedSize(horizontal: false, vertical: true)
@@ -169,7 +169,7 @@ struct SendMailView : View {
                                         }
                                         if session.speaker_name != nil{
                                             Text("Konuşmacı: \(session.speaker_name!)")
-                                                .foregroundColor(Color.gray)
+                                                .foregroundColor(Color.black)
                                                 .font(.footnote)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .padding([.bottom, .trailing, .leading])
@@ -219,7 +219,7 @@ struct SendMailView : View {
                                             .padding([.top, .bottom, .trailing, .leading])
                                         if debate.description != nil{
                                             Text(debate.description!)
-                                                .foregroundColor(Color.gray)
+                                                .foregroundColor(Color.black)
                                                 .font(.footnote)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .fixedSize(horizontal: false, vertical: true)

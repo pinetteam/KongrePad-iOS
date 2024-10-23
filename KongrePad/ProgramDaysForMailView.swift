@@ -54,10 +54,24 @@ struct ProgramDaysForMailView: View{
                                                 .scaledToFit()
                                                 .frame(height: screen_height*0.035).foregroundColor(.black)
                                                 .padding()
-                                            Text(day.day!)
                                                 .font(.system(size: 20))
                                                 .foregroundColor(.black)
                                                 .padding()
+                                            
+                                            // API'den gelen tarih formatını Türkçe'ye çeviriyoruz
+                                            if let dayString = day.day, 
+                                                let turkishDate = getTurkishFormattedDate(from: dayString) {
+                                                Text(turkishDate)
+                                                    .font(.system(size: 20))
+                                                    .foregroundColor(.black)
+                                                    .padding()
+                                            } else {
+                                                Text("Tarih Geçersiz")
+                                                    .font(.system(size: 20))
+                                                    .foregroundColor(.red)
+                                                    .padding()
+                                            }
+                                            
                                             Spacer()
                                         }
                                         .frame(width: screen_width*0.9, height: screen_height*0.08)
@@ -165,6 +179,27 @@ struct ProgramDaysForMailView: View{
                 print(error)
             }
         }.resume()
+    }
+
+    func getTurkishFormattedDate(from dateString: String) -> String? {
+        // Tarih stringine geçici bir yıl ekliyoruz
+        let dateStringWithYear = dateString + " 2024"
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd MMMM EEEE yyyy"
+        dateFormatter.locale = Locale(identifier: "en_US")
+
+        guard let date = dateFormatter.date(from: dateStringWithYear) else {
+            print("Tarih çevirimi başarısız: \(dateStringWithYear)")
+            return nil
+        }
+
+        let turkishDateFormatter = DateFormatter()
+        turkishDateFormatter.dateFormat = "dd MMMM EEEE"
+        turkishDateFormatter.locale = Locale(identifier: "tr_TR")
+
+        let turkishDate = turkishDateFormatter.string(from: date)
+        return turkishDate.capitalized
     }
 
 }

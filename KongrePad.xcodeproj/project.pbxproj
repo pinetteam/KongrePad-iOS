@@ -38,7 +38,6 @@
 		08AB71FA2A93EA4700EA59DF /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 08AB71F92A93EA4700EA59DF /* CodeScanner */; };
 		08AB71FC2A94C68A00EA59DF /* Meeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB71FB2A94C68A00EA59DF /* Meeting.swift */; };
 		08AB8E862ACF0FC500AA15DE /* ProgramDaysForMailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08AB8E852ACF0FC500AA15DE /* ProgramDaysForMailView.swift */; };
-		08AB8E882ADC6DEB00AA15DE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08AB8E872ADC6DEB00AA15DE /* GoogleService-Info.plist */; };
 		08AB8E972ADD685D00AA15DE /* PushNotifications in Frameworks */ = {isa = PBXBuildFile; productRef = 08AB8E962ADD685D00AA15DE /* PushNotifications */; };
 		08B6E9772A96597F00F9B529 /* Participant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B6E9762A96597F00F9B529 /* Participant.swift */; };
 		08D643062AA16E1400C7E676 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D643052AA16E1400C7E676 /* Program.swift */; };
@@ -83,7 +82,6 @@
 		08AB71F72A93EA0500EA59DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		08AB71FB2A94C68A00EA59DF /* Meeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meeting.swift; sourceTree = "<group>"; };
 		08AB8E852ACF0FC500AA15DE /* ProgramDaysForMailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramDaysForMailView.swift; sourceTree = "<group>"; };
-		08AB8E872ADC6DEB00AA15DE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		08AB8E942ADC777900AA15DE /* KongrePad.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KongrePad.entitlements; sourceTree = "<group>"; };
 		08B6E9762A96597F00F9B529 /* Participant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Participant.swift; sourceTree = "<group>"; };
 		08D643052AA16E1400C7E676 /* Program.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
@@ -130,7 +128,6 @@
 			isa = PBXGroup;
 			children = (
 				08AB8E942ADC777900AA15DE /* KongrePad.entitlements */,
-				08AB8E872ADC6DEB00AA15DE /* GoogleService-Info.plist */,
 				08AB71F72A93EA0500EA59DF /* Info.plist */,
 				08AB71E02A8D223800EA59DF /* KongrePadApp.swift */,
 				08AB71E22A8D223800EA59DF /* MainPageView.swift */,
@@ -252,7 +249,6 @@
 			files = (
 				08AB71E82A8D223900EA59DF /* Preview Assets.xcassets in Resources */,
 				08AB71E52A8D223900EA59DF /* Assets.xcassets in Resources */,
-				08AB8E882ADC6DEB00AA15DE /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,7 +442,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -483,7 +479,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = tr.com.pinet.kongrepad.id;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

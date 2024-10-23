@@ -14,6 +14,7 @@ class ScoreGame : Codable, Identifiable{
     var finish_At: String?
     var title: String?
     var status: Int?
+    var theme: String?  // Yeni eklenen alan
 }
 
 class ScoreGameJSON : Codable, Identifiable{

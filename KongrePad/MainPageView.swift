@@ -73,14 +73,17 @@ struct MainPageView: View{
                                 ScrollView(.horizontal){
                                     NavigationLink(destination: VirtualStandView(pdfURL: $standPdfURL, virtualStandId: $selectedVirtualStandId), isActive: $goToVirtualStand)
                                     {
-                                        HStack(alignment: .center, spacing: 10){
-                                            ForEach(self.virtualStands ?? []){stand in
-                                                AsyncImage(url: URL(string: stand.on_hover ?? false ? "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))" : "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!))_grayscale.\(String(describing: stand.file_extension!))" )){ image in
+                                        HStack(alignment: .center, spacing: 10) {
+                                            ForEach(self.virtualStands ?? []) { stand in
+                                                AsyncImage(
+                                                    url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")
+                                                ) { image in
                                                     image
                                                         .resizable()
                                                         .aspectRatio(contentMode: .fit)
-                                                        .frame(width: 100, height:50)
-                                                        .onTapGesture{
+                                                        .frame(width: 100, height: 50)
+                                                        .shadow(color: Color.gray.opacity(0.5), radius: 10, x: 0, y: 5)
+                                                        .onTapGesture {
                                                             self.selectedVirtualStandId = stand.id!
                                                             self.goToVirtualStand = true
                                                         }
@@ -89,13 +92,13 @@ struct MainPageView: View{
                                                                 virtualStands![index].on_hover = pressing
                                                             }
                                                         }, perform: {})
-                                                    
                                                 } placeholder: {
                                                     ProgressView()
                                                 }
                                                 .scaledToFill()
                                             }
                                         }
+
                                     }.buttonStyle(EmptyButtonStyle())
                                 }
                                 Image(systemName: "chevron.right")
@@ -216,12 +219,12 @@ struct MainPageView: View{
                             NavigationLink(destination: ScoreGameView())
                             {
                                 VStack(alignment: .center){
-                                    Image(systemName: "leaf.fill")
+                                    Image(systemName: "qrcode")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(height: screen_width*0.1)
                                         .foregroundColor(.white)
-                                    Text("Doğaya Can Ver").font(.title2).foregroundColor(.white)
+                                    Text("QR Okut").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
                             }
                         }
