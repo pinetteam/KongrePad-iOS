@@ -75,14 +75,19 @@ struct MainPageView: View{
                                     {
                                         HStack(alignment: .center, spacing: 10) {
                                             ForEach(self.virtualStands ?? []) { stand in
-                                                AsyncImage(url: URL(string: stand.on_hover ?? false ? "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))" : "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!))_grayscale.\(String(describing: stand.file_extension!))" )){ image in
+                                                AsyncImage(
+                                                    url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")
+                                                ) { image in
                                                     image
                                                         .resizable()
                                                         .aspectRatio(contentMode: .fit)
                                                         .frame(width: 100, height: 50)
                                                         .shadow(color: Color.gray.opacity(0.5), radius: 10, x: 0, y: 5)
                                                         .onTapGesture {
+                                                            // PDF URL'sini ve seçilen ID'yi güncellerken aynı anda güncelle
                                                             self.selectedVirtualStandId = stand.id!
+                                                            self.standPdfURL = URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")
+                                                            // NavigationLink'i aktif et
                                                             self.goToVirtualStand = true
                                                         }
                                                         .onLongPressGesture(minimumDuration: 20, maximumDistance: 100, pressing: { pressing in
@@ -361,7 +366,7 @@ struct HallsForDocument: View {
     @Binding var goToSession: Bool
     @Binding var pdfURL: URL?
     @Binding var hallId: Int
-    @Environment(\.dismiss) var dismiss
+    @Environment (\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -472,7 +477,7 @@ struct HallsForSendMail: View {
     @State var halls: [Hall]?
     @Binding var goToProgramsForMail: Bool
     @Binding var hallId: Int
-    @Environment(\.dismiss) var dismiss
+    @Environment (\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -554,7 +559,7 @@ struct HallsForProgram: View {
     @State var halls: [Hall]?
     @Binding var goToProgram: Bool
     @Binding var hallId: Int
-    @Environment(\.dismiss) var dismiss
+    @Environment (\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -713,4 +718,3 @@ struct HallsForAskQuestion: View {
     }
     
 }
-
