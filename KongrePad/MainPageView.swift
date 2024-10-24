@@ -75,9 +75,7 @@ struct MainPageView: View{
                                     {
                                         HStack(alignment: .center, spacing: 10) {
                                             ForEach(self.virtualStands ?? []) { stand in
-                                                AsyncImage(
-                                                    url: URL(string: "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))")
-                                                ) { image in
+                                                AsyncImage(url: URL(string: stand.on_hover ?? false ? "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!)).\(String(describing: stand.file_extension!))" : "https://app.kongrepad.com/storage/virtual-stands/\(String(describing: stand.file_name!))_grayscale.\(String(describing: stand.file_extension!))" )){ image in
                                                     image
                                                         .resizable()
                                                         .aspectRatio(contentMode: .fit)
@@ -224,7 +222,7 @@ struct MainPageView: View{
                                         .scaledToFit()
                                         .frame(height: screen_width*0.1)
                                         .foregroundColor(.white)
-                                    Text("QR Okut").font(.title2).foregroundColor(.white)
+                                    Text("Puan Topla").font(.title2).foregroundColor(.white)
                                 }.frame(width: screen_width*0.42, height: screen_height*0.15).background(AppColors.buttonGreen).cornerRadius(10)
                             }
                         }
@@ -363,7 +361,7 @@ struct HallsForDocument: View {
     @Binding var goToSession: Bool
     @Binding var pdfURL: URL?
     @Binding var hallId: Int
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -474,7 +472,7 @@ struct HallsForSendMail: View {
     @State var halls: [Hall]?
     @Binding var goToProgramsForMail: Bool
     @Binding var hallId: Int
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -556,7 +554,7 @@ struct HallsForProgram: View {
     @State var halls: [Hall]?
     @Binding var goToProgram: Bool
     @Binding var hallId: Int
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -638,7 +636,7 @@ struct HallsForAskQuestion: View {
     @State var halls: [Hall]?
     @Binding var goToAskQuestion: Bool
     @Binding var hallId: Int
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in

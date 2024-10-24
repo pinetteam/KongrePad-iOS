@@ -186,7 +186,7 @@ struct PdfKitRepresentedView : UIViewRepresentable {
     
     func makeUIView(context: Context) -> some PDFView {
         let pdfView : PDFView = PDFView()
-        if let documentURL{
+        if documentURL != nil{
             pdfView.document = PDFDocument(url: self.documentURL!)
         }
         pdfView.displayDirection = .vertical
@@ -196,8 +196,9 @@ struct PdfKitRepresentedView : UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
-        if let documentURL {
-            uiView.document = PDFDocument(url: documentURL)
+        let pdfView : PDFView = PDFView()
+        if documentURL != nil{
+            pdfView.document = PDFDocument(url: self.documentURL!)
         } else {
             uiView.document = nil
         }

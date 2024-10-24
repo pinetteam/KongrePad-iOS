@@ -1,5 +1,5 @@
 import SwiftUI
-import Foundation
+import PusherSwift
 
 struct ProgramDaysView: View {
     @Environment(\.presentationMode) var pm
@@ -46,20 +46,11 @@ struct ProgramDaysView: View {
                                                     .scaledToFit()
                                                     .frame(height: screen_height * 0.035).foregroundColor(.black)
                                                     .padding()
-                                                
-                                                // API'den gelen tarih formatını Türkçe'ye çeviriyoruz
-                                                if let dayString = day.day, let turkishDate = getTurkishFormattedDate(from: dayString) {
-                                                    Text(turkishDate)
-                                                        .font(.system(size: 20))
-                                                        .foregroundColor(.black)
-                                                        .padding()
-                                                } else {
-                                                    Text("Tarih Geçersiz")
-                                                        .font(.system(size: 20))
-                                                        .foregroundColor(.red)
-                                                        .padding()
-                                                }
-                                                
+                                                Text(day.day!)
+                                                    .font(.system(size: 20))
+                                                    .foregroundColor(.black)
+                                                    .padding()
+
                                                 Spacer()
                                             }
                                             .frame(width: screen_width * 0.9, height: screen_height * 0.08)
@@ -91,6 +82,7 @@ struct ProgramDaysView: View {
 
     func getPrograms() {
         self.isLoading = true
+        @State var isLoading : Bool = true
         guard let url = URL(string: "https://app.kongrepad.com/api/v1/hall/\(self.hallId)/program") else {
             return
         }
@@ -109,32 +101,11 @@ struct ProgramDaysView: View {
                     self.programDays = programs.data
                 }
             } catch {
-                print("JSON Decode Hatası: \(error)")
+                print(error)
             }
             DispatchQueue.main.async {
                 self.isLoading = false
             }
         }.resume()
-    }
-
-    func getTurkishFormattedDate(from dateString: String) -> String? {
-        // Tarih stringine geçici bir yıl ekliyoruz
-        let dateStringWithYear = dateString + " 2024"
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd MMMM EEEE yyyy"
-        dateFormatter.locale = Locale(identifier: "en_US")
-
-        guard let date = dateFormatter.date(from: dateStringWithYear) else {
-            print("Tarih çevirimi başarısız: \(dateStringWithYear)")
-            return nil
-        }
-        
-        let turkishDateFormatter = DateFormatter()
-        turkishDateFormatter.dateFormat = "dd MMMM EEEE"
-        turkishDateFormatter.locale = Locale(identifier: "tr_TR")
-
-        let turkishDate = turkishDateFormatter.string(from: date)
-        return turkishDate.capitalized
     }
 }

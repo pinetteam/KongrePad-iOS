@@ -157,7 +157,7 @@ struct LoginView: View {
                         }.sheet(isPresented: $isPresentingLoginWithCode){
                             loginWithCode(goToMainPage: $goToMainPage, scanError: $scanError)
                         }
-                        Text("v1.3.0").font(.footnote).foregroundColor(.black)
+                        Text("v1.3.3").font(.footnote).foregroundColor(.black)
                     }.padding()
                 }.frame(width: screen_width, height: screen_height)
                     .background(AppColors.bgBlue)
@@ -206,7 +206,7 @@ struct loginWithCode: View {
     @State var isPresentingKvkk = false
     @State var code: String = ""
     @Binding var scanError: String
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in

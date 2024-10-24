@@ -131,7 +131,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.pushNotifications.handleNotification(userInfo: userInfo)
         var userData :PusherBeamsJSON?
         do {
-            let data = try JSONSerialization.data(withJSONObject: userInfo["data"], options: [])
+            let data = try JSONSerialization.data(withJSONObject: userInfo["data"]!, options: [])
             userData = try JSONDecoder().decode(PusherBeamsJSON.self, from: data)
         } catch {
             print(error)

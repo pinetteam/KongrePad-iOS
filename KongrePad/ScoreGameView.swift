@@ -50,7 +50,7 @@ struct ScoreGameView: View {
                             self.scanError = response.errors![0]
                             return
                         }
-                        self.scanError = "Tebrikler!"
+                        self.scanError = "Tebrikler! Başarıyla puanı topladınız!"
                         self.is_scanned = true
                         getPoints()
                     } catch {
@@ -90,31 +90,25 @@ struct ScoreGameView: View {
                                 }.frame(width: screen_width*0.1)
                             Spacer()
                         }
-                        Text("QR Okut")
+                        Text("Puan Topla")
                             .foregroundColor(Color.white).font(.title)
                             .frame(width: screen_width*0.7, height: screen_height*0.1)
                             .multilineTextAlignment(.center)
                     }.padding().frame(width: screen_width).background(AppColors.bgBlue)
                         .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(Color.gray), alignment: .bottom)
-                    ZStack {
-                        
-                        Image(systemName: "qrcode")
+                    ZStack{
+                        Image("skor_oyunu")
+                            .renderingMode(.template)
                             .resizable()
-                            .scaledToFit()
-                            .frame(width: screen_width * 0.6, height: screen_width * 0.6)
+                            .frame(width: screen_width*0.6, height: screen_width*0.6)
                             .foregroundColor(AppColors.sendButtonGreen)
-                        
-                        Image(systemName: "qrcode")
+                        Image("skor_oyunu")
+                            .renderingMode(.template)
                             .resizable()
-                            .scaledToFit()
-                            .frame(width: screen_width * 0.6, height: screen_width * 0.6)
+                            .frame(width: screen_width*0.6, height: screen_width*0.6)
                             .foregroundColor(Color.gray)
-                            .mask(
-                                Rectangle()
-                                    .padding(.bottom, screen_width * 0.006 * CGFloat(total_point * 100 / (scoreGame?.total_point ?? 1)))
-                            )
+                            .mask(Rectangle().padding(.bottom, screen_width*0.006*CGFloat(total_point * 100 / (scoreGame?.total_point ?? 1))))
                     }
-
                     Text("\(total_point) puan")
                         .font(.largeTitle).bold()
                         .foregroundColor(AppColors.sendButtonGreen)
@@ -211,7 +205,7 @@ struct ScoreGameView: View {
 
 struct ScoreGamePointsView: View {
     @Binding var scoreGamePoints: [ScoreGamePoint]?
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in

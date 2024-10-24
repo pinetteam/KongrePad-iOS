@@ -32,7 +32,7 @@ struct KeypadView: View {
     @State var response: String?
     @State var success: Bool?
     @State var keypad: Keypad?
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -165,7 +165,7 @@ struct DebateView: View {
     @State var response: String?
     @State var success: Bool?
     @State var isLoading: Bool = true
-    @Environment (\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     var body: some View{
         NavigationStack{
             GeometryReader{ geometry in
@@ -319,4 +319,3 @@ struct EmptyButtonStyle: ButtonStyle {
         configuration.label
     }
 }
-
